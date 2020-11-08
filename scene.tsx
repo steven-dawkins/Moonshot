@@ -1,11 +1,11 @@
-import React = require("react");
+import * as React from 'react';
 
 import {
-    WebGLRenderer, Camera, Scene, TextureLoader, OrthographicCamera, PlaneGeometry, Texture,
-    MeshBasicMaterial, Mesh, Object3D, Vector3, MeshPhongMaterial, PointLight
-} from "three";
+    WebGLRenderer, Scene, TextureLoader, OrthographicCamera, PlaneGeometry, Texture,
+    MeshBasicMaterial, Mesh, Object3D, Vector3} from "three";
 
 import myImage from "./assets/image1.png";
+import { Typist } from './src/typist';
 
 export function InitWebgl(parent: HTMLDivElement)
 {
@@ -19,8 +19,6 @@ export function InitWebgl(parent: HTMLDivElement)
     var camera = new OrthographicCamera(0, WIDTH, HEIGHT, 0, NEAR, FAR);
     camera =  new OrthographicCamera( WIDTH / - 2, WIDTH / 2, HEIGHT / 2, HEIGHT / - 2, 1, 1000 );
     camera.zoom = 0.2;
-    //const gui = new GUI();
-    //gui.add(camera, 'zoom', 0.01, 1, 0.01).listen();
 
     camera.setRotationFromAxisAngle(new Vector3(0, 0, 1), 0.0);
     const scene = new Scene();
@@ -29,7 +27,6 @@ export function InitWebgl(parent: HTMLDivElement)
     const texture: Texture = loader.load("./" + myImage);
 
     const material = new MeshBasicMaterial({ map: texture });
-    //const material = new MeshPhongMaterial({color: 0xCC0000});
 
     camera.position.z = 200;
 
@@ -46,17 +43,11 @@ export function InitWebgl(parent: HTMLDivElement)
 
     scene.add(mesh);
 
-    // const pointLight: PointLight = new PointLight(0xFFFFFF);
-    // pointLight.position.x = 50;
-    // pointLight.position.y = 50;
-    // pointLight.position.z = 130;
-    // scene.add(pointLight);
-
     var i = 0.0;
 
     function webglRender(): void {
-      console.log("webglrender");
-      mesh.position.setX(i += 0.1);
+      //mesh.position.setX(i += 0.1);
+      mesh.position.setX(typist.Position * 10);
       mesh.position.setY(0);
       mesh.setRotationFromAxisAngle(new Vector3(0, 0, 1), 0);
       
@@ -64,9 +55,35 @@ export function InitWebgl(parent: HTMLDivElement)
       renderer.render(scene, camera);
       window.requestAnimationFrame(webglRender);
     }
+
+    var typist = new Typist("Lorem ipsum");
+    window.addEventListener("keydown", (evt : KeyboardEvent) => {
+      
+      if (evt.key.length <= 1 && isAlphaNumeric(evt.key))
+      {
+        typist.ProcessCharacter(evt.key);
+      }
+
+      return true;
+    });
   
     webglRender();
 }
+
+function isAlphaNumeric(str: string) {
+  var code, i, len;
+
+  for (i = 0, len = str.length; i < len; i++) {
+    code = str.charCodeAt(i);
+    if (!(code > 47 && code < 58) && // numeric (0-9)
+        !(code > 64 && code < 91) && // upper alpha (A-Z)
+        !(code > 96 && code < 123) &&
+        !(str === " ")) { // lower alpha (a-z)
+      return false;
+    }
+  }
+  return true;
+};
 
 export class WebGlScene extends React.Component {
     private el: HTMLDivElement | null = null;
