@@ -2,9 +2,10 @@ import * as React from 'react';
 
 import {
     WebGLRenderer, Scene, TextureLoader, OrthographicCamera, PlaneGeometry, Texture,
-    MeshBasicMaterial, Mesh, Object3D, Vector3} from "three";
+    MeshBasicMaterial, Mesh, Object3D, Vector3, Vector2, ShaderMaterial} from "three";
 
 import myImage from "./assets/image1.png";
+import starImage from "./assets/star.png";
 import { Typist } from './src/typist';
 
 export function InitWebgl(parent: HTMLDivElement)
@@ -15,18 +16,55 @@ export function InitWebgl(parent: HTMLDivElement)
         NEAR = 0.1,
         FAR = 10000;
 
-    const renderer = new WebGLRenderer();
+    const renderer = new WebGLRenderer({  });
+    renderer.autoClear = true;
+    renderer.autoClearColor = true;
+
     var camera = new OrthographicCamera(0, WIDTH, HEIGHT, 0, NEAR, FAR);
-    camera =  new OrthographicCamera( WIDTH / - 2, WIDTH / 2, HEIGHT / 2, HEIGHT / - 2, 1, 1000 );
-    camera.zoom = 0.2;
 
     camera.setRotationFromAxisAngle(new Vector3(0, 0, 1), 0.0);
     const scene = new Scene();
 
     const loader: TextureLoader = new TextureLoader();
     const texture: Texture = loader.load("./" + myImage);
+    const starTexture: Texture = loader.load("./" + starImage);
+    const starMaterial = new MeshBasicMaterial({ map: starTexture, alphaMap: starTexture });
 
-    const material = new MeshBasicMaterial({ map: texture });
+    // const material = new MeshBasicMaterial({ map: texture });
+
+    const uniforms = {
+      time: { type: "f", value: 1.0 },
+      resolution: { type: "v2", value: new Vector2() },
+      //texture: starTexture
+    };
+
+    var material1 = new ShaderMaterial({
+      uniforms: uniforms,
+      vertexShader: 
+      `uniform float time;
+      uniform vec2 resolution;
+      void main()	{
+          gl_Position = vec4( position, 1.0 );
+          gl_Position = projectionMatrix *
+          modelViewMatrix *
+          vec4(position,1.0);
+      }`,
+      fragmentShader:
+      `uniform float time;
+      uniform vec2 resolution;
+      void main()	{
+          float x = mod(time + gl_FragCoord.x, 30.) - 15.;
+          float y = mod(time + gl_FragCoord.y, 30.) - 15.;
+          //float r = distance(vec2(x,y), vec2(0.,0.)) / 20.;
+          float r = (abs(x * x * x) + abs(y * y * y)) / 1000.;
+          gl_FragColor = vec4(1. - r, 0., 0., 1.);
+      }
+      `
+    });
+
+    const material2 = new MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.5 });
+
+    const material = material1;
 
     camera.position.z = 200;
 
@@ -41,17 +79,36 @@ export function InitWebgl(parent: HTMLDivElement)
 
     mesh.setRotationFromAxisAngle(new Vector3(0, 0, 1), 0);
 
+
     scene.add(mesh);
+
+    for(var i = 0; i < 40; i++)
+    {
+      const geometry: PlaneGeometry = new PlaneGeometry(40, 40);
+
+      const mesh2: Object3D = new Mesh(geometry, starMaterial)
+                                .translateX(Math.random() * WIDTH)
+                                .translateY(Math.random() * HEIGHT);
+
+      mesh2.setRotationFromAxisAngle(new Vector3(0, 0, 1), 0);
+
+      scene.add(mesh2);
+    }
 
     var i = 0.0;
 
+    var startTime = Date.now();
     function webglRender(): void {
+      var elapsedMilliseconds = Date.now() - startTime;
+      var elapsedSeconds = elapsedMilliseconds / 1000.;
+      //uniforms.time.value = 60. * elapsedSeconds;
+
       //mesh.position.setX(i += 0.1);
       mesh.position.setX(typist.Position * 10);
       mesh.position.setY(0);
       mesh.setRotationFromAxisAngle(new Vector3(0, 0, 1), 0);
       
-      renderer.setViewport( 0, 0, WIDTH / 2, HEIGHT );
+      renderer.setViewport( 0, 0, WIDTH, HEIGHT );
       renderer.render(scene, camera);
       window.requestAnimationFrame(webglRender);
     }
