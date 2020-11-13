@@ -2,9 +2,10 @@ import * as React from 'react';
 
 import {
     WebGLRenderer, Scene, TextureLoader, OrthographicCamera, PlaneGeometry, Texture,
-    MeshBasicMaterial, Mesh, Object3D, Vector3, Vector2, ShaderMaterial} from "three";
+    MeshBasicMaterial, Mesh, Object3D, Vector3, Vector2, ShaderMaterial, FontLoader, TextGeometry, MeshPhongMaterial} from "three";
 
 import myImage from "./assets/image1.png";
+import rocketImage from "./assets/onlyrocket.png";
 import starImage from "./assets/star.png";
 import { Typist } from './src/typist';
 
@@ -28,7 +29,9 @@ export function InitWebgl(parent: HTMLDivElement)
     const loader: TextureLoader = new TextureLoader();
     const texture: Texture = loader.load("./" + myImage);
     const starTexture: Texture = loader.load("./" + starImage);
-    const starMaterial = new MeshBasicMaterial({ map: starTexture, alphaMap: starTexture });
+    const rocketTexture: Texture = loader.load("./" + rocketImage);
+    const starMaterial = new MeshBasicMaterial({ map: starTexture/*, alphaMap: starTexture*/, transparent: true });
+    const rocketMaterial = new MeshBasicMaterial({ map: rocketTexture/*, alphaMap: rocketTexture*/, transparent: true });
 
     // const material = new MeshBasicMaterial({ map: texture });
 
@@ -75,7 +78,7 @@ export function InitWebgl(parent: HTMLDivElement)
     const geometry: PlaneGeometry = new PlaneGeometry(100, 100);
     // geometry.translate(50, 50, 0);
 
-    const mesh: Object3D = new Mesh(geometry, material).translateX(0).translateY(0);
+    const mesh: Object3D = new Mesh(geometry, rocketMaterial).translateX(0).translateY(0);
 
     mesh.setRotationFromAxisAngle(new Vector3(0, 0, 1), 0);
 
@@ -95,6 +98,29 @@ export function InitWebgl(parent: HTMLDivElement)
       scene.add(mesh2);
     }
 
+
+    const fontLoader = new FontLoader();
+
+    fontLoader.load( 'assets/helvetiker_regular.typeface.json', function ( font ) {
+
+      const geometry = new TextGeometry( 'Hello three.js!', {
+        font: font,
+        size: 60,
+        height: 5,
+        curveSegments: 12,
+        bevelEnabled: true,
+        bevelThickness: 10,
+        bevelSize: 8,
+        bevelOffset: 0,
+        bevelSegments: 5
+      } );
+    
+      var textMesh = new Mesh( geometry, material2 );
+      textMesh.translateY(100);
+
+      scene.add(textMesh);
+    } );
+
     var i = 0.0;
 
     var startTime = Date.now();
@@ -104,9 +130,10 @@ export function InitWebgl(parent: HTMLDivElement)
       //uniforms.time.value = 60. * elapsedSeconds;
 
       //mesh.position.setX(i += 0.1);
-      mesh.position.setX(typist.Position * 10);
-      mesh.position.setY(0);
-      mesh.setRotationFromAxisAngle(new Vector3(0, 0, 1), 0);
+      mesh.position.setX(typist.Position * 30 + 50);
+      mesh.position.setY(typist.Position * 30 + 50);
+      mesh.position.setZ(50);
+      mesh.setRotationFromAxisAngle(new Vector3(0, 0, 1), -Math.PI/4);
       
       renderer.setViewport( 0, 0, WIDTH, HEIGHT );
       renderer.render(scene, camera);

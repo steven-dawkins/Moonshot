@@ -7,6 +7,14 @@
     "test": "mocha -r ts-node/register tests/**/*.test.ts",
     "coverage": "nyc -r lcov -e .ts -x \"*.test.ts\" npm run test"
   },
+  "staticFiles": {
+    "staticPath": [
+      {
+        "staticPath": "assets",
+        "staticOutDir": "assets/"
+      }
+    ]
+  },
   "license": "MIT",
   "devDependencies": {
     "@types/chai": "^4.2.14",
@@ -20,6 +28,7 @@
     "typescript": "^4.0.5"
   },
   "dependencies": {
+    "parcel-plugin-static-files-copy": "^2.5.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "three": "^0.122.0"
