@@ -2,14 +2,15 @@ import * as React from 'react';
 
 import {
     WebGLRenderer, Scene, TextureLoader, OrthographicCamera, PlaneGeometry, Texture,
-    MeshBasicMaterial, Mesh, Object3D, Vector3, Vector2, ShaderMaterial, FontLoader, TextGeometry, MeshPhongMaterial} from "three";
+    MeshBasicMaterial, Mesh, Object3D, Vector3, Vector2, ShaderMaterial, FontLoader, TextGeometry} from "three";
 
-import myImage from "./assets/image1.png";
 import rocketImage from "./assets/onlyrocket.png";
 import starImage from "./assets/star.png";
+import moonImage from "./assets/moon-0000010.png";
+
 import { Typist } from './src/typist';
 
-export function InitWebgl(parent: HTMLDivElement)
+export function InitWebgl(parent: HTMLDivElement, typist: Typist)
 {
     console.log("init webgl");
     const WIDTH = 700,
@@ -27,11 +28,12 @@ export function InitWebgl(parent: HTMLDivElement)
     const scene = new Scene();
 
     const loader: TextureLoader = new TextureLoader();
-    const texture: Texture = loader.load("./" + myImage);
     const starTexture: Texture = loader.load("./" + starImage);
     const rocketTexture: Texture = loader.load("./" + rocketImage);
-    const starMaterial = new MeshBasicMaterial({ map: starTexture/*, alphaMap: starTexture*/, transparent: true });
-    const rocketMaterial = new MeshBasicMaterial({ map: rocketTexture/*, alphaMap: rocketTexture*/, transparent: true });
+    const moonTexture: Texture = loader.load("./" + moonImage);
+    const starMaterial = new MeshBasicMaterial({ map: starTexture, transparent: true });
+    const rocketMaterial = new MeshBasicMaterial({ map: rocketTexture, transparent: true });
+    const moonMaterial = new MeshBasicMaterial({ map: moonTexture, transparent: true });
 
     // const material = new MeshBasicMaterial({ map: texture });
 
@@ -82,8 +84,14 @@ export function InitWebgl(parent: HTMLDivElement)
 
     mesh.setRotationFromAxisAngle(new Vector3(0, 0, 1), 0);
 
-
     scene.add(mesh);
+
+    const moonGeometry: PlaneGeometry = new PlaneGeometry(100, 100);
+    const moon: Object3D = new Mesh(moonGeometry, moonMaterial).translateX(600).translateY(500);
+
+    moon.setRotationFromAxisAngle(new Vector3(0, 0, 1), 0);
+
+    scene.add(moon);
 
     for(var i = 0; i < 40; i++)
     {
@@ -129,9 +137,8 @@ export function InitWebgl(parent: HTMLDivElement)
       var elapsedSeconds = elapsedMilliseconds / 1000.;
       //uniforms.time.value = 60. * elapsedSeconds;
 
-      //mesh.position.setX(i += 0.1);
-      mesh.position.setX(typist.Position * 30 + 50);
-      mesh.position.setY(typist.Position * 30 + 50);
+      mesh.position.setX(typist.Position * (WIDTH - 200) + 50);
+      mesh.position.setY(typist.Position * (HEIGHT - 200) + 50);
       mesh.position.setZ(50);
       mesh.setRotationFromAxisAngle(new Vector3(0, 0, 1), -Math.PI/4);
       
@@ -139,17 +146,6 @@ export function InitWebgl(parent: HTMLDivElement)
       renderer.render(scene, camera);
       window.requestAnimationFrame(webglRender);
     }
-
-    var typist = new Typist("Lorem ipsum");
-    window.addEventListener("keydown", (evt : KeyboardEvent) => {
-      
-      if (evt.key.length <= 1 && isAlphaNumeric(evt.key))
-      {
-        typist.ProcessCharacter(evt.key);
-      }
-
-      return true;
-    });
   
     webglRender();
 }
@@ -169,21 +165,46 @@ function isAlphaNumeric(str: string) {
   return true;
 };
 
-export class WebGlScene extends React.Component {
+export class WebGlScene extends React.Component<{typist: Typist}, {typist: Typist}> {
     private el: HTMLDivElement | null = null;
+
+    constructor(props: {typist: Typist})
+    {
+      super(props);
+      
+      this.state = { typist: props.typist };
+
+      this.onKeyDown = this.onKeyDown.bind(this);
+    }
+
+    onKeyDown(evt: KeyboardEvent) {
+      if (evt.key.length <= 1 && isAlphaNumeric(evt.key))
+      {
+        this.state.typist.ProcessCharacter(evt.key);
+        this.setState({ typist: this.state.typist });
+      }
+
+      return true;
+    }
   
     componentDidMount() {
-      if (this.el !== null)
+      if (this.el !== null && this.state.typist != null)
       {
-        InitWebgl(this.el, );
+        window.addEventListener("keydown", this.onKeyDown);
+
+        InitWebgl(this.el, this.state.typist);
       }
     }
   
     componentWillUnmount() {
       // this.engine.destroy();
+      window.removeEventListener("keydown", this.onKeyDown);
     }
   
     render() {
-      return <div ref={el => this.el = el} />;
+      return <div>
+          <div><span style={{color: "red"}}>{this.state.typist.TypedText}</span>|<span>{this.state.typist.UnTypedText}</span></div>
+          <div ref={el => this.el = el} />
+        </div>;
     }
   }
