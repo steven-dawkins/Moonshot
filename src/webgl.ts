@@ -1,6 +1,6 @@
 import {
     WebGLRenderer, Scene, TextureLoader, OrthographicCamera, PlaneGeometry, Texture,
-    MeshBasicMaterial, Mesh, Object3D, Vector3, Vector2, ShaderMaterial, FontLoader, TextGeometry} from "three";
+    MeshBasicMaterial, Mesh, Object3D, Vector3, Vector2, ShaderMaterial, FontLoader, TextGeometry, Material} from "three";
 
 import rocketImage from "../assets/onlyrocket.png";
 import starImage from "../assets/star.png";
@@ -8,6 +8,9 @@ import moonImage from "../assets/moon-0000010.png";
 
 import starShader from "../assets/shaders/star.vert";
 import starFragShader from "../assets/shaders/star.frag";
+
+import backgroundShader from "../assets/shaders/background.vert";
+import backgroundFragShader from "../assets/shaders/background.frag";
 
 import { Typist } from "./typist";
 
@@ -36,12 +39,11 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist)
     const rocketMaterial = new MeshBasicMaterial({ map: rocketTexture, transparent: true });
     const moonMaterial = new MeshBasicMaterial({ map: moonTexture, transparent: true });
 
-    // const material = new MeshBasicMaterial({ map: texture });
 
     const uniforms = {
       time: { type: "f", value: 1.0 },
+      offset: { type: "f", value: 0.0 },
       resolution: { type: "v2", value: new Vector2() },
-      //texture: starTexture
       map: { type:"t", value: 0, texture: starTexture } 
     };
 
@@ -51,7 +53,8 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist)
       defines: { USE_MAP: '' },
       uniforms: uniforms,
       vertexShader: starShader,
-      fragmentShader: starFragShader
+      fragmentShader: starFragShader,
+      transparent: true
     });
 
     material1.uniforms.map.value = starTexture;
@@ -66,6 +69,24 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist)
 
     parent.appendChild(renderer.domElement);
 
+    const backgroundUniforms = {
+      u_time: { type: "f", value: 1.0 },
+      u_resolution: { type: "v2", value: new Vector2(WIDTH, HEIGHT) },
+      u_mouse: { type: "v2", value: new Vector2() }
+    };
+
+    var backgroundMaterial = new ShaderMaterial({
+      defines: { USE_MAP: '' },
+      uniforms: backgroundUniforms,
+      vertexShader: backgroundShader,
+      fragmentShader: backgroundFragShader,
+      transparent: true
+    });
+
+    const background: Object3D = CreatePlane(backgroundMaterial, WIDTH, HEIGHT, WIDTH/2, HEIGHT/2);
+
+    scene.add(background);
+
     const geometry: PlaneGeometry = new PlaneGeometry(100, 100);
 
     const mesh: Object3D = new Mesh(geometry, rocketMaterial).translateX(0).translateY(0);
@@ -74,10 +95,7 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist)
 
     scene.add(mesh);
 
-    const moonGeometry: PlaneGeometry = new PlaneGeometry(100, 100);
-    const moon: Object3D = new Mesh(moonGeometry, moonMaterial).translateX(600).translateY(500);
-
-    moon.setRotationFromAxisAngle(new Vector3(0, 0, 1), 0);
+    const moon: Object3D = CreatePlane(moonMaterial, 100, 100, 600, 500);
 
     scene.add(moon);
 
@@ -125,6 +143,7 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist)
       var elapsedMilliseconds = Date.now() - startTime;
       var elapsedSeconds = elapsedMilliseconds / 1000.;
       uniforms.time.value = 60. * elapsedSeconds;
+      backgroundUniforms.u_time.value = elapsedSeconds;
 
       mesh.position.setX(typist.Position * (WIDTH - 200) + 50);
       mesh.position.setY(typist.Position * (HEIGHT - 200) + 50);
@@ -137,4 +156,12 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist)
     }
   
     webglRender();
+}
+
+function CreatePlane(moonMaterial: Material, width: number, height: number, x: number, y: number) {
+  const moonGeometry: PlaneGeometry = new PlaneGeometry(width, height);
+  const moon: Object3D = new Mesh(moonGeometry, moonMaterial).translateX(x).translateY(y);
+
+  moon.setRotationFromAxisAngle(new Vector3(0, 0, 1), 0);
+  return moon;
 }
