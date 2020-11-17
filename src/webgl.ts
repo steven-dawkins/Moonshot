@@ -35,10 +35,8 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist)
     const loader: TextureLoader = new TextureLoader();
     const starTexture: Texture = loader.load("./" + starImage);
     const rocketTexture: Texture = loader.load("./" + rocketImage);
-    const moonTexture: Texture = loader.load("./" + moonImage);
     
     const rocketMaterial = new MeshBasicMaterial({ map: rocketTexture, transparent: true });
-    const moonMaterial = new MeshBasicMaterial({ map: moonTexture, transparent: true });
 
     const uniforms = {
       time: { type: "f", value: 1.0 },
@@ -58,8 +56,6 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist)
     material1.uniforms.map.value = starTexture;
 
     const material2 = new MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.5 });
-
-    const material = material1;
 
     camera.position.z = 200;
 
@@ -86,18 +82,15 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist)
     scene.add(background);
 
    
-    const mesh: Object3D = CreatePlane(rocketMaterial, 50, 50, 0, 0);
+    const rocket: Object3D = CreatePlane(rocketMaterial, 50, 50, 0, 0);
 
-    scene.add(mesh);
-
-    const moon: Object3D = CreatePlane(moonMaterial, 100, 100, 600, 500);
-
-    scene.add(moon);
+    scene.add(rocket);
+    
+    const moonMaterial = new MeshBasicMaterial({ map: loader.load("./" + moonImage), transparent: true });
+    scene.add(CreatePlane(moonMaterial, 100, 100, 600, 500));
 
     const earthMaterial = new MeshBasicMaterial({ map: loader.load("./" + earthImage), transparent: true });
-    const earth: Object3D = CreatePlane(earthMaterial, 200, 200, 100, 100);
-
-    scene.add(earth);
+    scene.add(CreatePlane(earthMaterial, 200, 200, 100, 100));
 
     for(var i = 0; i < 40; i++)
     {
@@ -147,10 +140,10 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist)
       uniforms.time.value = 60. * elapsedSeconds;
       backgroundUniforms.u_time.value = elapsedSeconds;
 
-      mesh.position.setX(typist.Position * (WIDTH - 300) + 170);
-      mesh.position.setY(typist.Position * (HEIGHT - 300) + 170);
-      mesh.position.setZ(50);
-      mesh.setRotationFromAxisAngle(new Vector3(0, 0, 1), -Math.PI/4);
+      rocket.position.setX(typist.Position * (WIDTH - 300) + 170);
+      rocket.position.setY(typist.Position * (HEIGHT - 300) + 170);
+      rocket.position.setZ(50);
+      rocket.setRotationFromAxisAngle(new Vector3(0, 0, 1), -Math.PI/4);
       
       renderer.setViewport( 0, 0, WIDTH, HEIGHT );
       renderer.render(scene, camera);
