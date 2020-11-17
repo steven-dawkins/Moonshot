@@ -5,6 +5,7 @@ import {
 import rocketImage from "../assets/onlyrocket.png";
 import starImage from "../assets/star.png";
 import moonImage from "../assets/moon-0000010.png";
+import earthImage from "../assets/sprites/earth-0062.png";
 
 import starShader from "../assets/shaders/star.vert";
 import starFragShader from "../assets/shaders/star.frag";
@@ -35,10 +36,9 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist)
     const starTexture: Texture = loader.load("./" + starImage);
     const rocketTexture: Texture = loader.load("./" + rocketImage);
     const moonTexture: Texture = loader.load("./" + moonImage);
-    const starMaterial = new MeshBasicMaterial({ map: starTexture, transparent: true,  });
+    
     const rocketMaterial = new MeshBasicMaterial({ map: rocketTexture, transparent: true });
     const moonMaterial = new MeshBasicMaterial({ map: moonTexture, transparent: true });
-
 
     const uniforms = {
       time: { type: "f", value: 1.0 },
@@ -46,8 +46,6 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist)
       resolution: { type: "v2", value: new Vector2() },
       map: { type:"t", value: 0, texture: starTexture } 
     };
-
-    console.log(starShader);
 
     var material1 = new ShaderMaterial({
       defines: { USE_MAP: '' },
@@ -87,17 +85,19 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist)
 
     scene.add(background);
 
-    const geometry: PlaneGeometry = new PlaneGeometry(100, 100);
-
-    const mesh: Object3D = new Mesh(geometry, rocketMaterial).translateX(0).translateY(0);
-
-    mesh.setRotationFromAxisAngle(new Vector3(0, 0, 1), 0);
+   
+    const mesh: Object3D = CreatePlane(rocketMaterial, 50, 50, 0, 0);
 
     scene.add(mesh);
 
     const moon: Object3D = CreatePlane(moonMaterial, 100, 100, 600, 500);
 
     scene.add(moon);
+
+    const earthMaterial = new MeshBasicMaterial({ map: loader.load("./" + earthImage), transparent: true });
+    const earth: Object3D = CreatePlane(earthMaterial, 200, 200, 100, 100);
+
+    scene.add(earth);
 
     for(var i = 0; i < 40; i++)
     {
@@ -109,31 +109,33 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist)
 
       mesh2.setRotationFromAxisAngle(new Vector3(0, 0, 1), 0);
 
+      mesh2.position.setZ(0);
+
       scene.add(mesh2);
     }
 
 
-    const fontLoader = new FontLoader();
+    // const fontLoader = new FontLoader();
 
-    fontLoader.load( 'assets/helvetiker_regular.typeface.json', function ( font ) {
+    // fontLoader.load( 'assets/helvetiker_regular.typeface.json', function ( font ) {
 
-      const geometry = new TextGeometry( 'Hello three.js!', {
-        font: font,
-        size: 60,
-        height: 5,
-        curveSegments: 12,
-        bevelEnabled: true,
-        bevelThickness: 10,
-        bevelSize: 8,
-        bevelOffset: 0,
-        bevelSegments: 5
-      } );
+    //   const geometry = new TextGeometry( 'Hello three.js!', {
+    //     font: font,
+    //     size: 60,
+    //     height: 5,
+    //     curveSegments: 12,
+    //     bevelEnabled: true,
+    //     bevelThickness: 10,
+    //     bevelSize: 8,
+    //     bevelOffset: 0,
+    //     bevelSegments: 5
+    //   } );
     
-      var textMesh = new Mesh( geometry, material2 );
-      textMesh.translateY(100);
+    //   var textMesh = new Mesh( geometry, material2 );
+    //   textMesh.translateY(100);
 
-      scene.add(textMesh);
-    } );
+    //   scene.add(textMesh);
+    // } );
 
     var i = 0.0;
 
@@ -145,8 +147,8 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist)
       uniforms.time.value = 60. * elapsedSeconds;
       backgroundUniforms.u_time.value = elapsedSeconds;
 
-      mesh.position.setX(typist.Position * (WIDTH - 200) + 50);
-      mesh.position.setY(typist.Position * (HEIGHT - 200) + 50);
+      mesh.position.setX(typist.Position * (WIDTH - 300) + 170);
+      mesh.position.setY(typist.Position * (HEIGHT - 300) + 170);
       mesh.position.setZ(50);
       mesh.setRotationFromAxisAngle(new Vector3(0, 0, 1), -Math.PI/4);
       
