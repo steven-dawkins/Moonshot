@@ -11,7 +11,13 @@ function isAlphaNumeric(str: string) {
     if (!(code > 47 && code < 58) && // numeric (0-9)
         !(code > 64 && code < 91) && // upper alpha (A-Z)
         !(code > 96 && code < 123) &&
-        !(str === " ")) { // lower alpha (a-z)
+        !(str === " ") &&
+        !(str === "/") &&
+        !(str === ",") &&
+        !(str === ".") &&
+        !(str === "?") &&
+        !(str === "!") &&
+        !(str === "'")) { // lower alpha (a-z)
       return false;
     }
   }
@@ -31,6 +37,7 @@ export class WebGlScene extends React.Component<{typist: Typist}, {typist: Typis
     }
 
     onKeyDown(evt: KeyboardEvent) {
+      
       if (evt.key.length <= 1 && isAlphaNumeric(evt.key))
       {
         this.state.typist.ProcessCharacter(evt.key);

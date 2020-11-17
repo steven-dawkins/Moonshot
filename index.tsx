@@ -3,9 +3,13 @@ import { render } from "react-dom";
 import { WebGlScene } from "./scene";
 import { Typist } from "./src/typist";
 
+import khanText from "./assets/khan.txt";
+
 const el = document.getElementById("body");
 
-const typist = new Typist("Lorem ipsum");
+const texts = khanText.split("\n");
+
+const typist = new Typist(texts[Math.floor(Math.random() * texts.length)]);
 
 render(<div>
         <h1>Moonshot</h1>
