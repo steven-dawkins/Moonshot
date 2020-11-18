@@ -7,6 +7,10 @@ namespace Moonshot_Server
     {
         IEnumerable<string> AllMessages { get; }
 
+        IEnumerable<Player> Players { get; }
+
         string AddMessage(string receivedMessage);
+
+        string AddPlayer(Player name);
     }
 }

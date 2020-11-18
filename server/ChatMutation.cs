@@ -7,6 +7,17 @@ namespace Moonshot_Server
     {
         public ChatMutation(IChat chat)
         {
+            Field<StringGraphType>("join",
+                arguments: new QueryArguments(
+                    new QueryArgument<StringGraphType> { Name = "name" }
+                ),
+                resolve: context =>
+                {
+                    var receivedMessage = context.GetArgument<string>("name");
+                    var message = chat.AddPlayer(new Player(receivedMessage));
+                    return message;
+                });
+
             Field<StringGraphType>("addMessage",
                 arguments: new QueryArguments(
                     new QueryArgument<StringGraphType> { Name = "message" }

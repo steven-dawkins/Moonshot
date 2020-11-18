@@ -16,15 +16,19 @@ namespace Moonshot_Server
 
     public class Chat : IChat
     {
-        private List<Player> players = new List<Player>();
-        private List<string> messages = new[] { "Hello", "World!!!" }.ToList();
-        private List<IObserver<string>> observers = new List<IObserver<string>>();
+        private readonly List<Player> players = new List<Player>();
+        private readonly List<string> messages = new List<string>();
+        private readonly List<IObserver<string>> observers = new List<IObserver<string>>();
 
         public IEnumerable<string> AllMessages => this.messages;
 
-        public void AddPlayer(Player player)
+        public IEnumerable<Player> Players => this.players;
+
+        public string AddPlayer(Player player)
         {
             this.players.Add(player);
+
+            return player.Name;
         }
 
         public string AddMessage(string receivedMessage)
