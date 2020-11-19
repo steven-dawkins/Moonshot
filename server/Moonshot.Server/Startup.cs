@@ -6,8 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using GraphQL.Server.Transports.AspNetCore;
+using Moonshot.Server.MoonSchema;
+using Moonshot.Server.Models;
 
-namespace Moonshot_Server
+namespace Moonshot.Server
 {
 
     public class Startup

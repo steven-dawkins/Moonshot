@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using GraphQL.Types;
-using Moonshot_Server.MoonSchema.GraphQLTypes;
+using Moonshot.Server.Models;
+using Moonshot.Server.MoonSchema.GraphQLTypes;
 
 namespace Moonshot.Server.MoonSchema
 {

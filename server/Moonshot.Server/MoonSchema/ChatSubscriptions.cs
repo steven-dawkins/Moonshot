@@ -3,6 +3,7 @@ using GraphQL.Resolvers;
 using GraphQL.Subscription;
 using GraphQL.Types;
 using GraphQL;
+using Moonshot.Server.Models;
 
 namespace Moonshot.Server.MoonSchema
 {

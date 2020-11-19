@@ -11,7 +11,7 @@ namespace Moonshot.Tests
         [Fact]
         public async Task Test1()
         {
-            using var fixture = new ApiFixture();
+            using var fixture = new ApiFixture(5012);
 
             var heroRequest = new GraphQLRequest
             {

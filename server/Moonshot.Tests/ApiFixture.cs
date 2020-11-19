@@ -7,9 +7,9 @@ namespace Moonshot.Tests
 {
     public class ApiFixture : IDisposable
     {
-        public ApiFixture()
+        public ApiFixture(int port)
         {
-            this.host = Program.CreateHostBuilder(new string[] { }).Build();
+            this.host = Program.CreateHostBuilder(new string[] { }, port).Build();
 
             this.ServerRunning = host.StartAsync();
         }

@@ -1,7 +1,6 @@
 ﻿using FluentAssertions;
 using GraphQL;
-using Moonshot_Server;
-using Moonshot_Server.Models;
+using Moonshot.Server.Models;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -20,7 +19,7 @@ namespace Moonshot.Tests
         [Fact]
         public async Task NoPlayersInitially()
         {
-            using var fixture = new ApiFixture();
+            using var fixture = new ApiFixture(5010);
 
             var graphQLResponse = await fixture.Execute<GraphQlPlayerModel>(playersRequest);
 
@@ -30,7 +29,7 @@ namespace Moonshot.Tests
         [Fact]
         public async Task PlayerJoin()
         {
-            using var fixture = new ApiFixture();
+            using var fixture = new ApiFixture(5011);
 
             var playersMutationRequest = new GraphQLRequest
             {
