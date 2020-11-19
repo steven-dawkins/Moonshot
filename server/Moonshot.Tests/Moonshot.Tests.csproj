@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Moonshot-Server.csproj" />
+    <ProjectReference Include="..\MoonShot.Server\Moonshot-Server.csproj" />
   </ItemGroup>
 
 </Project>

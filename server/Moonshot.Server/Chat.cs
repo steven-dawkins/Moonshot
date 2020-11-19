@@ -1,32 +1,25 @@
-﻿using System;
+﻿using Moonshot_Server.Models;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Moonshot_Server
 {
-    public class Player
-    {
-        public Player(string name)
-        {
-            this.Name = name;
-        }
-
-        public string Name { get; }
-    }
 
     public class Chat : IChat
     {
-        private readonly List<Player> players = new List<Player>();
+        private readonly ConcurrentDictionary<string, Player> players = new ConcurrentDictionary<string, Player>();
         private readonly List<string> messages = new List<string>();
         private readonly List<IObserver<string>> observers = new List<IObserver<string>>();
 
         public IEnumerable<string> AllMessages => this.messages;
 
-        public IEnumerable<Player> Players => this.players;
+        public IEnumerable<Player> Players => this.players.Values;
 
         public string AddPlayer(Player player)
         {
-            this.players.Add(player);
+            this.players.TryAdd(player.Name, player);
 
             return player.Name;
         }

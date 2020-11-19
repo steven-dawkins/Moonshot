@@ -1,4 +1,5 @@
 ﻿using GraphQL.Types;
+using Moonshot_Server.Models;
 
 namespace Moonshot_Server.MoonSchema.GraphQLTypes
 {
