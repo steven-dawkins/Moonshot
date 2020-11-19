@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moonshot-Server", "Moonshot-Server.csproj", "{2F2537DB-763B-4BC2-8675-A21F4536334F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moonshot-Server", "MoonShot.Server\Moonshot-Server.csproj", "{2F2537DB-763B-4BC2-8675-A21F4536334F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Moonshot.Tests", "Moonshot.Tests\Moonshot.Tests.csproj", "{E9EE97A8-9ED0-47FA-BCE0-64DBBE2F6EAF}"
 EndProject
