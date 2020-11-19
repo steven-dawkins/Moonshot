@@ -1,7 +1,7 @@
 ﻿using System;
 using GraphQL.Types;
 
-namespace Moonshot_Server
+namespace Moonshot.Server.MoonSchema
 {
     public class ChatSchema : Schema
     {

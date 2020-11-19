@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Moonshot_Server
+namespace Moonshot.Server.Models
 {
     public interface IChat : IObservable<string>
     {

@@ -2,7 +2,7 @@
 using GraphQL.Types;
 using Moonshot_Server.MoonSchema.GraphQLTypes;
 
-namespace Moonshot_Server
+namespace Moonshot.Server.MoonSchema
 {
     public class ChatQuery : ObjectGraphType
     {

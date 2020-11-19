@@ -4,7 +4,7 @@ using GraphQL.Subscription;
 using GraphQL.Types;
 using GraphQL;
 
-namespace Moonshot_Server
+namespace Moonshot.Server.MoonSchema
 {
     public class ChatSubscriptions : ObjectGraphType<object>
     {

@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Moonshot_Server
+namespace Moonshot.Server.Models
 {
 
     public class Chat : IChat

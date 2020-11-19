@@ -1,4 +1,4 @@
-﻿namespace Moonshot_Server.Models
+﻿namespace Moonshot.Server.Models
 {
     public class Player
     {

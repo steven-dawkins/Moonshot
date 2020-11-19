@@ -2,7 +2,7 @@
 using GraphQL;
 using Moonshot_Server.Models;
 
-namespace Moonshot_Server
+namespace Moonshot.Server.MoonSchema
 {
     public class ChatMutation : ObjectGraphType<object>
     {

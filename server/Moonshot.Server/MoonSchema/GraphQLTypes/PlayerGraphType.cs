@@ -1,7 +1,7 @@
 ﻿using GraphQL.Types;
-using Moonshot_Server.Models;
+using Moonshot.Server.Models;
 
-namespace Moonshot_Server.MoonSchema.GraphQLTypes
+namespace Moonshot.Server.MoonSchema.GraphQLTypes
 {
     public class PlayerGraphType : ObjectGraphType<Player>
     {
