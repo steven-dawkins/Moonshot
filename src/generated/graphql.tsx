@@ -38,42 +38,82 @@ export type ChatSubscriptions = {
   messageAdded?: Maybe<Scalars['String']>;
 };
 
-export type Unnamed_1_QueryVariables = Exact<{ [key: string]: never; }>;
+export type JoinMutationVariables = Exact<{
+  name?: Maybe<Scalars['String']>;
+}>;
 
 
-export type Unnamed_1_Query = (
+export type JoinMutation = (
+  { __typename?: 'ChatMutation' }
+  & Pick<ChatMutation, 'join'>
+);
+
+export type GetPlayersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetPlayersQuery = (
   { __typename?: 'ChatQuery' }
   & Pick<ChatQuery, 'players'>
 );
 
 
-export const Document = gql`
-    {
+export const JoinDocument = gql`
+    mutation Join($name: String) {
+  join(name: $name)
+}
+    `;
+export type JoinMutationFn = Apollo.MutationFunction<JoinMutation, JoinMutationVariables>;
+
+/**
+ * __useJoinMutation__
+ *
+ * To run a mutation, you first call `useJoinMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useJoinMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [joinMutation, { data, loading, error }] = useJoinMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useJoinMutation(baseOptions?: Apollo.MutationHookOptions<JoinMutation, JoinMutationVariables>) {
+        return Apollo.useMutation<JoinMutation, JoinMutationVariables>(JoinDocument, baseOptions);
+      }
+export type JoinMutationHookResult = ReturnType<typeof useJoinMutation>;
+export type JoinMutationResult = Apollo.MutationResult<JoinMutation>;
+export type JoinMutationOptions = Apollo.BaseMutationOptions<JoinMutation, JoinMutationVariables>;
+export const GetPlayersDocument = gql`
+    query GetPlayers {
   players
 }
     `;
 
 /**
- * __useQuery__
+ * __useGetPlayersQuery__
  *
- * To run a query within a React component, call `useQuery` and pass it any options that fit your needs.
- * When your component renders, `useQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetPlayersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPlayersQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useQuery({
+ * const { data, loading, error } = useGetPlayersQuery({
  *   variables: {
  *   },
  * });
  */
-export function useQuery(baseOptions?: Apollo.QueryHookOptions<Query, QueryVariables>) {
-        return Apollo.useQuery<Query, QueryVariables>(Document, baseOptions);
+export function useGetPlayersQuery(baseOptions?: Apollo.QueryHookOptions<GetPlayersQuery, GetPlayersQueryVariables>) {
+        return Apollo.useQuery<GetPlayersQuery, GetPlayersQueryVariables>(GetPlayersDocument, baseOptions);
       }
-export function useLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Query, QueryVariables>) {
-          return Apollo.useLazyQuery<Query, QueryVariables>(Document, baseOptions);
+export function useGetPlayersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPlayersQuery, GetPlayersQueryVariables>) {
+          return Apollo.useLazyQuery<GetPlayersQuery, GetPlayersQueryVariables>(GetPlayersDocument, baseOptions);
         }
-export type QueryHookResult = ReturnType<typeof useQuery>;
-export type LazyQueryHookResult = ReturnType<typeof useLazyQuery>;
-export type QueryResult = Apollo.QueryResult<Query, QueryVariables>;
+export type GetPlayersQueryHookResult = ReturnType<typeof useGetPlayersQuery>;
+export type GetPlayersLazyQueryHookResult = ReturnType<typeof useGetPlayersLazyQuery>;
+export type GetPlayersQueryResult = Apollo.QueryResult<GetPlayersQuery, GetPlayersQueryVariables>;

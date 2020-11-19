@@ -33,16 +33,14 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist)
     const scene = new Scene();
 
     const loader: TextureLoader = new TextureLoader();
-    const starTexture: Texture = loader.load("./" + starImage);
-    const rocketTexture: Texture = loader.load("./" + rocketImage);
     
-    const rocketMaterial = new MeshBasicMaterial({ map: rocketTexture, transparent: true });
+    const rocketMaterial = new MeshBasicMaterial({ map: loader.load("./" + rocketImage), transparent: true });
 
     const uniforms = {
       time: { type: "f", value: 1.0 },
       offset: { type: "f", value: 0.0 },
       resolution: { type: "v2", value: new Vector2() },
-      map: { type:"t", value: 0, texture: starTexture } 
+      map: { type:"t", value: 0  } 
     };
 
     var material1 = new ShaderMaterial({
@@ -53,7 +51,7 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist)
       transparent: true
     });
 
-    material1.uniforms.map.value = starTexture;
+    material1.uniforms.map.value = loader.load("./" + starImage);
 
     const material2 = new MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.5 });
 
@@ -94,7 +92,7 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist)
 
     for(var i = 0; i < 40; i++)
     {
-      const geometry: PlaneGeometry = new PlaneGeometry(40, 40);
+      const geometry: PlaneGeometry = new PlaneGeometry(20, 20);
 
       const mesh2: Object3D = new Mesh(geometry, material1)
                                 .translateX(Math.random() * WIDTH)

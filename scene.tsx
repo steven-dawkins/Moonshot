@@ -24,10 +24,10 @@ function isAlphaNumeric(str: string) {
   return true;
 };
 
-export class WebGlScene extends React.Component<{typist: Typist}, {typist: Typist}> {
+export class WebGlScene extends React.Component<{typist: Typist, name: string}, {typist: Typist}> {
     private el: HTMLDivElement | null = null;
 
-    constructor(props: {typist: Typist})
+    constructor(props: {typist: Typist, name: string})
     {
       super(props);
       
@@ -63,6 +63,7 @@ export class WebGlScene extends React.Component<{typist: Typist}, {typist: Typis
   
     render() {
       return <div>
+          <div>Hi: {this.props.name}</div>
           <div><span style={{color: "red"}}>{this.state.typist.TypedText}</span>|<span>{this.state.typist.UnTypedText}</span></div>
           <div ref={el => this.el = el} />
         </div>;

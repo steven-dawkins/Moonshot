@@ -1,0 +1,3 @@
+mutation Join($name: String) {
+  join(name: $name)
+}
