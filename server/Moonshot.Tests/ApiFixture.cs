@@ -12,6 +12,8 @@ namespace Moonshot.Tests
             this.host = Program.CreateHostBuilder(new string[] { }, port).Build();
 
             this.ServerRunning = host.StartAsync();
+
+            this.Url = $"http://localhost:{port}/graphql/";
         }
 
         public void Dispose()
@@ -22,5 +24,7 @@ namespace Moonshot.Tests
         private readonly IHost host;
 
         public Task ServerRunning { get; }
+
+        public string Url { get; }
     }
 }

@@ -12,7 +12,9 @@ namespace Moonshot.Tests
         {
             Query = @"
                 {
-                    players
+                    players {
+                        name
+                    }
                 }"
         };
 

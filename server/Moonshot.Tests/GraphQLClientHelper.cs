@@ -23,7 +23,7 @@ namespace Moonshot.Tests
         {
             await fixture.ServerRunning;
 
-            var graphQLClient = new GraphQLHttpClient("https://localhost:5001/graphql/", new NewtonsoftJsonSerializer());
+            var graphQLClient = new GraphQLHttpClient(fixture.Url, new NewtonsoftJsonSerializer());
 
             var graphQLResponse = await func(graphQLClient);
 
