@@ -1,6 +1,5 @@
 import {
-    WebGLRenderer, Scene, TextureLoader, OrthographicCamera, PlaneGeometry, Texture,
-    MeshBasicMaterial, Mesh, Object3D, Vector3, Vector2, ShaderMaterial, FontLoader, TextGeometry, Material
+    WebGLRenderer, Scene, TextureLoader, OrthographicCamera, PlaneGeometry, MeshBasicMaterial, Mesh, Object3D, Vector3, Vector2, ShaderMaterial, Material
 } from "three";
 
 import rocketImage from "../assets/sprites/onlyrocket.png";
@@ -74,7 +73,6 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: numb
 
     starMaterial.uniforms.map.value = loader.load("./" + starImage);
 
-    const material2 = new MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.5 });
 
     camera.position.z = 200;
 

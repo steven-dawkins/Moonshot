@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-import { Typist } from './src/typist';
-import { InitWebgl } from './src/webgl';
+import { Typist } from '../typist';
+import { InitWebgl } from '../webgl';
 
 function isAlphaNumeric(str: string) {
   var code, i, len;
