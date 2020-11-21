@@ -10,49 +10,85 @@ namespace Moonshot.Server.Models
     {
         private readonly ConcurrentDictionary<string, Player> players = new ConcurrentDictionary<string, Player>();
         private readonly List<string> messages = new List<string>();
-        private readonly List<IObserver<string>> observers = new List<IObserver<string>>();
+        private readonly MessageObserver<string> messageObserver;
+        private readonly MessageObserver<Player> playerObserver;
 
         public IEnumerable<string> AllMessages => this.messages;
 
+        public IObservable<string> MessagesStram => this.messageObserver;
+
+        public IObservable<Player> PlayersStream => this.playerObserver;
+
         public IEnumerable<Player> Players => this.players.Values;
 
-        public string AddPlayer(Player player)
+        public Chat()
         {
-            this.players.TryAdd(player.Name, player);
+            this.messageObserver = new MessageObserver<string>();
+            this.playerObserver = new MessageObserver<Player>();
+        }
 
-            return player.Name;
+        public string AddPlayer(string name)
+        {
+            lock (this.players)
+            {
+                if (!this.players.ContainsKey(name))
+                {
+                    Player player = new Player(name, this.players.Count);
+                    this.players.TryAdd(name, player);
+
+                    this.playerObserver.Observe(player);
+                }
+
+                return name;
+            }
         }
 
         public string AddMessage(string receivedMessage)
         {
             this.messages.Add(receivedMessage);
 
-            foreach (var observer in this.observers)
-            {
-                observer.OnNext(receivedMessage);
-            }
+            this.messageObserver.Observe(receivedMessage);
 
             return receivedMessage;
         }
 
-        public IDisposable Subscribe(IObserver<string> observer)
+        interface IObserverRemover<T>
         {
-            this.observers.Add(observer);
-
-            return new ObserverDisposer(observer, this);
+            void RemoveObserver(IObserver<T> observer);
         }
 
-        private void RemoveObserver(IObserver<string> observer)
+        private class MessageObserver<T> : IObserverRemover<T>, IObservable<T>
         {
-            this.observers.Remove(observer);
+
+            private readonly HashSet<IObserver<T>> observers = new HashSet<IObserver<T>>();
+
+            public IDisposable Subscribe(IObserver<T> observer)
+            {
+                this.observers.Add(observer);
+
+                return new ObserverDisposer<T>(observer, this);
+            }
+
+            public void RemoveObserver(IObserver<T> observer)
+            {
+                this.observers.Remove(observer);
+            }
+
+            public void Observe(T receivedMessage)
+            {
+                foreach (var observer in this.observers)
+                {
+                    observer.OnNext(receivedMessage);
+                }
+            }
         }
 
-        private class ObserverDisposer : IDisposable
+        private class ObserverDisposer<T> : IDisposable
         {
-            private readonly IObserver<string> observer;
-            private readonly Chat chat;
+            private readonly IObserver<T> observer;
+            private readonly IObserverRemover<T> chat;
 
-            public ObserverDisposer(IObserver<string> observer, Chat chat)
+            public ObserverDisposer(IObserver<T> observer, IObserverRemover<T> chat)
             {
                 this.observer = observer;
                 this.chat = chat;

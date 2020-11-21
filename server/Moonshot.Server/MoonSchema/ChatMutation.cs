@@ -15,7 +15,7 @@ namespace Moonshot.Server.MoonSchema
                 resolve: context =>
                 {
                     var receivedMessage = context.GetArgument<string>("name");
-                    var message = chat.AddPlayer(new Player(receivedMessage));
+                    var message = chat.AddPlayer(receivedMessage);
                     return message;
                 });
 
