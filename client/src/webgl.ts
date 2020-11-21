@@ -16,12 +16,33 @@ import backgroundFragShader from "../assets/shaders/background.frag";
 
 import { Typist } from "./typist";
 
-export function InitWebgl(parent: HTMLDivElement, typist: Typist) {
+const earthPosition = new Vector2(100, 100);
+const earthRadius = 100;
+
+const moonPosition = new Vector2(600, 500);
+const moonRadius = 50;
+
+const WIDTH = 700,
+HEIGHT = 600,
+NEAR = 0.1,
+FAR = 10000;
+
+export function calculateRocketPosition(position: number, numRockets: number, progress: number) {
+
+    const startPositionX = Math.sin(position * Math.PI * 2 / numRockets) * earthRadius + earthPosition.x;
+    const startPositionY = Math.cos(position * Math.PI * 2 / numRockets) * earthRadius + earthPosition.y;
+
+    const endPositionX = moonPosition.x - moonRadius;
+    const endPositionY = moonPosition.y - moonRadius;
+    
+    const startPosition = new Vector2(startPositionX, startPositionY);
+    const endPosition = new Vector2(endPositionX, endPositionY);
+
+    return startPosition.multiplyScalar(1 - progress).add(endPosition.multiplyScalar(progress));
+}
+
+export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: number, numRockets: number) {
     console.log("init webgl");
-    const WIDTH = 700,
-        HEIGHT = 600,
-        NEAR = 0.1,
-        FAR = 10000;
 
     const renderer = new WebGLRenderer({});
     renderer.autoClear = true;
@@ -43,7 +64,7 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist) {
         map: { type: "t", value: 0 }
     };
 
-    var material1 = new ShaderMaterial({
+    var starMaterial = new ShaderMaterial({
         defines: { USE_MAP: '' },
         uniforms: uniforms,
         vertexShader: starShader,
@@ -51,7 +72,7 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist) {
         transparent: true
     });
 
-    material1.uniforms.map.value = loader.load("./" + starImage);
+    starMaterial.uniforms.map.value = loader.load("./" + starImage);
 
     const material2 = new MeshBasicMaterial({ color: 0xff0000, transparent: true, opacity: 0.5 });
 
@@ -79,21 +100,26 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist) {
 
     scene.add(background);
 
+    const rockets = [...Array(numRockets).keys()].map(i => {
+        const rocketPosition = calculateRocketPosition(i, numRockets, 0);
+        const newRocket: Object3D = CreatePlane(rocketMaterial, 50, 50, rocketPosition.x, rocketPosition.y);
+        newRocket.setRotationFromAxisAngle(new Vector3(0, 0, 1), -Math.PI / 4);
 
-    const rocket: Object3D = CreatePlane(rocketMaterial, 50, 50, 0, 0);
-
-    scene.add(rocket);
+        scene.add(newRocket);
+        return newRocket;
+    })
+    const rocket = rockets[0];
 
     const moonMaterial = new MeshBasicMaterial({ map: loader.load("./" + moonImage), transparent: true });
-    scene.add(CreatePlane(moonMaterial, 100, 100, 600, 500));
+    scene.add(CreatePlane(moonMaterial, moonRadius * 2, moonRadius * 2, moonPosition.x, moonPosition.y));
 
     const earthMaterial = new MeshBasicMaterial({ map: loader.load("./" + earthImage), transparent: true });
-    scene.add(CreatePlane(earthMaterial, 200, 200, 100, 100));
+    scene.add(CreatePlane(earthMaterial, earthRadius * 2, earthRadius * 2, earthPosition.x, earthPosition.y));
 
     for (var i = 0; i < 400; i++) {
         const geometry: PlaneGeometry = new PlaneGeometry(20, 20);
 
-        const mesh2: Object3D = new Mesh(geometry, material1)
+        const mesh2: Object3D = new Mesh(geometry, starMaterial)
             .translateX(Math.random() * WIDTH)
             .translateY(Math.random() * HEIGHT)
             .translateZ(i);
@@ -136,8 +162,9 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist) {
         uniforms.time.value = 60. * elapsedSeconds;
         backgroundUniforms.u_time.value = elapsedSeconds;
 
-        rocket.position.setX(typist.Position * (WIDTH - 300) + 170);
-        rocket.position.setY(typist.Position * (HEIGHT - 300) + 170);
+        var currentRocketPosition = calculateRocketPosition(position, numRockets, typist.Position);
+        rocket.position.setX(currentRocketPosition.x);
+        rocket.position.setY(currentRocketPosition.y);
         rocket.position.setZ(50);
         rocket.setRotationFromAxisAngle(new Vector3(0, 0, 1), -Math.PI / 4);
 
@@ -149,10 +176,10 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist) {
     webglRender();
 }
 
-function CreatePlane(moonMaterial: Material, width: number, height: number, x: number, y: number) {
-    const moonGeometry: PlaneGeometry = new PlaneGeometry(width, height);
-    const moon: Object3D = new Mesh(moonGeometry, moonMaterial).translateX(x).translateY(y);
+function CreatePlane(material: Material, width: number, height: number, x: number, y: number) {
+    const geometry: PlaneGeometry = new PlaneGeometry(width, height);
+    const object: Object3D = new Mesh(geometry, material).translateX(x).translateY(y);
 
-    moon.setRotationFromAxisAngle(new Vector3(0, 0, 1), 0);
-    return moon;
+    object.setRotationFromAxisAngle(new Vector3(0, 0, 1), 0);
+    return object;
 }

@@ -21,7 +21,7 @@ function App() {
 
     const [players, setPlayers] = useState(Array<Player>());
 
-    const { data: playersData, error: playersError } = usePlayersSubscription({
+    const { error: playersError } = usePlayersSubscription({
         variables: {
         },
         onSubscriptionData: data => {

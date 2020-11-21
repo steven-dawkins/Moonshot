@@ -52,7 +52,7 @@ export class WebGlScene extends React.Component<{typist: Typist, name: string}, 
       {
         window.addEventListener("keydown", this.onKeyDown);
 
-        InitWebgl(this.el, this.state.typist);
+        InitWebgl(this.el, this.state.typist, 0, 5);
       }
     }
   
