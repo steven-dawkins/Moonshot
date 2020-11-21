@@ -27,19 +27,22 @@ namespace Moonshot.Server.Models
             this.playerObserver = new MessageObserver<Player>();
         }
 
-        public string AddPlayer(string name)
+        public Player AddPlayer(string name)
         {
             lock (this.players)
             {
-                if (!this.players.ContainsKey(name))
+                if (!this.players.TryGetValue(name, out Player existingPlayer))
                 {
                     Player player = new Player(name, this.players.Count);
                     this.players.TryAdd(name, player);
 
                     this.playerObserver.Observe(player);
+                    return player;
                 }
-
-                return name;
+                else
+                {
+                    return existingPlayer;
+                }
             }
         }
 
@@ -60,23 +63,23 @@ namespace Moonshot.Server.Models
         private class MessageObserver<T> : IObserverRemover<T>, IObservable<T>
         {
 
-            private readonly HashSet<IObserver<T>> observers = new HashSet<IObserver<T>>();
+            private readonly ConcurrentDictionary<IObserver<T>, IObserver<T>> observers = new ConcurrentDictionary<IObserver<T>, IObserver<T>>();
 
             public IDisposable Subscribe(IObserver<T> observer)
             {
-                this.observers.Add(observer);
+                this.observers.TryAdd(observer, observer);
 
                 return new ObserverDisposer<T>(observer, this);
             }
 
             public void RemoveObserver(IObserver<T> observer)
             {
-                this.observers.Remove(observer);
+                this.observers.TryRemove(observer, out _);
             }
 
             public void Observe(T receivedMessage)
             {
-                foreach (var observer in this.observers)
+                foreach (var observer in this.observers.Values)
                 {
                     observer.OnNext(receivedMessage);
                 }

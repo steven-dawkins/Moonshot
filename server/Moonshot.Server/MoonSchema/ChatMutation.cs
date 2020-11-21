@@ -1,6 +1,7 @@
 ﻿using GraphQL.Types;
 using GraphQL;
 using Moonshot.Server.Models;
+using Moonshot.Server.MoonSchema.GraphQLTypes;
 
 namespace Moonshot.Server.MoonSchema
 {
@@ -8,7 +9,7 @@ namespace Moonshot.Server.MoonSchema
     {
         public ChatMutation(IChat chat)
         {
-            Field<StringGraphType>("join",
+            Field<PlayerGraphType>("join",
                 arguments: new QueryArguments(
                     new QueryArgument<StringGraphType> { Name = "name" }
                 ),
