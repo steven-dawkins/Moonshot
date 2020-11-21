@@ -1,11 +1,11 @@
 import * as React from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { render } from "react-dom";
 import { WebGlScene } from "./scene";
 import { Typist } from "./src/typist";
 
 import khanText from "./assets/khan.txt";
-import { useJoinMutation, usePlayersSubscription } from "./src/generated/graphql";
+import { Player, useJoinMutation, usePlayersSubscription } from "./src/generated/graphql";
 import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { split, HttpLink } from '@apollo/client';
 import { getMainDefinition } from '@apollo/client/utilities';
@@ -19,46 +19,59 @@ const typist = new Typist(texts[Math.floor(Math.random() * texts.length)]);
 
 function App() {
 
-    const [joinMutation, { data, loading, error }] = useJoinMutation({
+    const [players, setPlayers] = useState(Array<Player>());
+
+    const { data: playersData, error: playersError } = usePlayersSubscription({
         variables: {
-            name: "Moonshot"
         },
+        onSubscriptionData: data => {
+            const playerJoined = data.subscriptionData.data?.playerJoined;
+            players.push({ name: playerJoined?.name, index: playerJoined?.index });
+            
+            setPlayers(players);
+        }
     });
 
-    const { data: playersData, loading: playersLoading, error: playersError } = usePlayersSubscription({
+    const [joinMutation, { data, loading: joinLoading, error: joinError }] = useJoinMutation({
         variables: {
+            name: "Moonshot player"
         },
+        onCompleted: data => {
+            players.push({ name: data?.join?.name, index: data?.join?.index });
+            
+            setPlayers(players);
+        }
     });
 
     useEffect(() => {
-        console.log("join");
         joinMutation();
     }, []);
 
-    if (error) {
-        return <div>Error! {error}</div>
+    if (joinError) {
+        return <div>Error! {joinError}</div>
     }
 
-    if (loading || !data || !data.join) {
+    if (joinLoading || !data || !data.join) {
         return <div>Loading...</div>;
     }
-
-
-    console.log(data.join);
 
     if (playersError) {
         return <div>Players Error! {playersError}</div>
     }
 
-    if (playersLoading) {
-        return <div>Players loading...</div>;
+    if (!data.join.name)
+    {
+        return <div>Not joined...</div>;
     }
-
-    console.log(playersData?.playerJoined);
 
     return <div>
         <h1>Moonshot</h1>
-        <WebGlScene typist={typist} name={data.join} ></WebGlScene>
+
+        <ul>
+            {players.map(player => <li key={player.name}>{player.name}</li>)}
+        </ul>
+
+        <WebGlScene typist={typist} name={data.join.name} ></WebGlScene>
     </div>;
 }
 

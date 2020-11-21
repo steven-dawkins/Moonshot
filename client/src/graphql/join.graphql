@@ -1,3 +1,6 @@
 mutation Join($name: String) {
-  join(name: $name)
+  join(name: $name) {
+      name
+      index 
+  }
 }

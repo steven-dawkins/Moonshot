@@ -152,8 +152,8 @@
               }
             ],
             "type": {
-              "kind": "SCALAR",
-              "name": "String",
+              "kind": "OBJECT",
+              "name": "Player",
               "ofType": null
             },
             "isDeprecated": false,

@@ -26,7 +26,7 @@ export type Player = {
 export type ChatMutation = {
   __typename?: 'ChatMutation';
   addMessage?: Maybe<Scalars['String']>;
-  join?: Maybe<Scalars['String']>;
+  join?: Maybe<Player>;
 };
 
 
@@ -52,7 +52,10 @@ export type JoinMutationVariables = Exact<{
 
 export type JoinMutation = (
   { __typename?: 'ChatMutation' }
-  & Pick<ChatMutation, 'join'>
+  & { join?: Maybe<(
+    { __typename?: 'Player' }
+    & Pick<Player, 'name' | 'index'>
+  )> }
 );
 
 export type PlayersSubscriptionVariables = Exact<{ [key: string]: never; }>;
@@ -80,7 +83,10 @@ export type GetPlayersQuery = (
 
 export const JoinDocument = gql`
     mutation Join($name: String) {
-  join(name: $name)
+  join(name: $name) {
+    name
+    index
+  }
 }
     `;
 export type JoinMutationFn = Apollo.MutationFunction<JoinMutation, JoinMutationVariables>;
