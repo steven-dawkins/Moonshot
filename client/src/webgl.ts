@@ -2,9 +2,9 @@ import {
     WebGLRenderer, Scene, TextureLoader, OrthographicCamera, PlaneGeometry, Texture,
     MeshBasicMaterial, Mesh, Object3D, Vector3, Vector2, ShaderMaterial, FontLoader, TextGeometry, Material} from "three";
 
-import rocketImage from "../assets/onlyrocket.png";
-import starImage from "../assets/star.png";
-import moonImage from "../assets/moon-0000010.png";
+import rocketImage from "../assets/sprites/onlyrocket.png";
+import starImage from "../assets/sprites/star.png";
+import moonImage from "../assets/sprites/moon-dif-512.png";
 import earthImage from "../assets/sprites/earth-0062.png";
 
 import starShader from "../assets/shaders/star.vert";
@@ -90,17 +90,16 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist)
     const earthMaterial = new MeshBasicMaterial({ map: loader.load("./" + earthImage), transparent: true });
     scene.add(CreatePlane(earthMaterial, 200, 200, 100, 100));
 
-    for(var i = 0; i < 40; i++)
+    for(var i = 0; i < 400; i++)
     {
       const geometry: PlaneGeometry = new PlaneGeometry(20, 20);
 
       const mesh2: Object3D = new Mesh(geometry, material1)
                                 .translateX(Math.random() * WIDTH)
-                                .translateY(Math.random() * HEIGHT);
+                                .translateY(Math.random() * HEIGHT)
+                                .translateZ(i);
 
       mesh2.setRotationFromAxisAngle(new Vector3(0, 0, 1), 0);
-
-      mesh2.position.setZ(0);
 
       scene.add(mesh2);
     }

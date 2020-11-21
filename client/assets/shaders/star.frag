@@ -2,7 +2,7 @@ uniform float time;
 uniform float offset;
 uniform sampler2D map;
 varying vec2 vUv;
-varying vec3 pos;
+varying vec2 vPosition;
 
 float random (in vec2 _st) {
     return fract(sin(dot(_st.xy,
@@ -21,10 +21,18 @@ void main()	{
 
     //gl_FragColor = texture2D(map, gl_PointCoord );
 
-    //float t = time + random(pos.xy) * 100.0;
+    //float t = time + floor(random(gl_FragCoord.xy / 600.0) * 100.0);
     float t = time;
+    //float t = 0.0;
     gl_FragColor = texture2D(map, vUv ) * max(abs(sin(t / 100.0)), 0.5);
-    //gl_FragColor.a = 0.1;
+    //gl_FragColor.r = gl_FragCoord.z * 255.0 / 400.0;
+    //gl_FragColor.r = 255.0;
+    // gl_FragColor.r = 0.0;
+    // gl_FragColor.a = 255.0;
+    // gl_FragColor.g = 0.0;
+    // gl_FragColor.b = 0.0;
+    // //gl_FragColor.r = random(gl_FragCoord.xy) * 1.0;
+    // gl_FragColor.a = 1.0;
 
     //gl_FragColor = texture2D ( map, vUv );
     //gl_FragColor = vec4(tex.r, tex.g, tex.b, tex.a);
