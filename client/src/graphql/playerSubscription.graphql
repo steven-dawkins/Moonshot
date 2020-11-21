@@ -1,0 +1,6 @@
+subscription Players {
+  playerJoined {
+    name
+    index
+  }
+}

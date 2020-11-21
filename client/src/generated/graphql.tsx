@@ -14,7 +14,13 @@ export type Scalars = {
 export type ChatQuery = {
   __typename?: 'ChatQuery';
   messages?: Maybe<Array<Maybe<Scalars['String']>>>;
-  players?: Maybe<Array<Maybe<Scalars['String']>>>;
+  players?: Maybe<Array<Maybe<Player>>>;
+};
+
+export type Player = {
+  __typename?: 'Player';
+  index?: Maybe<Scalars['Int']>;
+  name?: Maybe<Scalars['String']>;
 };
 
 export type ChatMutation = {
@@ -36,6 +42,7 @@ export type ChatMutationJoinArgs = {
 export type ChatSubscriptions = {
   __typename?: 'ChatSubscriptions';
   messageAdded?: Maybe<Scalars['String']>;
+  playerJoined?: Maybe<Player>;
 };
 
 export type JoinMutationVariables = Exact<{
@@ -48,12 +55,26 @@ export type JoinMutation = (
   & Pick<ChatMutation, 'join'>
 );
 
+export type PlayersSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type PlayersSubscription = (
+  { __typename?: 'ChatSubscriptions' }
+  & { playerJoined?: Maybe<(
+    { __typename?: 'Player' }
+    & Pick<Player, 'name' | 'index'>
+  )> }
+);
+
 export type GetPlayersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetPlayersQuery = (
   { __typename?: 'ChatQuery' }
-  & Pick<ChatQuery, 'players'>
+  & { players?: Maybe<Array<Maybe<(
+    { __typename?: 'Player' }
+    & Pick<Player, 'name' | 'index'>
+  )>>> }
 );
 
 
@@ -87,9 +108,41 @@ export function useJoinMutation(baseOptions?: Apollo.MutationHookOptions<JoinMut
 export type JoinMutationHookResult = ReturnType<typeof useJoinMutation>;
 export type JoinMutationResult = Apollo.MutationResult<JoinMutation>;
 export type JoinMutationOptions = Apollo.BaseMutationOptions<JoinMutation, JoinMutationVariables>;
+export const PlayersDocument = gql`
+    subscription Players {
+  playerJoined {
+    name
+    index
+  }
+}
+    `;
+
+/**
+ * __usePlayersSubscription__
+ *
+ * To run a query within a React component, call `usePlayersSubscription` and pass it any options that fit your needs.
+ * When your component renders, `usePlayersSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = usePlayersSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function usePlayersSubscription(baseOptions?: Apollo.SubscriptionHookOptions<PlayersSubscription, PlayersSubscriptionVariables>) {
+        return Apollo.useSubscription<PlayersSubscription, PlayersSubscriptionVariables>(PlayersDocument, baseOptions);
+      }
+export type PlayersSubscriptionHookResult = ReturnType<typeof usePlayersSubscription>;
+export type PlayersSubscriptionResult = Apollo.SubscriptionResult<PlayersSubscription>;
 export const GetPlayersDocument = gql`
     query GetPlayers {
-  players
+  players {
+    name
+    index
+  }
 }
     `;
 
