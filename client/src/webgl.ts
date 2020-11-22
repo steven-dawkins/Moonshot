@@ -1,5 +1,5 @@
 import {
-    WebGLRenderer, Scene, TextureLoader, OrthographicCamera, PlaneGeometry, MeshBasicMaterial, Mesh, Object3D, Vector3, Vector2, ShaderMaterial, Material
+    WebGLRenderer, Scene, TextureLoader, OrthographicCamera, PlaneGeometry, MeshBasicMaterial, Mesh, Object3D, Vector3, Vector2, ShaderMaterial, Material, IUniform
 } from "three";
 
 import rocketImage from "../assets/sprites/onlyrocket.png";
@@ -56,24 +56,6 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: numb
 
     const rocketMaterial = new MeshBasicMaterial({ map: loader.load("./" + rocketImage), transparent: true });
 
-    const uniforms = {
-        time: { type: "f", value: 1.0 },
-        offset: { type: "f", value: 0.0 },
-        resolution: { type: "v2", value: new Vector2() },
-        map: { type: "t", value: 0 }
-    };
-
-    var starMaterial = new ShaderMaterial({
-        defines: { USE_MAP: '' },
-        uniforms: uniforms,
-        vertexShader: starShader,
-        fragmentShader: starFragShader,
-        transparent: true
-    });
-
-    starMaterial.uniforms.map.value = loader.load("./" + starImage);
-
-
     camera.position.z = 200;
 
     renderer.setSize(WIDTH, HEIGHT);
@@ -114,7 +96,29 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: numb
     const earthMaterial = new MeshBasicMaterial({ map: loader.load("./" + earthImage), transparent: true });
     scene.add(CreatePlane(earthMaterial, earthRadius * 2, earthRadius * 2, earthPosition.x, earthPosition.y));
 
-    for (var i = 0; i < 400; i++) {
+    const starUniforms:{ [uniform: string]: IUniform }[] = [];
+
+    for (var i = 0; i < 40; i++) {
+
+        const uniforms = {
+            time: { type: "f", value: 1.0 },
+            offset: { type: "f", value: i },
+            resolution: { type: "v2", value: new Vector2() },
+            map: { type: "t", value: 0 }
+        };
+
+        starUniforms.push(uniforms);
+
+        var starMaterial = new ShaderMaterial({
+            defines: { USE_MAP: '' },
+            uniforms: uniforms,
+            vertexShader: starShader,
+            fragmentShader: starFragShader,
+            transparent: true
+        });
+
+        starMaterial.uniforms.map.value = loader.load("./" + starImage);
+
         const geometry: PlaneGeometry = new PlaneGeometry(20, 20);
 
         const mesh2: Object3D = new Mesh(geometry, starMaterial)
@@ -157,7 +161,12 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: numb
     function webglRender(): void {
         var elapsedMilliseconds = Date.now() - startTime;
         var elapsedSeconds = elapsedMilliseconds / 1000.;
-        uniforms.time.value = 60. * elapsedSeconds;
+
+        for(var i = 0; i < starUniforms.length; i++)
+        {
+            starUniforms[i].time.value = 60. * elapsedSeconds;
+        }
+        
         backgroundUniforms.u_time.value = elapsedSeconds;
 
         var currentRocketPosition = calculateRocketPosition(position, numRockets, typist.Position);

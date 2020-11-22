@@ -22,9 +22,13 @@ void main()	{
     //gl_FragColor = texture2D(map, gl_PointCoord );
 
     //float t = time + floor(random(gl_FragCoord.xy / 600.0) * 100.0);
-    float t = time;
+    float t = time + random(vec2(offset, offset)) * 1000.0;
+
+    float intensity = max(sin(t / 20.0), 0.0);
+    intensity = intensity * intensity * intensity * intensity;
+    intensity = 1.0 - intensity;
     //float t = 0.0;
-    gl_FragColor = texture2D(map, vUv ) * max(abs(sin(t / 100.0)), 0.5);
+    gl_FragColor = texture2D(map, vUv ) * max(intensity, 0.5);
     //gl_FragColor.r = gl_FragCoord.z * 255.0 / 400.0;
     //gl_FragColor.r = 255.0;
     // gl_FragColor.r = 0.0;
