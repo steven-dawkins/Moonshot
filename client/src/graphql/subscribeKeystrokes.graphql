@@ -1,0 +1,6 @@
+subscription Keystrokes {
+  keystrokeAdded {
+    playerName
+    keystroke
+  }
+}

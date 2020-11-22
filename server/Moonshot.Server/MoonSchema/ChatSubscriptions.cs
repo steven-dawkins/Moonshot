@@ -26,9 +26,9 @@ namespace Moonshot.Server.MoonSchema
 
             AddField(new EventStreamFieldType
             {
-                Name = "messageAdded",
+                Name = "keystrokeAdded",
                 Type = typeof(PlayerKeystrokeGraphType),
-                Resolver = new FuncFieldResolver<string>(ResolveMessage),
+                Resolver = new FuncFieldResolver<PlayerKeystroke>(ResolveKeystroke),
                 Subscriber = new EventStreamResolver<PlayerKeystroke>(SubscribeKeystrokes)
             });
         }
@@ -52,9 +52,9 @@ namespace Moonshot.Server.MoonSchema
             return _chat.PlayersStream;
         }
 
-        private string ResolveMessage(IResolveFieldContext context)
+        private PlayerKeystroke ResolveKeystroke(IResolveFieldContext context)
         {
-            var message = context.Source as string;
+            var message = context.Source as PlayerKeystroke;
 
             return message;
         }

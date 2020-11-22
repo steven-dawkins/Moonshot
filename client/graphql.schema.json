@@ -16,15 +16,15 @@
         "description": null,
         "fields": [
           {
-            "name": "messages",
+            "name": "keystrokes",
             "description": null,
             "args": [],
             "type": {
               "kind": "LIST",
               "name": null,
               "ofType": {
-                "kind": "SCALAR",
-                "name": "String",
+                "kind": "OBJECT",
+                "name": "PlayerKeystroke",
                 "ofType": null
               }
             },
@@ -43,6 +43,41 @@
                 "name": "Player",
                 "ofType": null
               }
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "inputFields": null,
+        "interfaces": [],
+        "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "OBJECT",
+        "name": "PlayerKeystroke",
+        "description": null,
+        "fields": [
+          {
+            "name": "keystroke",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "playerName",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -114,11 +149,21 @@
         "description": null,
         "fields": [
           {
-            "name": "addMessage",
+            "name": "addKeystroke",
             "description": null,
             "args": [
               {
-                "name": "message",
+                "name": "playerName",
+                "description": null,
+                "type": {
+                  "kind": "SCALAR",
+                  "name": "String",
+                  "ofType": null
+                },
+                "defaultValue": null
+              },
+              {
+                "name": "keystroke",
                 "description": null,
                 "type": {
                   "kind": "SCALAR",
@@ -129,8 +174,8 @@
               }
             ],
             "type": {
-              "kind": "SCALAR",
-              "name": "String",
+              "kind": "OBJECT",
+              "name": "PlayerKeystroke",
               "ofType": null
             },
             "isDeprecated": false,
@@ -171,12 +216,12 @@
         "description": null,
         "fields": [
           {
-            "name": "messageAdded",
+            "name": "keystrokeAdded",
             "description": null,
             "args": [],
             "type": {
-              "kind": "SCALAR",
-              "name": "String",
+              "kind": "OBJECT",
+              "name": "PlayerKeystroke",
               "ofType": null
             },
             "isDeprecated": false,

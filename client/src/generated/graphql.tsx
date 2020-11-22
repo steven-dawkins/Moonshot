@@ -13,8 +13,14 @@ export type Scalars = {
 
 export type ChatQuery = {
   __typename?: 'ChatQuery';
-  messages?: Maybe<Array<Maybe<Scalars['String']>>>;
+  keystrokes?: Maybe<Array<Maybe<PlayerKeystroke>>>;
   players?: Maybe<Array<Maybe<Player>>>;
+};
+
+export type PlayerKeystroke = {
+  __typename?: 'PlayerKeystroke';
+  keystroke?: Maybe<Scalars['String']>;
+  playerName?: Maybe<Scalars['String']>;
 };
 
 export type Player = {
@@ -25,13 +31,14 @@ export type Player = {
 
 export type ChatMutation = {
   __typename?: 'ChatMutation';
-  addMessage?: Maybe<Scalars['String']>;
+  addKeystroke?: Maybe<PlayerKeystroke>;
   join?: Maybe<Player>;
 };
 
 
-export type ChatMutationAddMessageArgs = {
-  message?: Maybe<Scalars['String']>;
+export type ChatMutationAddKeystrokeArgs = {
+  playerName?: Maybe<Scalars['String']>;
+  keystroke?: Maybe<Scalars['String']>;
 };
 
 
@@ -41,7 +48,7 @@ export type ChatMutationJoinArgs = {
 
 export type ChatSubscriptions = {
   __typename?: 'ChatSubscriptions';
-  messageAdded?: Maybe<Scalars['String']>;
+  keystrokeAdded?: Maybe<PlayerKeystroke>;
   playerJoined?: Maybe<Player>;
 };
 
@@ -78,6 +85,17 @@ export type GetPlayersQuery = (
     { __typename?: 'Player' }
     & Pick<Player, 'name' | 'index'>
   )>>> }
+);
+
+export type KeystrokesSubscriptionVariables = Exact<{ [key: string]: never; }>;
+
+
+export type KeystrokesSubscription = (
+  { __typename?: 'ChatSubscriptions' }
+  & { keystrokeAdded?: Maybe<(
+    { __typename?: 'PlayerKeystroke' }
+    & Pick<PlayerKeystroke, 'playerName' | 'keystroke'>
+  )> }
 );
 
 
@@ -176,3 +194,32 @@ export function useGetPlayersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions
 export type GetPlayersQueryHookResult = ReturnType<typeof useGetPlayersQuery>;
 export type GetPlayersLazyQueryHookResult = ReturnType<typeof useGetPlayersLazyQuery>;
 export type GetPlayersQueryResult = Apollo.QueryResult<GetPlayersQuery, GetPlayersQueryVariables>;
+export const KeystrokesDocument = gql`
+    subscription Keystrokes {
+  keystrokeAdded {
+    playerName
+    keystroke
+  }
+}
+    `;
+
+/**
+ * __useKeystrokesSubscription__
+ *
+ * To run a query within a React component, call `useKeystrokesSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useKeystrokesSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useKeystrokesSubscription({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useKeystrokesSubscription(baseOptions?: Apollo.SubscriptionHookOptions<KeystrokesSubscription, KeystrokesSubscriptionVariables>) {
+        return Apollo.useSubscription<KeystrokesSubscription, KeystrokesSubscriptionVariables>(KeystrokesDocument, baseOptions);
+      }
+export type KeystrokesSubscriptionHookResult = ReturnType<typeof useKeystrokesSubscription>;
+export type KeystrokesSubscriptionResult = Apollo.SubscriptionResult<KeystrokesSubscription>;
