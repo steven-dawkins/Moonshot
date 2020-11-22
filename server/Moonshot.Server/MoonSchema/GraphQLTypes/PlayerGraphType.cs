@@ -3,6 +3,7 @@ using Moonshot.Server.Models;
 
 namespace Moonshot.Server.MoonSchema.GraphQLTypes
 {
+
     public class PlayerGraphType : ObjectGraphType<Player>
     {
         public PlayerGraphType()

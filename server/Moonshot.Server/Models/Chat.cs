@@ -8,14 +8,14 @@ namespace Moonshot.Server.Models
 
     public class Chat : IChat
     {
-        private readonly ConcurrentDictionary<string, Player> players = new ConcurrentDictionary<string, Player>();
-        private readonly List<string> messages = new List<string>();
-        private readonly MessageObserver<string> messageObserver;
+        private readonly ConcurrentDictionary<string, Player> players;
+        private readonly List<PlayerKeystroke> messages;
+        private readonly MessageObserver<PlayerKeystroke> messageObserver;
         private readonly MessageObserver<Player> playerObserver;
 
-        public IEnumerable<string> AllMessages => this.messages;
+        public IEnumerable<PlayerKeystroke> AllMessages => this.messages;
 
-        public IObservable<string> MessagesStram => this.messageObserver;
+        public IObservable<PlayerKeystroke> MessagesStream => this.messageObserver;
 
         public IObservable<Player> PlayersStream => this.playerObserver;
 
@@ -23,7 +23,9 @@ namespace Moonshot.Server.Models
 
         public Chat()
         {
-            this.messageObserver = new MessageObserver<string>();
+            this.players = new ConcurrentDictionary<string, Player>();
+            this.messages = new List<PlayerKeystroke>();
+            this.messageObserver = new MessageObserver<PlayerKeystroke>();
             this.playerObserver = new MessageObserver<Player>();
         }
 
@@ -46,13 +48,13 @@ namespace Moonshot.Server.Models
             }
         }
 
-        public string AddMessage(string receivedMessage)
+        public PlayerKeystroke AddMessage(PlayerKeystroke keystroke)
         {
-            this.messages.Add(receivedMessage);
+            this.messages.Add(keystroke);
 
-            this.messageObserver.Observe(receivedMessage);
+            this.messageObserver.Observe(keystroke);
 
-            return receivedMessage;
+            return keystroke;
         }
 
         interface IObserverRemover<T>

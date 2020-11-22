@@ -27,9 +27,9 @@ namespace Moonshot.Server.MoonSchema
             AddField(new EventStreamFieldType
             {
                 Name = "messageAdded",
-                Type = typeof(StringGraphType),
+                Type = typeof(PlayerKeystrokeGraphType),
                 Resolver = new FuncFieldResolver<string>(ResolveMessage),
-                Subscriber = new EventStreamResolver<string>(Subscribe)
+                Subscriber = new EventStreamResolver<PlayerKeystroke>(SubscribeKeystrokes)
             });
         }
 
@@ -59,7 +59,7 @@ namespace Moonshot.Server.MoonSchema
             return message;
         }
 
-        private IObservable<string> Subscribe(IResolveEventStreamContext context)
+        private IObservable<PlayerKeystroke> SubscribeKeystrokes(IResolveEventStreamContext context)
         {
             //var messageContext = context.UserContext.As<MessageHandlingContext>();
             //var user = messageContext.Get<ClaimsPrincipal>("user");
@@ -68,7 +68,7 @@ namespace Moonshot.Server.MoonSchema
             //if (user != null)
             //    sub = user.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
 
-            return _chat.MessagesStram;
+            return _chat.MessagesStream;
         }
     }
 }

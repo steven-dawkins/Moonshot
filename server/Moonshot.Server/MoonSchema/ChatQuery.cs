@@ -9,7 +9,7 @@ namespace Moonshot.Server.MoonSchema
     {
         public ChatQuery(IChat chat)
         {
-            Field<ListGraphType<StringGraphType>>("messages", resolve: context => chat.AllMessages.Take(100));
+            Field<ListGraphType<PlayerKeystrokeGraphType>>("keystrokes", resolve: context => chat.AllMessages.Take(100));
 
             Field<ListGraphType<PlayerGraphType>>("players", resolve: context => chat.Players.Take(100));
         }

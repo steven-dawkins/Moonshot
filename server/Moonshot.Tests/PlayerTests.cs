@@ -36,7 +36,9 @@ namespace Moonshot.Tests
             var playersMutationRequest = new GraphQLRequest
             {
                 Query = @"mutation Join($name: String) {
-                    join(name: $name)
+                    join(name: $name) {
+                        name
+                    }
                   }",
                 Variables = new
                 {
@@ -65,7 +67,7 @@ namespace Moonshot.Tests
 
         public class GraphQlPlayerModelRoot
         {
-            public string Join { get; set; }
+            public Player Join { get; set; }
         }
     }
 }

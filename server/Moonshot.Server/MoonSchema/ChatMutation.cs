@@ -20,14 +20,16 @@ namespace Moonshot.Server.MoonSchema
                     return message;
                 });
 
-            Field<StringGraphType>("addMessage",
+            Field<PlayerKeystrokeGraphType>("addKeystroke",
                 arguments: new QueryArguments(
-                    new QueryArgument<StringGraphType> { Name = "message" }
+                    new QueryArgument<StringGraphType> { Name = nameof(PlayerKeystroke.PlayerName) },
+                    new QueryArgument<StringGraphType> { Name = nameof(PlayerKeystroke.Keystroke) }
                 ),
                 resolve: context =>
                 {
-                    var receivedMessage = context.GetArgument<string>("message");
-                    var message = chat.AddMessage(receivedMessage);
+                    var playerName = context.GetArgument<string>(nameof(PlayerKeystroke.PlayerName));
+                    var receivedMessage = context.GetArgument<string>(nameof(PlayerKeystroke.Keystroke));
+                    var message = chat.AddMessage(new PlayerKeystroke(playerName, receivedMessage));
                     return message;
                 });
         }
