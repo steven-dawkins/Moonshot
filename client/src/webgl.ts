@@ -29,8 +29,11 @@ FAR = 10000;
 
 export function calculateRocketPosition(position: number, numRockets: number, progress: number) {
 
-    const startPositionX = Math.sin(position * Math.PI * 2 / numRockets) * earthRadius + earthPosition.x;
-    const startPositionY = Math.cos(position * Math.PI * 2 / numRockets) * earthRadius + earthPosition.y;
+
+    const alpha = position / numRockets;
+
+    const startPositionX = Math.sin(alpha * Math.PI - Math.PI/4) * earthRadius + earthPosition.x;
+    const startPositionY = Math.cos(alpha * Math.PI - Math.PI/4) * earthRadius + earthPosition.y;
 
     const endPositionX = moonPosition.x - moonRadius;
     const endPositionY = moonPosition.y - moonRadius;
@@ -80,8 +83,8 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: numb
 
     scene.add(background);
 
-    const rockets = [...Array(players.length).keys()].map(i => {
-        const rocketPosition = calculateRocketPosition(i, numRockets, 0);
+    const rockets = players.map(player => {
+        const rocketPosition = calculateRocketPosition(player.player.index, numRockets, 0);
         const newRocket: Object3D = CreatePlane(rocketMaterial, 50, 50, rocketPosition.x, rocketPosition.y);
         newRocket.setRotationFromAxisAngle(new Vector3(0, 0, 1), -Math.PI / 4);
 
