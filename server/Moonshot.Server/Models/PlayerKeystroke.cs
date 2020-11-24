@@ -1,4 +1,6 @@
-﻿namespace Moonshot.Server.Models
+﻿using System;
+
+namespace Moonshot.Server.Models
 {
     public class PlayerKeystroke
     {
@@ -6,10 +8,13 @@
         {
             this.PlayerName = playerName;
             this.Keystroke = message;
+            this.Id = Guid.NewGuid();
         }
 
         public string PlayerName { get; }
 
         public string Keystroke { get; }
+
+        public Guid Id { get; }
     }
 }

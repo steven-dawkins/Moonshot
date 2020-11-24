@@ -19,6 +19,7 @@ export type ChatQuery = {
 
 export type PlayerKeystroke = {
   __typename?: 'PlayerKeystroke';
+  id?: Maybe<Scalars['String']>;
   keystroke?: Maybe<Scalars['String']>;
   playerName?: Maybe<Scalars['String']>;
 };
@@ -94,7 +95,7 @@ export type KeystrokesSubscription = (
   { __typename?: 'ChatSubscriptions' }
   & { keystrokeAdded?: Maybe<(
     { __typename?: 'PlayerKeystroke' }
-    & Pick<PlayerKeystroke, 'playerName' | 'keystroke'>
+    & Pick<PlayerKeystroke, 'playerName' | 'keystroke' | 'id'>
   )> }
 );
 
@@ -199,6 +200,7 @@ export const KeystrokesDocument = gql`
   keystrokeAdded {
     playerName
     keystroke
+    id
   }
 }
     `;

@@ -2,7 +2,7 @@ import {
     WebGLRenderer, Scene, TextureLoader, OrthographicCamera, PlaneGeometry, MeshBasicMaterial, Mesh, Object3D, Vector3, Vector2, ShaderMaterial, Material, IUniform
 } from "three";
 
-import rocketImage from "../assets/sprites/onlyrocket.png";
+import rocketImage from "../assets/sprites/cohete_off.png";
 import starImage from "../assets/sprites/star.png";
 import moonImage from "../assets/sprites/moon-dif-512.png";
 import earthImage from "../assets/sprites/earth-0062.png";
@@ -14,6 +14,7 @@ import backgroundShader from "../assets/shaders/background.vert";
 import backgroundFragShader from "../assets/shaders/background.frag";
 
 import { Typist } from "./typist";
+import { TypistPlayer } from "./TypistPlayer";
 
 const earthPosition = new Vector2(100, 100);
 const earthRadius = 100;
@@ -40,8 +41,7 @@ export function calculateRocketPosition(position: number, numRockets: number, pr
     return startPosition.multiplyScalar(1 - progress).add(endPosition.multiplyScalar(progress));
 }
 
-export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: number, numRockets: number) {
-    console.log("init webgl");
+export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: number, numRockets: number, players: TypistPlayer[]) {
 
     const renderer = new WebGLRenderer({});
     renderer.autoClear = true;
@@ -80,14 +80,15 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: numb
 
     scene.add(background);
 
-    const rockets = [...Array(numRockets).keys()].map(i => {
+    const rockets = [...Array(players.length).keys()].map(i => {
         const rocketPosition = calculateRocketPosition(i, numRockets, 0);
         const newRocket: Object3D = CreatePlane(rocketMaterial, 50, 50, rocketPosition.x, rocketPosition.y);
         newRocket.setRotationFromAxisAngle(new Vector3(0, 0, 1), -Math.PI / 4);
 
         scene.add(newRocket);
         return newRocket;
-    })
+    });
+
     const rocket = rockets[0];
 
     const moonMaterial = new MeshBasicMaterial({ map: loader.load("./" + moonImage), transparent: true });
@@ -169,11 +170,42 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: numb
         
         backgroundUniforms.u_time.value = elapsedSeconds;
 
-        var currentRocketPosition = calculateRocketPosition(position, numRockets, typist.Position);
-        rocket.position.setX(currentRocketPosition.x);
-        rocket.position.setY(currentRocketPosition.y);
-        rocket.position.setZ(50);
-        rocket.setRotationFromAxisAngle(new Vector3(0, 0, 1), -Math.PI / 4);
+        var currentRocketPosition = calculateRocketPosition(position, players.length, typist.Position);
+
+        if (rocket)
+        {
+            rocket.position.setX(currentRocketPosition.x);
+            rocket.position.setY(currentRocketPosition.y);
+            rocket.position.setZ(50);
+            rocket.setRotationFromAxisAngle(new Vector3(0, 0, 1), -Math.PI / 4);
+        }
+
+        players.map(playerI => {
+
+        });
+
+        [...Array(players.length).keys()].map(i => {
+            var rocketI = rockets[i];
+
+            if (!rocketI)
+            {
+                const rocketPosition = calculateRocketPosition(i, numRockets, 0);
+                rocketI = CreatePlane(rocketMaterial, 50, 50, rocketPosition.x, rocketPosition.y);
+                rocketI.setRotationFromAxisAngle(new Vector3(0, 0, 1), -Math.PI / 4);
+
+                scene.add(rocketI);
+                rockets[i] = rocketI;
+            }
+
+            const playerI = players[i];
+
+            const rocketPosition = calculateRocketPosition(i, players.length, playerI.typist.Position);
+
+            rocketI.position.setX(rocketPosition.x);
+            rocketI.position.setY(rocketPosition.y);
+            rocketI.position.setZ(50);
+            rocketI.setRotationFromAxisAngle(new Vector3(0, 0, 1), -Math.PI / 4);
+        });
 
         renderer.setViewport(0, 0, WIDTH, HEIGHT);
         renderer.render(scene, camera);

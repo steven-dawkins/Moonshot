@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import { Typist } from '../typist';
+import { TypistPlayer } from '../TypistPlayer';
 import { InitWebgl } from '../webgl';
 
 function isAlphaNumeric(str: string) {
@@ -24,10 +25,17 @@ function isAlphaNumeric(str: string) {
   return true;
 };
 
-export class WebGlScene extends React.Component<{typist: Typist, name: string}, {typist: Typist}> {
+interface IWebGlSceneProps
+{
+    typist: Typist;
+    name: string;
+    players: TypistPlayer[];
+}
+
+export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typist}> {
     private el: HTMLDivElement | null = null;
 
-    constructor(props: {typist: Typist, name: string})
+    constructor(props: IWebGlSceneProps)
     {
       super(props);
       
@@ -37,11 +45,13 @@ export class WebGlScene extends React.Component<{typist: Typist, name: string}, 
     }
 
     onKeyDown(evt: KeyboardEvent) {
-      
+      console.log("keydown");
       if (evt.key.length <= 1 && isAlphaNumeric(evt.key))
       {
-        this.state.typist.ProcessCharacter(evt.key);
+        this.state.typist.ProcessCharacter(evt.key, null);
         this.setState({ typist: this.state.typist });
+
+        // todo: publish to server
       }
 
       return true;
@@ -52,7 +62,7 @@ export class WebGlScene extends React.Component<{typist: Typist, name: string}, 
       {
         window.addEventListener("keydown", this.onKeyDown);
 
-        InitWebgl(this.el, this.state.typist, 0, 5);
+        InitWebgl(this.el, this.state.typist, 0, 5, this.props.players);
       }
     }
   
