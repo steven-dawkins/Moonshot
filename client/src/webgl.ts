@@ -29,7 +29,6 @@ FAR = 10000;
 
 export function calculateRocketPosition(position: number, numRockets: number, progress: number) {
 
-
     const alpha = position / numRockets;
 
     const startPositionX = Math.sin(alpha * Math.PI - Math.PI/4) * earthRadius + earthPosition.x;
@@ -41,7 +40,21 @@ export function calculateRocketPosition(position: number, numRockets: number, pr
     const startPosition = new Vector2(startPositionX, startPositionY);
     const endPosition = new Vector2(endPositionX, endPositionY);
 
-    return startPosition.multiplyScalar(1 - progress).add(endPosition.multiplyScalar(progress));
+    const midpoint = startPosition.clone().add(startPosition.clone().sub(earthPosition).multiplyScalar(2.0));
+
+    return startPosition.multiplyScalar((1 - progress) * (1 - progress))
+            .add(midpoint.multiplyScalar(2.0 * (1 - progress) * progress))
+            .add(endPosition.multiplyScalar(progress * progress));
+}
+
+function calculateRocketAngle(position: number, numRockets: number, progress: number)
+{
+    const previous = calculateRocketPosition(position, numRockets, progress - 0.01);
+    const current = calculateRocketPosition(position, numRockets, progress);
+
+    const diff = current.sub(previous);
+
+    return diff.angle();
 }
 
 export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: number, numRockets: number, players: TypistPlayer[]) {
@@ -84,15 +97,14 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: numb
     scene.add(background);
 
     const rockets = players.map(player => {
-        const rocketPosition = calculateRocketPosition(player.player.index, numRockets, 0);
+        const rocketPosition = calculateRocketPosition(player.player.index, players.length, 0);
+        const rocketAngle = calculateRocketAngle(player.player.index, players.length, 0);
         const newRocket: Object3D = CreatePlane(rocketMaterial, 50, 50, rocketPosition.x, rocketPosition.y);
-        newRocket.setRotationFromAxisAngle(new Vector3(0, 0, 1), -Math.PI / 4);
+        newRocket.setRotationFromAxisAngle(new Vector3(0, 0, 1), rocketAngle);
 
         scene.add(newRocket);
         return newRocket;
     });
-
-    const rocket = rockets[0];
 
     const moonMaterial = new MeshBasicMaterial({ map: loader.load("./" + moonImage), transparent: true });
     scene.add(CreatePlane(moonMaterial, moonRadius * 2, moonRadius * 2, moonPosition.x, moonPosition.y));
@@ -173,41 +185,27 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: numb
         
         backgroundUniforms.u_time.value = elapsedSeconds;
 
-        var currentRocketPosition = calculateRocketPosition(position, players.length, typist.Position);
-
-        if (rocket)
-        {
-            rocket.position.setX(currentRocketPosition.x);
-            rocket.position.setY(currentRocketPosition.y);
-            rocket.position.setZ(50);
-            rocket.setRotationFromAxisAngle(new Vector3(0, 0, 1), -Math.PI / 4);
-        }
-
         players.map(playerI => {
 
-        });
-
-        [...Array(players.length).keys()].map(i => {
+            const i = playerI.player.index;
             var rocketI = rockets[i];
+
+            const rocketPosition = calculateRocketPosition(i, players.length, playerI.typist.Position);
+            
+            const rocketAngle = calculateRocketAngle(i, players.length, playerI.typist.Position);
 
             if (!rocketI)
             {
-                const rocketPosition = calculateRocketPosition(i, numRockets, 0);
                 rocketI = CreatePlane(rocketMaterial, 50, 50, rocketPosition.x, rocketPosition.y);
-                rocketI.setRotationFromAxisAngle(new Vector3(0, 0, 1), -Math.PI / 4);
 
                 scene.add(rocketI);
                 rockets[i] = rocketI;
             }
 
-            const playerI = players[i];
-
-            const rocketPosition = calculateRocketPosition(i, players.length, playerI.typist.Position);
-
             rocketI.position.setX(rocketPosition.x);
             rocketI.position.setY(rocketPosition.y);
             rocketI.position.setZ(50);
-            rocketI.setRotationFromAxisAngle(new Vector3(0, 0, 1), -Math.PI / 4);
+            rocketI.setRotationFromAxisAngle(new Vector3(0, 0, 1), rocketAngle - Math.PI / 2);
         });
 
         renderer.setViewport(0, 0, WIDTH, HEIGHT);
