@@ -26,14 +26,14 @@ export type PlayerKeystroke = {
 
 export type Player = {
   __typename?: 'Player';
-  index?: Maybe<Scalars['Int']>;
-  name?: Maybe<Scalars['String']>;
+  index: Scalars['Int'];
+  name: Scalars['String'];
 };
 
 export type ChatMutation = {
   __typename?: 'ChatMutation';
   addKeystroke?: Maybe<PlayerKeystroke>;
-  join?: Maybe<Player>;
+  join: Player;
 };
 
 
@@ -60,10 +60,10 @@ export type JoinMutationVariables = Exact<{
 
 export type JoinMutation = (
   { __typename?: 'ChatMutation' }
-  & { join?: Maybe<(
+  & { join: (
     { __typename?: 'Player' }
     & Pick<Player, 'name' | 'index'>
-  )> }
+  ) }
 );
 
 export type PlayersSubscriptionVariables = Exact<{ [key: string]: never; }>;

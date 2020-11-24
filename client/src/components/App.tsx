@@ -60,6 +60,10 @@ export function App() {
         onSubscriptionData: data => {
             const playerJoined = data.subscriptionData.data?.playerJoined;
 
+            if (!playerJoined) {
+                return;
+            }
+
             const p = new TypistPlayer({ name: playerJoined?.name, index: playerJoined?.index }, text);
 
             var existing = players.filter(t => t.player.index === p.player.index);
@@ -80,8 +84,12 @@ export function App() {
         variables: {
             name: name
         },
-        onCompleted: data => {            
-            const p = new TypistPlayer({ name: data?.join?.name, index: data?.join?.index }, text);
+        onCompleted: data => {
+            if (!data.join) {
+                return;
+            }
+
+            const p = new TypistPlayer({ name: data.join.name, index: data?.join.index }, text);
 
             var existing = players.filter(t => t.player.index === p.player.index);
 
@@ -137,6 +145,6 @@ export function App() {
                 <li key={player.player.name}>{player.player.name} ({player.typist.Position})</li>)}
         </ul>
 
-        <WebGlScene typist={player.typist} name={data.join.name} players={players} ></WebGlScene>
+        <WebGlScene player={player} players={players} ></WebGlScene>
     </div>;
 }

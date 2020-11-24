@@ -9,7 +9,7 @@ namespace Moonshot.Server.MoonSchema
     {
         public ChatMutation(IChat chat)
         {
-            Field<PlayerGraphType>("join",
+            Field<NonNullGraphType<PlayerGraphType>>("join",
                 arguments: new QueryArguments(
                     new QueryArgument<StringGraphType> { Name = "name" }
                 ),

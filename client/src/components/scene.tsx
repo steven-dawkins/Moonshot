@@ -27,8 +27,7 @@ function isAlphaNumeric(str: string) {
 
 interface IWebGlSceneProps
 {
-    typist: Typist;
-    name: string;
+    player: TypistPlayer;
     players: TypistPlayer[];
 }
 
@@ -39,7 +38,7 @@ export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typis
     {
       super(props);
       
-      this.state = { typist: props.typist };
+      this.state = { typist: props.player.typist };
 
       this.onKeyDown = this.onKeyDown.bind(this);
     }
@@ -73,7 +72,7 @@ export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typis
   
     render() {
       return <div>
-          <div>Hi: {this.props.name}</div>
+          <div>Hi: {this.props.player.player.name}</div>
           <div><span style={{color: "red"}}>{this.state.typist.TypedText}</span>|<span>{this.state.typist.UnTypedText}</span></div>
           <div ref={el => this.el = el} />
         </div>;
