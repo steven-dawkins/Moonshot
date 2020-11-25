@@ -1,5 +1,6 @@
 varying vec2 vUv;
 uniform float time;
+uniform float magnitude;
 uniform sampler2D uDiffuseSampler;
 
 void main()	{
@@ -34,5 +35,9 @@ void main()	{
     finalNoise = clamp(finalNoise, 0.05, 1.0);
     color.w = texture2D(uDiffuseSampler, finalNoise).z*2.0;
     color.w = color.w*texture2D(uDiffuseSampler, uv).z;
+
+    // scale flame according to magnitude
+    color.w = color.w * (1.0 - 8.0 * uv.y * (1.0 - magnitude));
+
     gl_FragColor = color;
 }

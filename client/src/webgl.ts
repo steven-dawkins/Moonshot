@@ -1,5 +1,5 @@
 import {
-    WebGLRenderer, Scene, TextureLoader, OrthographicCamera, PlaneGeometry, MeshBasicMaterial, Mesh, Object3D, Vector3, Vector2, ShaderMaterial, Material, IUniform
+    WebGLRenderer, Scene, TextureLoader, OrthographicCamera, PlaneGeometry, MeshBasicMaterial, Mesh, Object3D, Vector3, Vector2, ShaderMaterial, Material, IUniform, MirroredRepeatWrapping
 } from "three";
 
 import rocketImage from "../assets/sprites/cohete_off.png";
@@ -83,18 +83,10 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: numb
 
     const rocketMaterial = new MeshBasicMaterial({ map: loader.load("./" + rocketImage), transparent: true });
 
-    const flameUniforms = {
-        time: { type: "f", value: 1.0 },
-        uDiffuseSampler: { type: "t", value: 0 }
-    };
-    const flameMaterial = new ShaderMaterial({
-        defines: { USE_MAP: '' },
-        uniforms: flameUniforms,
-        vertexShader: flameShader,
-        fragmentShader: flameFragShader,
-        transparent: true
-    });
-    flameMaterial.uniforms.uDiffuseSampler.value = loader.load("./" + flameImage);
+    const fi = loader.load("./" + flameImage);
+    fi.wrapS = MirroredRepeatWrapping;
+    fi.wrapT = MirroredRepeatWrapping;
+
 
     camera.position.z = 200;
 
@@ -186,8 +178,7 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: numb
 
     
 
-    const rockets = new Array<Object3D>();
-    const flames = new Array<Object3D>();
+    const rockets = new Array<{mesh: Object3D, flameUniforms: { [uniform: string]: IUniform }, flameMesh: Object3D}>();
 
     var i = 0.0;
 
@@ -203,7 +194,6 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: numb
         }
         
         backgroundUniforms.u_time.value = elapsedSeconds;
-        flameUniforms.time.value = elapsedSeconds % 1;
 
         players.map(playerI => {
 
@@ -213,31 +203,46 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: numb
             const rocketAngle = calculateRocketAngle(i, players.length, playerI.typist.Position);
             const vec = calculateRocketVector(i, players.length, playerI.typist.Position);
 
-            var rocketI = rockets[i];
-            var flameI = flames[i];
-
-            if (!rocketI)
+            if (!rockets[i])
             {
-                rocketI = CreatePlane(rocketMaterial, 50, 50, rocketPosition.x, rocketPosition.y);
-                scene.add(rocketI);
-                rockets[i] = rocketI;
+                const rocketMesh = CreatePlane(rocketMaterial, 50, 50, rocketPosition.x, rocketPosition.y);
+                scene.add(rocketMesh);
 
-                flameI = CreatePlane(flameMaterial, 50, 50, rocketPosition.x, rocketPosition.y);
+                const flameUniforms = {
+                    time: { type: "f", value: 1.0 },
+                    uDiffuseSampler: { type: "t", value: 0 },
+                    magnitude: { type: "f", value: 0.0 }
+                };
+                const flameMaterial = new ShaderMaterial({
+                    defines: { USE_MAP: '' },
+                    uniforms: flameUniforms,
+                    vertexShader: flameShader,
+                    fragmentShader: flameFragShader,
+                    transparent: true
+                });
+            
+                flameMaterial.uniforms.uDiffuseSampler.value = fi;
+                const flameI = CreatePlane(flameMaterial, 50, 50, rocketPosition.x, rocketPosition.y);
                 scene.add(flameI);
-                flames[i] = flameI;
+                rockets[i] = { mesh: rocketMesh, flameUniforms: flameUniforms, flameMesh: flameI };
             }
 
-            rocketI.position.setX(rocketPosition.x);
-            rocketI.position.setY(rocketPosition.y);
-            rocketI.position.setZ(50);
-            rocketI.setRotationFromAxisAngle(new Vector3(0, 0, 1), rocketAngle - Math.PI / 2);
+            var rocketI = rockets[i];
+
+            rocketI.mesh.position.setX(rocketPosition.x);
+            rocketI.mesh.position.setY(rocketPosition.y);
+            rocketI.mesh.position.setZ(50);
+            rocketI.mesh.setRotationFromAxisAngle(new Vector3(0, 0, 1), rocketAngle - Math.PI / 2);
 
             const flamePosition = rocketPosition.sub(vec.normalize().multiplyScalar(45));
 
-            flameI.position.setX(flamePosition.x);
-            flameI.position.setY(flamePosition.y);
-            flameI.position.setZ(10);
-            flameI.setRotationFromAxisAngle(new Vector3(0, 0, 1), rocketAngle + Math.PI / 2);
+            rocketI.flameMesh.position.setX(flamePosition.x);
+            rocketI.flameMesh.position.setY(flamePosition.y);
+            rocketI.flameMesh.position.setZ(10);
+            rocketI.flameMesh.setRotationFromAxisAngle(new Vector3(0, 0, 1), rocketAngle + Math.PI / 2);
+
+            rocketI.flameUniforms.time.value = elapsedSeconds;
+            rocketI.flameUniforms.magnitude.value = playerI.typist.Position;
         });
 
         renderer.setViewport(0, 0, WIDTH, HEIGHT);
