@@ -13,6 +13,10 @@ import starFragShader from "../assets/shaders/star.frag";
 import backgroundShader from "../assets/shaders/background.vert";
 import backgroundFragShader from "../assets/shaders/background.frag";
 
+import flameImage from "../assets/sprites/flame.png";
+import flameShader from "../assets/shaders/flame.vert";
+import flameFragShader from "../assets/shaders/flame.frag";
+
 import { Typist } from "./typist";
 import { TypistPlayer } from "./TypistPlayer";
 
@@ -47,12 +51,19 @@ export function calculateRocketPosition(position: number, numRockets: number, pr
             .add(endPosition.multiplyScalar(progress * progress));
 }
 
-function calculateRocketAngle(position: number, numRockets: number, progress: number)
+function calculateRocketVector(position: number, numRockets: number, progress: number)
 {
     const previous = calculateRocketPosition(position, numRockets, progress - 0.01);
     const current = calculateRocketPosition(position, numRockets, progress);
 
     const diff = current.sub(previous);
+
+    return diff;
+}
+
+function calculateRocketAngle(position: number, numRockets: number, progress: number)
+{
+    const diff = calculateRocketVector(position, numRockets, progress);
 
     return diff.angle();
 }
@@ -71,6 +82,19 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: numb
     const loader: TextureLoader = new TextureLoader();
 
     const rocketMaterial = new MeshBasicMaterial({ map: loader.load("./" + rocketImage), transparent: true });
+
+    const flameUniforms = {
+        time: { type: "f", value: 1.0 },
+        uDiffuseSampler: { type: "t", value: 0 }
+    };
+    const flameMaterial = new ShaderMaterial({
+        defines: { USE_MAP: '' },
+        uniforms: flameUniforms,
+        vertexShader: flameShader,
+        fragmentShader: flameFragShader,
+        transparent: true
+    });
+    flameMaterial.uniforms.uDiffuseSampler.value = loader.load("./" + flameImage);
 
     camera.position.z = 200;
 
@@ -95,16 +119,6 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: numb
     const background: Object3D = CreatePlane(backgroundMaterial, WIDTH, HEIGHT, WIDTH / 2, HEIGHT / 2);
 
     scene.add(background);
-
-    const rockets = players.map(player => {
-        const rocketPosition = calculateRocketPosition(player.player.index, players.length, 0);
-        const rocketAngle = calculateRocketAngle(player.player.index, players.length, 0);
-        const newRocket: Object3D = CreatePlane(rocketMaterial, 50, 50, rocketPosition.x, rocketPosition.y);
-        newRocket.setRotationFromAxisAngle(new Vector3(0, 0, 1), rocketAngle);
-
-        scene.add(newRocket);
-        return newRocket;
-    });
 
     const moonMaterial = new MeshBasicMaterial({ map: loader.load("./" + moonImage), transparent: true });
     scene.add(CreatePlane(moonMaterial, moonRadius * 2, moonRadius * 2, moonPosition.x, moonPosition.y));
@@ -170,6 +184,11 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: numb
     //   scene.add(textMesh);
     // } );
 
+    
+
+    const rockets = new Array<Object3D>();
+    const flames = new Array<Object3D>();
+
     var i = 0.0;
 
     var startTime = Date.now();
@@ -184,28 +203,41 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: numb
         }
         
         backgroundUniforms.u_time.value = elapsedSeconds;
+        flameUniforms.time.value = elapsedSeconds % 1;
 
         players.map(playerI => {
 
             const i = playerI.player.index;
-            var rocketI = rockets[i];
 
             const rocketPosition = calculateRocketPosition(i, players.length, playerI.typist.Position);
-            
             const rocketAngle = calculateRocketAngle(i, players.length, playerI.typist.Position);
+            const vec = calculateRocketVector(i, players.length, playerI.typist.Position);
+
+            var rocketI = rockets[i];
+            var flameI = flames[i];
 
             if (!rocketI)
             {
                 rocketI = CreatePlane(rocketMaterial, 50, 50, rocketPosition.x, rocketPosition.y);
-
                 scene.add(rocketI);
                 rockets[i] = rocketI;
+
+                flameI = CreatePlane(flameMaterial, 50, 50, rocketPosition.x, rocketPosition.y);
+                scene.add(flameI);
+                flames[i] = flameI;
             }
 
             rocketI.position.setX(rocketPosition.x);
             rocketI.position.setY(rocketPosition.y);
             rocketI.position.setZ(50);
             rocketI.setRotationFromAxisAngle(new Vector3(0, 0, 1), rocketAngle - Math.PI / 2);
+
+            const flamePosition = rocketPosition.sub(vec.normalize().multiplyScalar(45));
+
+            flameI.position.setX(flamePosition.x);
+            flameI.position.setY(flamePosition.y);
+            flameI.position.setZ(10);
+            flameI.setRotationFromAxisAngle(new Vector3(0, 0, 1), rocketAngle + Math.PI / 2);
         });
 
         renderer.setViewport(0, 0, WIDTH, HEIGHT);
