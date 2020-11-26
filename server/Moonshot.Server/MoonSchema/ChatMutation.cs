@@ -16,8 +16,19 @@ namespace Moonshot.Server.MoonSchema
                 resolve: context =>
                 {
                     var receivedMessage = context.GetArgument<string>("name");
-                    var message = chat.AddPlayer(receivedMessage);
-                    return message;
+                    var player = chat.AddPlayer(receivedMessage);
+                    return player;
+                });
+
+            Field<NonNullGraphType<GameGraphType>>("createGame",
+                arguments: new QueryArguments(
+                    new QueryArgument<StringGraphType> { Name = "name" }
+                ),
+                resolve: context =>
+                {
+                    var receivedMessage = context.GetArgument<string>("name");
+                    var game = chat.AddGame(receivedMessage);
+                    return game;
                 });
 
             Field<PlayerKeystrokeGraphType>("addKeystroke",

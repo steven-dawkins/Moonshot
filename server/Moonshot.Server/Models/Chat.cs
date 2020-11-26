@@ -8,6 +8,7 @@ namespace Moonshot.Server.Models
 
     public class Chat : IChat
     {
+        private readonly ConcurrentDictionary<string, Game> games;
         private readonly ConcurrentDictionary<string, Player> players;
         private readonly List<PlayerKeystroke> messages;
         private readonly MessageObserver<PlayerKeystroke> messageObserver;
@@ -21,8 +22,11 @@ namespace Moonshot.Server.Models
 
         public IEnumerable<Player> Players => this.players.Values;
 
+        public IEnumerable<Game> Games => this.games.Values;
+
         public Chat()
         {
+            this.games = new ConcurrentDictionary<string, Game>();
             this.players = new ConcurrentDictionary<string, Player>();
             this.messages = new List<PlayerKeystroke>();
             this.messageObserver = new MessageObserver<PlayerKeystroke>();
@@ -39,6 +43,24 @@ namespace Moonshot.Server.Models
                     this.players.TryAdd(name, player);
 
                     this.playerObserver.Observe(player);
+                    return player;
+                }
+                else
+                {
+                    return existingPlayer;
+                }
+            }
+        }
+
+        public Game AddGame(string name)
+        {
+            lock (this.games)
+            {
+                if (!this.games.TryGetValue(name, out Game existingPlayer))
+                {
+                    Game player = new Game(name);
+                    this.games.TryAdd(name, player);
+
                     return player;
                 }
                 else

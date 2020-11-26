@@ -1,10 +1,12 @@
-﻿namespace Moonshot.Server.Models
+﻿using System;
+
+namespace Moonshot.Server.Models
 {
     public class Player
     {
         public Player(string name, int index)
         {
-            this.Name = name;
+            this.Name = name ?? throw new ArgumentNullException(nameof(name));
             this.Index = index;
         }
 

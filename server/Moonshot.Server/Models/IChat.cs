@@ -5,6 +5,8 @@ namespace Moonshot.Server.Models
 {
     public interface IChat
     {
+        IEnumerable<Game> Games { get; }
+
         IEnumerable<Player> Players { get; }
 
         IObservable<Player> PlayersStream { get; }
@@ -16,5 +18,7 @@ namespace Moonshot.Server.Models
         PlayerKeystroke AddMessage(PlayerKeystroke playerKeystroke);
 
         Player AddPlayer(string name);
+
+        Game AddGame(string name);
     }
 }
