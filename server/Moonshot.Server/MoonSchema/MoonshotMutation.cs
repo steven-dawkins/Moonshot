@@ -5,9 +5,9 @@ using Moonshot.Server.MoonSchema.GraphQLTypes;
 
 namespace Moonshot.Server.MoonSchema
 {
-    public class ChatMutation : ObjectGraphType<object>
+    public class MoonshotMutation : ObjectGraphType<object>
     {
-        public ChatMutation(IChat chat)
+        public MoonshotMutation(IChat chat)
         {
             Field<NonNullGraphType<PlayerGraphType>>("join",
                 arguments: new QueryArguments(
@@ -26,8 +26,23 @@ namespace Moonshot.Server.MoonSchema
                 ),
                 resolve: context =>
                 {
-                    var receivedMessage = context.GetArgument<string>("name");
-                    var game = chat.AddGame(receivedMessage);
+                    var name = context.GetArgument<string>("name");
+                    var game = chat.AddGame(name);
+                    return game;
+                });
+
+            Field<NonNullGraphType<GameGraphType>>("joinGame",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "gameName" },
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "playerName" }
+                ),
+                resolve: context =>
+                {
+                    var gameName = context.GetArgument<string>("gameName");
+                    var playerName = context.GetArgument<string>("playerName");
+                    var game = chat.AddGame(gameName);
+                    game.AddPlayer(playerName);
+
                     return game;
                 });
 

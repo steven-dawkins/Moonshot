@@ -58,10 +58,10 @@ namespace Moonshot.Server.Models
             {
                 if (!this.games.TryGetValue(name, out Game existingPlayer))
                 {
-                    Game player = new Game(name);
-                    this.games.TryAdd(name, player);
+                    Game game = new Game(name);
+                    this.games.TryAdd(name, game);
 
-                    return player;
+                    return game;
                 }
                 else
                 {

@@ -9,7 +9,7 @@ namespace Moonshot.Server.MoonSchema
         public ChatSchema(IChat chat, IServiceProvider provider) : base(provider)
         {
             Query = new GameQuery(chat);
-            Mutation = new ChatMutation(chat);
+            Mutation = new MoonshotMutation(chat);
             Subscription = new ChatSubscriptions(chat);
         }
     }
