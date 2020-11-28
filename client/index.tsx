@@ -8,6 +8,9 @@ import { WebSocketLink } from '@apollo/client/link/ws';
 import { OnlineApp } from "./src/components/App";
 import { ChooseGame } from "./src/components/GameChooser";
 import { useState } from "react";
+import { TypistPlayer } from "./src/TypistPlayer";
+import { getRandomText } from "./src/texts";
+import { WebGlScene } from "./src/components/scene";
 
 const el = document.getElementById("body");
 
@@ -63,7 +66,11 @@ function App() {
         switch(gameName)
         {
             case "Offline":
-                return <OnlineApp gameName={"Offline"} playerName={playerName}></OnlineApp>
+                const text = getRandomText();
+                const player = new TypistPlayer({ name: playerName, index: 0 }, text);
+                const players = [player];
+                
+                return <WebGlScene player={player} players={players} ></WebGlScene>
             default:
                 return <OnlineApp gameName={gameName} playerName={playerName}></OnlineApp>
         }

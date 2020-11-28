@@ -44,7 +44,6 @@ export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typis
     }
 
     onKeyDown(evt: KeyboardEvent) {
-      console.log("keydown");
       if (evt.key.length <= 1 && isAlphaNumeric(evt.key))
       {
         this.state.typist.ProcessCharacter(evt.key, null);
@@ -61,7 +60,7 @@ export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typis
       {
         window.addEventListener("keydown", this.onKeyDown);
 
-        InitWebgl(this.el, this.state.typist, 0, 5, this.props.players);
+        InitWebgl(this.el, this.props.players);
       }
     }
   
@@ -71,10 +70,9 @@ export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typis
     }
   
     render() {
-      return <div>
-          <div>Hi: {this.props.player.player.name}</div>
-          <div><span style={{color: "red"}}>{this.state.typist.TypedText}</span>|<span>{this.state.typist.UnTypedText}</span></div>
-          <div ref={el => this.el = el} />
+      return <div className="row">
+          <div className="column"><span style={{color: "red"}}>{this.state.typist.TypedText}</span>|<span>{this.state.typist.UnTypedText}</span></div>
+          <div className="column" ref={el => this.el = el} />
         </div>;
     }
   }

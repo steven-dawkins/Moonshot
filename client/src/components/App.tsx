@@ -3,12 +3,10 @@ import { useEffect, useState } from "react";
 import { WebGlScene } from "./scene";
 import { useCreateGameMutation, useGameKeystrokesSubscription, useGamePlayersSubscription, useGetPlayersQuery, useJoinGameMutation, useJoinMutation, useKeystrokesSubscription, usePlayersSubscription, useGetGamesQuery } from "../generated/graphql";
 
-import khanText from "../../assets/texts/khan.txt";
 import { TypistPlayer } from "../TypistPlayer";
+import { getRandomText } from "../texts";
 
-const texts = khanText.split("\n");
-
-const text = texts[Math.floor(Math.random() * texts.length)];
+const text = getRandomText();
 
 export function OnlineApp(props: { gameName: string, playerName: string }) {
 
@@ -124,7 +122,7 @@ export function OnlineApp(props: { gameName: string, playerName: string }) {
     }
 
     return <div>
-        <h1>Moonshot</h1>
+        <h1>Moonshot - {data.joinGame.name}</h1>
 
         <ul>
             {players.map(player =>

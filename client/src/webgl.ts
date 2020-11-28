@@ -17,7 +17,6 @@ import flameImage from "../assets/sprites/flame.png";
 import flameShader from "../assets/shaders/flame.vert";
 import flameFragShader from "../assets/shaders/flame.frag";
 
-import { Typist } from "./typist";
 import { TypistPlayer } from "./TypistPlayer";
 
 const earthPosition = new Vector2(100, 100);
@@ -68,7 +67,7 @@ function calculateRocketAngle(position: number, numRockets: number, progress: nu
     return diff.angle();
 }
 
-export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: number, numRockets: number, players: TypistPlayer[]) {
+export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
 
     const renderer = new WebGLRenderer({});
     renderer.autoClear = true;

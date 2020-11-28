@@ -22,12 +22,12 @@ export function ChooseGame(props: { chooseGame: (gameName: string) => void }) {
     console.log(data?.games);
 
     return <div>
-        <button>Offline</button>
+        <button onClick={(evt) => { evt.preventDefault(); props.chooseGame("Offline"); }}>Offline</button>
         
         <fieldset>
             <legend>Create game</legend>
             <input id="gameName" type="text" value={name} onChange={e => setName(e.target.value)}></input>
-            <button onClick={(evt) => { evt.preventDefault(); props.chooseGame(name); }}>Create</button>
+            <button disabled={name.length === 0} onClick={(evt) => { evt.preventDefault(); props.chooseGame(name); }}>Create</button>
         </fieldset>
     
         <ul>
