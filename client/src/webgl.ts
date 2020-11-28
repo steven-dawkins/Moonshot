@@ -108,15 +108,15 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: numb
         transparent: true
     });
 
-    const background: Object3D = CreatePlane(backgroundMaterial, WIDTH, HEIGHT, WIDTH / 2, HEIGHT / 2);
+    const background: Object3D = CreatePlane(backgroundMaterial, WIDTH, HEIGHT, WIDTH / 2, HEIGHT / 2, 0);
 
     scene.add(background);
 
     const moonMaterial = new MeshBasicMaterial({ map: loader.load("./" + moonImage), transparent: true });
-    scene.add(CreatePlane(moonMaterial, moonRadius * 2, moonRadius * 2, moonPosition.x, moonPosition.y));
+    scene.add(CreatePlane(moonMaterial, moonRadius * 2, moonRadius * 2, moonPosition.x, moonPosition.y, 40));
 
     const earthMaterial = new MeshBasicMaterial({ map: loader.load("./" + earthImage), transparent: true });
-    scene.add(CreatePlane(earthMaterial, earthRadius * 2, earthRadius * 2, earthPosition.x, earthPosition.y));
+    scene.add(CreatePlane(earthMaterial, earthRadius * 2, earthRadius * 2, earthPosition.x, earthPosition.y, 40));
 
     const starUniforms:{ [uniform: string]: IUniform }[] = [];
 
@@ -146,7 +146,7 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: numb
         const mesh2: Object3D = new Mesh(geometry, starMaterial)
             .translateX(Math.random() * WIDTH)
             .translateY(Math.random() * HEIGHT)
-            .translateZ(i);
+            .translateZ(1);
 
         mesh2.setRotationFromAxisAngle(new Vector3(0, 0, 1), 0);
 
@@ -205,7 +205,7 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: numb
 
             if (!rockets[i])
             {
-                const rocketMesh = CreatePlane(rocketMaterial, 50, 50, rocketPosition.x, rocketPosition.y);
+                const rocketMesh = CreatePlane(rocketMaterial, 50, 50, rocketPosition.x, rocketPosition.y, 50);
                 scene.add(rocketMesh);
 
                 const flameUniforms = {
@@ -222,7 +222,7 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: numb
                 });
             
                 flameMaterial.uniforms.uDiffuseSampler.value = fi;
-                const flameI = CreatePlane(flameMaterial, 50, 50, rocketPosition.x, rocketPosition.y);
+                const flameI = CreatePlane(flameMaterial, 50, 50, rocketPosition.x, rocketPosition.y, 49);
                 scene.add(flameI);
                 rockets[i] = { mesh: rocketMesh, flameUniforms: flameUniforms, flameMesh: flameI };
             }
@@ -231,7 +231,6 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: numb
 
             rocketI.mesh.position.setX(rocketPosition.x);
             rocketI.mesh.position.setY(rocketPosition.y);
-            rocketI.mesh.position.setZ(50);
             rocketI.mesh.setRotationFromAxisAngle(new Vector3(0, 0, 1), rocketAngle - Math.PI / 2);
 
             const flamePosition = rocketPosition.sub(vec.normalize().multiplyScalar(45));
@@ -253,9 +252,9 @@ export function InitWebgl(parent: HTMLDivElement, typist: Typist, position: numb
     webglRender();
 }
 
-function CreatePlane(material: Material, width: number, height: number, x: number, y: number) {
+function CreatePlane(material: Material, width: number, height: number, x: number, y: number, z: number) {
     const geometry: PlaneGeometry = new PlaneGeometry(width, height);
-    const object: Object3D = new Mesh(geometry, material).translateX(x).translateY(y);
+    const object: Object3D = new Mesh(geometry, material).translateX(x).translateY(y).translateZ(z);
 
     object.setRotationFromAxisAngle(new Vector3(0, 0, 1), 0);
     return object;
