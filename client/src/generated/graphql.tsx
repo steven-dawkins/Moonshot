@@ -40,7 +40,7 @@ export type Game = {
   __typename?: 'Game';
   keystrokes: Array<Maybe<PlayerKeystroke>>;
   name: Scalars['String'];
-  players: Array<Maybe<Player>>;
+  players: Array<Player>;
 };
 
 export type MoonshotMutation = {
@@ -49,7 +49,7 @@ export type MoonshotMutation = {
   addKeystroke?: Maybe<PlayerKeystroke>;
   createGame: Game;
   join: Player;
-  joinGame: Player;
+  joinGame: Game;
 };
 
 
@@ -109,15 +109,15 @@ export type CreateGameMutation = (
   & { createGame: (
     { __typename?: 'Game' }
     & Pick<Game, 'name'>
-    & { players: Array<Maybe<(
+    & { players: Array<(
       { __typename?: 'Player' }
       & Pick<Player, 'name' | 'index'>
-    )>> }
+    )> }
   ) }
 );
 
 export type GetGamesQueryVariables = Exact<{
-  gameName: Scalars['String'];
+  gameName?: Maybe<Scalars['String']>;
 }>;
 
 
@@ -126,10 +126,10 @@ export type GetGamesQuery = (
   & { games?: Maybe<Array<(
     { __typename?: 'Game' }
     & Pick<Game, 'name'>
-    & { players: Array<Maybe<(
+    & { players: Array<(
       { __typename?: 'Player' }
       & Pick<Player, 'name' | 'index'>
-    )>> }
+    )> }
   )>> }
 );
 
@@ -155,8 +155,12 @@ export type JoinGameMutationVariables = Exact<{
 export type JoinGameMutation = (
   { __typename?: 'MoonshotMutation' }
   & { joinGame: (
-    { __typename?: 'Player' }
-    & Pick<Player, 'name' | 'index'>
+    { __typename?: 'Game' }
+    & Pick<Game, 'name'>
+    & { players: Array<(
+      { __typename?: 'Player' }
+      & Pick<Player, 'name' | 'index'>
+    )> }
   ) }
 );
 
@@ -257,7 +261,7 @@ export type CreateGameMutationHookResult = ReturnType<typeof useCreateGameMutati
 export type CreateGameMutationResult = Apollo.MutationResult<CreateGameMutation>;
 export type CreateGameMutationOptions = Apollo.BaseMutationOptions<CreateGameMutation, CreateGameMutationVariables>;
 export const GetGamesDocument = gql`
-    query GetGames($gameName: String!) {
+    query GetGames($gameName: String) {
   games(gameName: $gameName) {
     name
     players {
@@ -284,7 +288,7 @@ export const GetGamesDocument = gql`
  *   },
  * });
  */
-export function useGetGamesQuery(baseOptions: Apollo.QueryHookOptions<GetGamesQuery, GetGamesQueryVariables>) {
+export function useGetGamesQuery(baseOptions?: Apollo.QueryHookOptions<GetGamesQuery, GetGamesQueryVariables>) {
         return Apollo.useQuery<GetGamesQuery, GetGamesQueryVariables>(GetGamesDocument, baseOptions);
       }
 export function useGetGamesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetGamesQuery, GetGamesQueryVariables>) {
@@ -330,7 +334,10 @@ export const JoinGameDocument = gql`
     mutation JoinGame($gameName: String!, $playerName: String!) {
   joinGame(gameName: $gameName, playerName: $playerName) {
     name
-    index
+    players {
+      name
+      index
+    }
   }
 }
     `;

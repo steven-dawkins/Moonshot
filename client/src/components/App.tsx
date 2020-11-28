@@ -36,34 +36,6 @@ export function OnlineApp(props: { gameName: string}) {
         }
     });
 
-    // todo: consolidate with useJoinGameMutation
-    const { error: playersGetError } = useGetGamesQuery({
-        variables: {
-            gameName: props.gameName
-        },
-        onCompleted: data => {
-
-            console.log("getGamesQuery");
-            if (!data.games) {
-                return;
-            }
-
-            data.games.forEach(game => {
-                game.players.forEach(p => {
-
-                    if (p) {
-                        var existing = players.filter(t => t.player.index === p.index);
-            
-                        if (existing.length === 0)
-                        {
-                            players.push(new TypistPlayer({ name: p.name, index: p.index }, text));
-                        }
-                    }
-                }); 
-            });
-        }
-    });
-
     const { error: playersError } = useGamePlayersSubscription({
         variables: {
             gameName: props.gameName
@@ -97,22 +69,20 @@ export function OnlineApp(props: { gameName: string}) {
             gameName: props.gameName
         },
         onCompleted: data => {
+
             if (!data.joinGame) {
                 return;
             }
 
-            const p = new TypistPlayer({ name: data.joinGame.name, index: data?.joinGame.index }, text);
+            data.joinGame.players.forEach(p => {
 
-            var existing = players.filter(t => t.player.index === p.player.index);
-
-            if (existing && existing.length > 0) {
-                setPlayer(existing[0]);
-            }
-            else {
-                setPlayer(p);
-                players.push(p);
-                setPlayers(players);
-            }
+                var existing = players.filter(t => t.player.index === p.index);
+        
+                if (existing.length === 0)
+                {
+                    players.push(new TypistPlayer({ name: p.name, index: p.index }, text));
+                }
+            }); 
         }
     });
 
@@ -126,10 +96,6 @@ export function OnlineApp(props: { gameName: string}) {
 
     if (joinLoading || !data || !data.joinGame) {
         return <div>Loading...</div>;
-    }
-
-    if (playersGetError) {
-        return <div>Players Get Error! {playersError}</div>
     }
 
     if (playersError) {

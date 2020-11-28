@@ -31,7 +31,7 @@ namespace Moonshot.Server.MoonSchema
                     return game;
                 });
 
-            Field<NonNullGraphType<PlayerGraphType>>("joinGame",
+            Field<NonNullGraphType<GameGraphType>>("joinGame",
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "gameName" },
                     new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "playerName" }
@@ -43,7 +43,7 @@ namespace Moonshot.Server.MoonSchema
                     var game = chat.AddGame(gameName);
                     var player = game.AddPlayer(playerName);
 
-                    return player;
+                    return game;
                 });
 
             Field<PlayerKeystrokeGraphType>("addKeystroke",

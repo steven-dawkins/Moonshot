@@ -254,9 +254,13 @@
                 "kind": "LIST",
                 "name": null,
                 "ofType": {
-                  "kind": "OBJECT",
-                  "name": "Player",
-                  "ofType": null
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "OBJECT",
+                    "name": "Player",
+                    "ofType": null
+                  }
                 }
               }
             },
@@ -442,7 +446,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "Player",
+                "name": "Game",
                 "ofType": null
               }
             },
