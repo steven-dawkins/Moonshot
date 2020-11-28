@@ -1,0 +1,9 @@
+query GetGames($gameName: String!){
+  games(gameName: $gameName) {
+    name
+    players {
+       name
+      index
+    }
+  }
+}

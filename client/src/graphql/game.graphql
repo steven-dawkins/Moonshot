@@ -1,0 +1,9 @@
+mutation CreateGame($gameName: String!){
+  createGame(name: $gameName){
+    name
+    players {
+      name
+      index
+    }
+  }
+}

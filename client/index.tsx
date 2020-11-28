@@ -5,7 +5,7 @@ import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { split, HttpLink } from '@apollo/client';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { WebSocketLink } from '@apollo/client/link/ws';
-import { App } from "./src/components/App";
+import { OnlineApp } from "./src/components/App";
 
 const el = document.getElementById("body");
 
@@ -51,6 +51,6 @@ const client = new ApolloClient({
 });
 
 render(<ApolloProvider client={client}>
-            <App></App>
+            <OnlineApp gameName={"Game1"}></OnlineApp>
        </ApolloProvider>,
     el);

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { WebGlScene } from "./scene";
-import { useGetPlayersQuery, useJoinMutation, useKeystrokesSubscription, usePlayersSubscription } from "../generated/graphql";
+import { useCreateGameMutation, useGameKeystrokesSubscription, useGamePlayersSubscription, useGetPlayersQuery, useJoinGameMutation, useJoinMutation, useKeystrokesSubscription, usePlayersSubscription, useGetGamesQuery } from "../generated/graphql";
 
 import khanText from "../../assets/texts/khan.txt";
 import { TypistPlayer } from "../TypistPlayer";
@@ -10,18 +10,19 @@ const texts = khanText.split("\n");
 
 const text = texts[Math.floor(Math.random() * texts.length)];
 
-export function App() {
+export function OnlineApp(props: { gameName: string}) {
 
     const [players, setPlayers] = useState(Array<TypistPlayer>());
     const [player, setPlayer] = useState<TypistPlayer | null>(null);
 
-    const { error: keystrokesError } = useKeystrokesSubscription({
+    const { error: keystrokesError } = useGameKeystrokesSubscription({
         variables: {
+            gameName: "Game1"
         },
         onSubscriptionData: data => {
             console.log("keystroke");
             console.log(data);
-            const playerJoined = data.subscriptionData.data?.keystrokeAdded;
+            const playerJoined = data.subscriptionData.data?.gameKeystroke;
 
             const p = players.filter(p => p.player.name === playerJoined?.playerName)[0];
 
@@ -35,30 +36,40 @@ export function App() {
         }
     });
 
-    const { error: playersGetError } = useGetPlayersQuery({
+    // todo: consolidate with useJoinGameMutation
+    const { error: playersGetError } = useGetGamesQuery({
         variables: {
+            gameName: props.gameName
         },
         onCompleted: data => {
-            if (data.players)
-            {
-                for (var i = 0; i < data.players.length; i++)
-                {
-                    const p = data.players[i];
 
-                    if (p)
-                    {
-                        players.push(new TypistPlayer({ name: p.name, index: p.index }, text));
-                    }
-                }
+            console.log("getGamesQuery");
+            if (!data.games) {
+                return;
             }
+
+            data.games.forEach(game => {
+                game.players.forEach(p => {
+
+                    if (p) {
+                        var existing = players.filter(t => t.player.index === p.index);
+            
+                        if (existing.length === 0)
+                        {
+                            players.push(new TypistPlayer({ name: p.name, index: p.index }, text));
+                        }
+                    }
+                }); 
+            });
         }
     });
 
-    const { error: playersError } = usePlayersSubscription({
+    const { error: playersError } = useGamePlayersSubscription({
         variables: {
+            gameName: props.gameName
         },
         onSubscriptionData: data => {
-            const playerJoined = data.subscriptionData.data?.playerJoined;
+            const playerJoined = data.subscriptionData.data?.playerJoinedGame;
 
             if (!playerJoined) {
                 return;
@@ -80,16 +91,17 @@ export function App() {
 
     const name = "Moonshot player " + Math.ceil(Math.random() * 100);
 
-    const [joinMutation, { data, loading: joinLoading, error: joinError }] = useJoinMutation({
+    const [joinMutation, { data, loading: joinLoading, error: joinError }] = useJoinGameMutation({
         variables: {
-            name: name
+            playerName: name,
+            gameName: props.gameName
         },
         onCompleted: data => {
-            if (!data.join) {
+            if (!data.joinGame) {
                 return;
             }
 
-            const p = new TypistPlayer({ name: data.join.name, index: data?.join.index }, text);
+            const p = new TypistPlayer({ name: data.joinGame.name, index: data?.joinGame.index }, text);
 
             var existing = players.filter(t => t.player.index === p.player.index);
 
@@ -112,7 +124,7 @@ export function App() {
         return <div>Error! {joinError}</div>
     }
 
-    if (joinLoading || !data || !data.join) {
+    if (joinLoading || !data || !data.joinGame) {
         return <div>Loading...</div>;
     }
 
@@ -132,7 +144,7 @@ export function App() {
         return <div>Player not loaded!</div>;
     }
 
-    if (!data.join.name)
+    if (!data.joinGame.name)
     {
         return <div>Not joined...</div>;
     }

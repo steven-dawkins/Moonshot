@@ -15,7 +15,7 @@ namespace Moonshot.Server.Models
 
         IObservable<PlayerKeystroke> MessagesStream { get; }
 
-        PlayerKeystroke AddMessage(PlayerKeystroke playerKeystroke);
+        PlayerKeystroke AddKeystroke(PlayerKeystroke playerKeystroke);
 
         Player AddPlayer(string name);
 
