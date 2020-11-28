@@ -10,7 +10,7 @@ const texts = khanText.split("\n");
 
 const text = texts[Math.floor(Math.random() * texts.length)];
 
-export function OnlineApp(props: { gameName: string}) {
+export function OnlineApp(props: { gameName: string, playerName: string }) {
 
     const [players, setPlayers] = useState(Array<TypistPlayer>());
     const [player, setPlayer] = useState<TypistPlayer | null>(null);
@@ -60,15 +60,15 @@ export function OnlineApp(props: { gameName: string}) {
         }
     });
 
-
-    const name = "Moonshot player " + Math.ceil(Math.random() * 100);
-
     const [joinMutation, { data, loading: joinLoading, error: joinError }] = useJoinGameMutation({
         variables: {
-            playerName: name,
+            playerName: props.playerName,
             gameName: props.gameName
         },
         onCompleted: data => {
+
+            console.log(data);
+            console.log(props.playerName);
 
             if (!data.joinGame) {
                 return;
@@ -80,8 +80,16 @@ export function OnlineApp(props: { gameName: string}) {
         
                 if (existing.length === 0)
                 {
-                    players.push(new TypistPlayer({ name: p.name, index: p.index }, text));
+                    const player = new TypistPlayer({ name: p.name, index: p.index }, text);
+                    players.push(player);
+
+                    if (player.player.name === props.playerName) {
+                        setPlayer(player);
+                    }
                 }
+
+                
+                setPlayers(players);
             }); 
         }
     });
@@ -120,7 +128,7 @@ export function OnlineApp(props: { gameName: string}) {
 
         <ul>
             {players.map(player =>
-                <li key={player.player.name}>{player.player.name} ({player.typist.Position})</li>)}
+                <li key={player.player.index}>{player.player.name} ({player.typist.Position})</li>)}
         </ul>
 
         <WebGlScene player={player} players={players} ></WebGlScene>

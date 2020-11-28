@@ -6,6 +6,8 @@ import { split, HttpLink } from '@apollo/client';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { WebSocketLink } from '@apollo/client/link/ws';
 import { OnlineApp } from "./src/components/App";
+import { ChooseGame } from "./src/components/GameChooser";
+import { useState } from "react";
 
 const el = document.getElementById("body");
 
@@ -50,7 +52,56 @@ const client = new ApolloClient({
     cache: new InMemoryCache()
 });
 
+const playerName = "Moonshot player " + Math.ceil(Math.random() * 100);
+
+function App() {
+
+    const [gameName, setGameName] = useState<string | null>(null);
+
+    if (gameName !== null)
+    {
+        switch(gameName)
+        {
+            case "Offline":
+                return <OnlineApp gameName={"Offline"} playerName={playerName}></OnlineApp>
+            default:
+                return <OnlineApp gameName={gameName} playerName={playerName}></OnlineApp>
+        }
+    }
+    else {
+        return <ChooseGame chooseGame={setGameName}></ChooseGame>
+    }
+}
+
+class ErrorBoundary extends React.Component<{}, { hasError: boolean }> {
+    constructor(props: {}) {
+      super(props);
+      this.state = { hasError: false };
+    }
+  
+    static getDerivedStateFromError(error: {}) {
+      // Update state so the next render will show the fallback UI.
+      return { hasError: true };
+    }
+  
+    componentDidCatch(error : {}, errorInfo: {}) {
+      // You can also log the error to an error reporting service
+      //logErrorToMyService(error, errorInfo);
+    }
+  
+    render() {
+      if (this.state.hasError) {
+        // You can render any custom fallback UI
+        return <h1>Something went wrong.</h1>;
+      }
+  
+      return this.props.children; 
+    }
+  }
+
 render(<ApolloProvider client={client}>
-            <OnlineApp gameName={"Game1"}></OnlineApp>
+            <ErrorBoundary>
+                <App></App>
+            </ErrorBoundary>
        </ApolloProvider>,
     el);
