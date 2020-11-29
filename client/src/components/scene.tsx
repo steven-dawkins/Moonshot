@@ -71,8 +71,8 @@ export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typis
   
     render() {
       return <div className="row">
-          <div className="column"><span style={{color: "red"}}>{this.state.typist.TypedText}</span>|<span>{this.state.typist.UnTypedText}</span></div>
-          <div className="column" ref={el => this.el = el} />
+          <div className="column-left"><span style={{color: "red"}}>{this.state.typist.TypedText}</span>|<span>{this.state.typist.UnTypedText}</span></div>
+          <div className="column-right render" ref={el => this.el = el} />
         </div>;
     }
   }
