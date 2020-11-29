@@ -112,10 +112,12 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
     scene.add(background);
 
     const moonMaterial = new MeshBasicMaterial({ map: loader.load("./" + moonImage), transparent: true });
-    scene.add(CreatePlane(moonMaterial, moonRadius * 2, moonRadius * 2, moonPosition.x, moonPosition.y, 40));
+    const moon = CreatePlane(moonMaterial, moonRadius * 2, moonRadius * 2, moonPosition.x, moonPosition.y, 40);
+    scene.add(moon);
 
     const earthMaterial = new MeshBasicMaterial({ map: loader.load("./" + earthImage), transparent: true });
-    scene.add(CreatePlane(earthMaterial, earthRadius * 2, earthRadius * 2, earthPosition.x, earthPosition.y, 40));
+    const earth = CreatePlane(earthMaterial, earthRadius * 2, earthRadius * 2, earthPosition.x, earthPosition.y, 40);
+    scene.add(earth);
 
     const starUniforms:{ [uniform: string]: IUniform }[] = [];
 
@@ -152,6 +154,14 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
         scene.add(mesh2);
     }
 
+    window.onresize = () => {
+
+        console.log(parent.clientWidth);
+        renderer.setSize(parent.clientWidth, HEIGHT);
+
+        earth.position.x = earthPosition.x * parent.clientWidth / WIDTH;
+        moon.position.x = moonPosition.x * parent.clientWidth / WIDTH;
+    };
 
     // const fontLoader = new FontLoader();
 
