@@ -12,57 +12,32 @@ import { TypistPlayer } from "./src/TypistPlayer";
 import { getRandomText } from "./src/texts";
 import { WebGlScene } from "./src/components/scene";
 
+import 'antd/dist/antd.css';
+
 const el = document.getElementById("body");
-
-// const client = new ApolloClient({
-//         uri: 'http://localhost:5000/graphql',
-//         //headers: {"Authorization": "Bearer "},
-//         cache: new InMemoryCache()
-//       });
-
-const httpLink = new HttpLink({
-    uri: 'http://localhost:5000/graphql'
-});
-
-const wsLink = new WebSocketLink({
-    uri: `ws://localhost:5000/graphql`,
-    options: {
-        reconnect: true,
-        connectionParams: {
-        },
-    },
-});
-
-// The split function takes three parameters:
-//
-// * A function that's called for each operation to execute
-// * The Link to use for an operation if the function returns a "truthy" value
-// * The Link to use for an operation if the function returns a "falsy" value
-const splitLink = split(
-    ({ query }) => {
-        const definition = getMainDefinition(query);
-        return (
-            definition.kind === 'OperationDefinition' &&
-            definition.operation === 'subscription'
-        );
-    },
-    wsLink,
-    httpLink,
-);
-
-const client = new ApolloClient({
-    link: splitLink,
-    cache: new InMemoryCache()
-});
 
 const playerName = "Moonshot player " + Math.ceil(Math.random() * 100);
 
-function OfflineGame() {
+var gameIndex = 0;
+
+function getPlayers()
+{
     const text = getRandomText();
     const player = new TypistPlayer({ name: playerName, index: 0 }, text);
     const players = [player];
+
+    return { player: player, players: players, gameIndex: gameIndex++ };
+}
+
+function OfflineGame() {
+    const [props, setProps] = useState<{player: TypistPlayer, players: TypistPlayer[], gameIndex: number}>(getPlayers());
     
-    return <WebGlScene player={player} players={players} ></WebGlScene>
+    return <div>
+        <WebGlScene key={props.gameIndex} {...props} onComplete={() => {
+        console.log("Restart");
+        setProps(getPlayers());
+    }} ></WebGlScene>
+    </div> 
 }
 
 function App() {
@@ -110,10 +85,55 @@ class ErrorBoundary extends React.Component<{}, { hasError: boolean }> {
     }
   }
 
-render(<ApolloProvider client={client}>
-            <ErrorBoundary>
-                {/* <App></App> */}
-                <OfflineGame />
-            </ErrorBoundary>
-       </ApolloProvider>,
-    el);
+if (false)
+{
+    // const client = new ApolloClient({
+    //         uri: 'http://localhost:5000/graphql',
+    //         //headers: {"Authorization": "Bearer "},
+    //         cache: new InMemoryCache()
+    //       });
+
+    const httpLink = new HttpLink({
+        uri: 'http://localhost:5000/graphql'
+    });
+
+    const wsLink = new WebSocketLink({
+        uri: `ws://localhost:5000/graphql`,
+        options: {
+            reconnect: true,
+            connectionParams: {
+            },
+        },
+    });
+
+    // The split function takes three parameters:
+    //
+    // * A function that's called for each operation to execute
+    // * The Link to use for an operation if the function returns a "truthy" value
+    // * The Link to use for an operation if the function returns a "falsy" value
+    const splitLink = split(
+        ({ query }) => {
+            const definition = getMainDefinition(query);
+            return (
+                definition.kind === 'OperationDefinition' &&
+                definition.operation === 'subscription'
+            );
+        },
+        wsLink,
+        httpLink,
+    );
+
+    const client = new ApolloClient({
+        link: splitLink,
+        cache: new InMemoryCache()
+    });
+
+    render(<ApolloProvider client={client}>
+        <ErrorBoundary>
+            <App></App>
+        </ErrorBoundary>
+   </ApolloProvider>,
+el);
+}
+
+render(<ErrorBoundary><OfflineGame /></ErrorBoundary>, el);

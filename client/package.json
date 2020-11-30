@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "@apollo/client": "^3.2.7",
+    "antd": "^4.9.0",
     "graphql": "^14.0.0 || ^15.0.0",
     "parcel-plugin-static-files-copy": "^2.5.0",
     "perf_hooks": "^0.0.1",

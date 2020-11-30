@@ -154,14 +154,14 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
         scene.add(mesh2);
     }
 
-    window.onresize = () => {
+    // window.onresize = () => {
 
-        console.log(parent.clientWidth);
-        renderer.setSize(parent.clientWidth, HEIGHT);
+    //     console.log(parent.clientWidth);
+    //     renderer.setSize(parent.clientWidth, HEIGHT);
 
-        earth.position.x = earthPosition.x * parent.clientWidth / WIDTH;
-        moon.position.x = moonPosition.x * parent.clientWidth / WIDTH;
-    };
+    //     earth.position.x = earthPosition.x * parent.clientWidth / WIDTH;
+    //     moon.position.x = moonPosition.x * parent.clientWidth / WIDTH;
+    // };
 
     // const fontLoader = new FontLoader();
 

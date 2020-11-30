@@ -1,3 +1,4 @@
+import { Button, Card, Statistic } from 'antd';
 import * as React from 'react';
 
 import { Typist } from '../typist';
@@ -29,6 +30,7 @@ interface IWebGlSceneProps
 {
     player: TypistPlayer;
     players: TypistPlayer[];
+    onComplete: () => void;
 }
 
 export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typist}> {
@@ -41,6 +43,11 @@ export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typis
       this.state = { typist: props.player.typist };
 
       this.onKeyDown = this.onKeyDown.bind(this);
+      this.onRestart = this.onRestart.bind(this);
+    }
+
+    onRestart(evt: any) {
+        this.props.onComplete();
     }
 
     onKeyDown(evt: KeyboardEvent) {
@@ -72,12 +79,18 @@ export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typis
     render() {
       return <div className="row">
           <div className="column-left">
-              <span style={{color: "red"}}>{this.state.typist.TypedText}</span>|<span>{this.state.typist.UnTypedText}</span>
+            <Card title="Moonshot" /*style={{ width: 300 }}*/>
+                <h1>Start typing...</h1>
+                <span style={{color: "red"}}>{this.state.typist.TypedText}</span>
+                |
+                <span>{this.state.typist.UnTypedText}</span>
 
-              <div>
-              <label>Words per minute: </label>
-              <span>{this.state.typist.WordsPerMinute}</span>
-              </div>
+                <Statistic title="Average words per minute" value={Math.round(this.state.typist.WordsPerMinute)} />
+
+                {this.state.typist.Finished
+                    ? <Button onClick={this.onRestart}>Play again</Button>
+                    : <Button onClick={this.onRestart}>Restart</Button> }
+            </Card>
           </div>
           <div className="column-right render" ref={el => this.el = el} />
         </div>;
