@@ -32,7 +32,9 @@ FAR = 10000;
 
 export function calculateRocketPosition(position: number, numRockets: number, progress: number) {
 
-    const alpha = position / numRockets;
+    const alpha = numRockets === 1
+        ? 0.75
+        : position / numRockets;
 
     const startPositionX = Math.sin(alpha * Math.PI - Math.PI/4) * earthRadius + earthPosition.x;
     const startPositionY = Math.cos(alpha * Math.PI - Math.PI/4) * earthRadius + earthPosition.y;
@@ -50,8 +52,7 @@ export function calculateRocketPosition(position: number, numRockets: number, pr
             .add(endPosition.multiplyScalar(progress * progress));
 }
 
-function calculateRocketVector(position: number, numRockets: number, progress: number)
-{
+function calculateRocketVector(position: number, numRockets: number, progress: number) {
     const previous = calculateRocketPosition(position, numRockets, progress - 0.01);
     const current = calculateRocketPosition(position, numRockets, progress);
 
@@ -60,8 +61,7 @@ function calculateRocketVector(position: number, numRockets: number, progress: n
     return diff;
 }
 
-function calculateRocketAngle(position: number, numRockets: number, progress: number)
-{
+function calculateRocketAngle(position: number, numRockets: number, progress: number) {
     const diff = calculateRocketVector(position, numRockets, progress);
 
     return diff.angle();
