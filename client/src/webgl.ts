@@ -250,7 +250,7 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
             rocketI.flameMesh.setRotationFromAxisAngle(new Vector3(0, 0, 1), rocketAngle + Math.PI / 2);
 
             rocketI.flameUniforms.time.value = elapsedSeconds;
-            rocketI.flameUniforms.magnitude.value = playerI.typist.Position;
+            rocketI.flameUniforms.magnitude.value = Math.min(playerI.typist.WordsPerMinute / 80, 1.0);
         });
 
         renderer.setViewport(0, 0, WIDTH, HEIGHT);

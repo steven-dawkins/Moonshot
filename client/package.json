@@ -40,6 +40,7 @@
     "@apollo/client": "^3.2.7",
     "graphql": "^14.0.0 || ^15.0.0",
     "parcel-plugin-static-files-copy": "^2.5.0",
+    "perf_hooks": "^0.0.1",
     "react": "^16.8.0 || ^17.0.0",
     "react-dom": "^17.0.1",
     "subscriptions-transport-ws": "^0.9.18",
