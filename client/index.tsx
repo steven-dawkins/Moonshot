@@ -57,6 +57,14 @@ const client = new ApolloClient({
 
 const playerName = "Moonshot player " + Math.ceil(Math.random() * 100);
 
+function OfflineGame() {
+    const text = getRandomText();
+    const player = new TypistPlayer({ name: playerName, index: 0 }, text);
+    const players = [player];
+    
+    return <WebGlScene player={player} players={players} ></WebGlScene>
+}
+
 function App() {
 
     const [gameName, setGameName] = useState<string | null>(null);
@@ -66,11 +74,7 @@ function App() {
         switch(gameName)
         {
             case "Offline":
-                const text = getRandomText();
-                const player = new TypistPlayer({ name: playerName, index: 0 }, text);
-                const players = [player];
-                
-                return <WebGlScene player={player} players={players} ></WebGlScene>
+                return <OfflineGame></OfflineGame>;
             default:
                 return <OnlineApp gameName={gameName} playerName={playerName}></OnlineApp>
         }
@@ -108,7 +112,8 @@ class ErrorBoundary extends React.Component<{}, { hasError: boolean }> {
 
 render(<ApolloProvider client={client}>
             <ErrorBoundary>
-                <App></App>
+                {/* <App></App> */}
+                <OfflineGame />
             </ErrorBoundary>
        </ApolloProvider>,
     el);
