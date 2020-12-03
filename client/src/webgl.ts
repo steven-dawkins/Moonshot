@@ -142,7 +142,10 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
 
         starMaterial.uniforms.map.value = loader.load("./" + starImage);
 
-        const geometry: PlaneGeometry = new PlaneGeometry(20, 20);
+
+        const size = Math.random() * 0.5 + 0.5;
+
+        const geometry: PlaneGeometry = new PlaneGeometry(20 * size, 20 * size);
 
         const mesh2: Object3D = new Mesh(geometry, starMaterial)
             .translateX(Math.random() * WIDTH)
