@@ -14,6 +14,8 @@ namespace Moonshot.Server.Models
 
         public string Name { get; }
 
+        public string GameText { get; set; }
+
         public IEnumerable<Player> Players => this.players.Values;
 
         public IEnumerable<PlayerKeystroke> Keystrokes => this.playerKeystrokes;
@@ -22,9 +24,10 @@ namespace Moonshot.Server.Models
 
         public IObservable<PlayerKeystroke> PlayersKeystrokeStream => this.playerKeystrokeObserver;
 
-        public Game(string name)
+        public Game(string name, string gameText)
         {
             this.Name = name ?? throw new ArgumentNullException(nameof(name));
+            this.GameText = gameText ?? throw new ArgumentNullException(nameof(gameText));
             this.players = new ConcurrentDictionary<string, Player>();
             this.playerObserver = new MessageObserver<Player>();
             this.playerKeystrokes = new ConcurrentQueue<PlayerKeystroke>();

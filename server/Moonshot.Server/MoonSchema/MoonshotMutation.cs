@@ -11,36 +11,49 @@ namespace Moonshot.Server.MoonSchema
         {
             Field<NonNullGraphType<PlayerGraphType>>("join",
                 arguments: new QueryArguments(
-                    new QueryArgument<StringGraphType> { Name = "name" }
-                ),
-                resolve: context =>
-                {
-                    var receivedMessage = context.GetArgument<string>("name");
-                    var player = chat.AddPlayer(receivedMessage);
-                    return player;
-                });
-
-            Field<NonNullGraphType<GameGraphType>>("createGame",
-                arguments: new QueryArguments(
-                    new QueryArgument<StringGraphType> { Name = "name" }
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "name" },
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "gameText" },
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "playerName" }
                 ),
                 resolve: context =>
                 {
                     var name = context.GetArgument<string>("name");
-                    var game = chat.AddGame(name);
+                    var gameText = context.GetArgument<string>("gameText");
+                    var playerName = context.GetArgument<string>("playerName");
+                    var game = chat.AddGame(name, gameText);
+                    var player = chat.AddPlayer(playerName);
+                    return player;
+                });
+
+            // todo: remove
+            Field<NonNullGraphType<GameGraphType>>("createGame",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "name" },
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "gameText" },
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "playerName" }
+                ),
+                resolve: context =>
+                {
+                    var name = context.GetArgument<string>("name");
+                    var gameText = context.GetArgument<string>("gameText");
+                    var playerName = context.GetArgument<string>("playerName");
+                    var game = chat.AddGame(name, gameText);
+                    var player = game.AddPlayer(playerName);
                     return game;
                 });
 
             Field<NonNullGraphType<GameGraphType>>("joinGame",
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "gameName" },
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "gameText" },
                     new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "playerName" }
                 ),
                 resolve: context =>
                 {
                     var gameName = context.GetArgument<string>("gameName");
+                    var gameText = context.GetArgument<string>("gameText");
                     var playerName = context.GetArgument<string>("playerName");
-                    var game = chat.AddGame(gameName);
+                    var game = chat.AddGame(gameName, gameText);
                     var player = game.AddPlayer(playerName);
 
                     return game;

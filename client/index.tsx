@@ -85,7 +85,7 @@ class ErrorBoundary extends React.Component<{}, { hasError: boolean }> {
     }
   }
 
-if (false)
+if (true)
 {
     // const client = new ApolloClient({
     //         uri: 'http://localhost:5000/graphql',
@@ -135,5 +135,7 @@ if (false)
    </ApolloProvider>,
 el);
 }
-
-render(<ErrorBoundary><OfflineGame /></ErrorBoundary>, el);
+else
+{   
+    render(<ErrorBoundary><OfflineGame /></ErrorBoundary>, el);
+}

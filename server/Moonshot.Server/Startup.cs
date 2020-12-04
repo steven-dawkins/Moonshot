@@ -8,6 +8,9 @@ using Microsoft.Extensions.Logging;
 using GraphQL.Server.Transports.AspNetCore;
 using Moonshot.Server.MoonSchema;
 using Moonshot.Server.Models;
+using System.IO;
+using Microsoft.Extensions.FileProviders;
+using System.Threading.Tasks;
 
 namespace Moonshot.Server
 {
@@ -42,7 +45,7 @@ namespace Moonshot.Server
                 })
                 // Add required services for de/serialization
                 .AddSystemTextJson(deserializerSettings => { }, serializerSettings => { }) // For .NET Core 3+
-                                                                                           //.AddNewtonsoftJson(deserializerSettings => { }, serializerSettings => { }) // For everything else
+                                                                                          
                 .AddErrorInfoProvider(opt => opt.ExposeExceptionStackTrace = CurrentEnvironment.IsDevelopment())
                 .AddWebSockets() // Add required services for web socket support
                 .AddDataLoader() // Add required services for DataLoader support
@@ -61,10 +64,25 @@ namespace Moonshot.Server
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapGet("/", async context =>
+                endpoints.MapGet("/", context =>
                 {
-                    await context.Response.WriteAsync("Hello World!");
+                    context.Response.Redirect("./index.html");
+
+                    return Task.CompletedTask;
                 });
+            });
+
+#if DEBUG
+            var contentPath = "../../client/dist";
+#else
+            var contentPath = "./client/";
+#endif
+
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(env.ContentRootPath, contentPath)),
+                RequestPath = ""
             });
 
             app.UseCors();

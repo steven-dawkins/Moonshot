@@ -54,17 +54,23 @@ namespace Moonshot.Server.Models
 
         public Game AddGame(string name)
         {
+            return AddGame(name, "");
+        }
+
+        public Game AddGame(string name, string gameText)
+        {
             lock (this.games)
             {
                 if (!this.games.TryGetValue(name, out Game existingPlayer))
                 {
-                    Game game = new Game(name);
+                    Game game = new Game(name, gameText);
                     this.games.TryAdd(name, game);
 
                     return game;
                 }
                 else
                 {
+                    existingPlayer.GameText = gameText;
                     return existingPlayer;
                 }
             }

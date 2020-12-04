@@ -1,5 +1,6 @@
-mutation JoinGame($gameName: String!, $playerName: String!) {
-  joinGame(gameName: $gameName, playerName: $playerName) {
+mutation JoinGame($gameName: String!, $playerName: String!, $gameText: String!) {
+  joinGame(gameName: $gameName, playerName: $playerName, gameText: $gameText) {
+      gameText
       name
       players {
         name

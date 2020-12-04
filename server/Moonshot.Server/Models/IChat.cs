@@ -19,6 +19,8 @@ namespace Moonshot.Server.Models
 
         Player AddPlayer(string name);
 
+        Game AddGame(string name, string gameText);
+
         Game AddGame(string name);
     }
 }

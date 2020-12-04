@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { WebGlScene } from "./scene";
-import { useCreateGameMutation, useGameKeystrokesSubscription, useGamePlayersSubscription, useGetPlayersQuery, useJoinGameMutation, useJoinMutation, useKeystrokesSubscription, usePlayersSubscription, useGetGamesQuery } from "../generated/graphql";
+import { useCreateGameMutation, useGameKeystrokesSubscription, useGamePlayersSubscription, useGetPlayersQuery, useJoinGameMutation, useKeystrokesSubscription, usePlayersSubscription, useGetGamesQuery } from "../generated/graphql";
 
 import { TypistPlayer } from "../TypistPlayer";
 import { getRandomText } from "../texts";
@@ -58,8 +58,9 @@ export function OnlineApp(props: { gameName: string, playerName: string }) {
         }
     });
 
-    const [joinMutation, { data, loading: joinLoading, error: joinError }] = useJoinGameMutation({
+const [joinMutation, { data, loading: joinLoading, error: joinError }] = useJoinGameMutation({
         variables: {
+            gameText: text,
             playerName: props.playerName,
             gameName: props.gameName
         },
@@ -94,8 +95,8 @@ export function OnlineApp(props: { gameName: string, playerName: string }) {
 
     useEffect(() => {
         joinMutation();
+        //player?.typist.OnCharacter((char) => inputMutation(char));
     }, []);
-
     if (joinError) {
         return <div>Error! {joinError}</div>
     }
@@ -129,6 +130,6 @@ export function OnlineApp(props: { gameName: string, playerName: string }) {
                 <li key={player.player.index}>{player.player.name} ({player.typist.Position})</li>)}
         </ul>
 
-        <WebGlScene player={player} players={players} ></WebGlScene>
+        <WebGlScene player={player} players={players} onComplete={() => {}} ></WebGlScene>
     </div>;
 }

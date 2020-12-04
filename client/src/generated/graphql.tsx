@@ -38,6 +38,7 @@ export type Player = {
 
 export type Game = {
   __typename?: 'Game';
+  gameText: Scalars['String'];
   keystrokes: Array<Maybe<PlayerKeystroke>>;
   name: Scalars['String'];
   players: Array<Player>;
@@ -67,17 +68,22 @@ export type MoonshotMutationAddKeystrokeArgs = {
 
 
 export type MoonshotMutationCreateGameArgs = {
-  name?: Maybe<Scalars['String']>;
+  name: Scalars['String'];
+  gameText: Scalars['String'];
+  playerName: Scalars['String'];
 };
 
 
 export type MoonshotMutationJoinArgs = {
-  name?: Maybe<Scalars['String']>;
+  name: Scalars['String'];
+  gameText: Scalars['String'];
+  playerName: Scalars['String'];
 };
 
 
 export type MoonshotMutationJoinGameArgs = {
   gameName: Scalars['String'];
+  gameText: Scalars['String'];
   playerName: Scalars['String'];
 };
 
@@ -101,6 +107,8 @@ export type ChatSubscriptionsPlayerJoinedGameArgs = {
 
 export type CreateGameMutationVariables = Exact<{
   gameName: Scalars['String'];
+  playerName: Scalars['String'];
+  gameText: Scalars['String'];
 }>;
 
 
@@ -108,7 +116,7 @@ export type CreateGameMutation = (
   { __typename?: 'MoonshotMutation' }
   & { createGame: (
     { __typename?: 'Game' }
-    & Pick<Game, 'name'>
+    & Pick<Game, 'name' | 'gameText'>
     & { players: Array<(
       { __typename?: 'Player' }
       & Pick<Player, 'name' | 'index'>
@@ -133,22 +141,10 @@ export type GetGamesQuery = (
   )>> }
 );
 
-export type JoinMutationVariables = Exact<{
-  name?: Maybe<Scalars['String']>;
-}>;
-
-
-export type JoinMutation = (
-  { __typename?: 'MoonshotMutation' }
-  & { join: (
-    { __typename?: 'Player' }
-    & Pick<Player, 'name' | 'index'>
-  ) }
-);
-
 export type JoinGameMutationVariables = Exact<{
   gameName: Scalars['String'];
   playerName: Scalars['String'];
+  gameText: Scalars['String'];
 }>;
 
 
@@ -156,7 +152,7 @@ export type JoinGameMutation = (
   { __typename?: 'MoonshotMutation' }
   & { joinGame: (
     { __typename?: 'Game' }
-    & Pick<Game, 'name'>
+    & Pick<Game, 'gameText' | 'name'>
     & { players: Array<(
       { __typename?: 'Player' }
       & Pick<Player, 'name' | 'index'>
@@ -225,9 +221,10 @@ export type GamePlayersSubscription = (
 
 
 export const CreateGameDocument = gql`
-    mutation CreateGame($gameName: String!) {
-  createGame(name: $gameName) {
+    mutation CreateGame($gameName: String!, $playerName: String!, $gameText: String!) {
+  createGame(name: $gameName, playerName: $playerName, gameText: $gameText) {
     name
+    gameText
     players {
       name
       index
@@ -251,6 +248,8 @@ export type CreateGameMutationFn = Apollo.MutationFunction<CreateGameMutation, C
  * const [createGameMutation, { data, loading, error }] = useCreateGameMutation({
  *   variables: {
  *      gameName: // value for 'gameName'
+ *      playerName: // value for 'playerName'
+ *      gameText: // value for 'gameText'
  *   },
  * });
  */
@@ -297,42 +296,10 @@ export function useGetGamesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<G
 export type GetGamesQueryHookResult = ReturnType<typeof useGetGamesQuery>;
 export type GetGamesLazyQueryHookResult = ReturnType<typeof useGetGamesLazyQuery>;
 export type GetGamesQueryResult = Apollo.QueryResult<GetGamesQuery, GetGamesQueryVariables>;
-export const JoinDocument = gql`
-    mutation Join($name: String) {
-  join(name: $name) {
-    name
-    index
-  }
-}
-    `;
-export type JoinMutationFn = Apollo.MutationFunction<JoinMutation, JoinMutationVariables>;
-
-/**
- * __useJoinMutation__
- *
- * To run a mutation, you first call `useJoinMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useJoinMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [joinMutation, { data, loading, error }] = useJoinMutation({
- *   variables: {
- *      name: // value for 'name'
- *   },
- * });
- */
-export function useJoinMutation(baseOptions?: Apollo.MutationHookOptions<JoinMutation, JoinMutationVariables>) {
-        return Apollo.useMutation<JoinMutation, JoinMutationVariables>(JoinDocument, baseOptions);
-      }
-export type JoinMutationHookResult = ReturnType<typeof useJoinMutation>;
-export type JoinMutationResult = Apollo.MutationResult<JoinMutation>;
-export type JoinMutationOptions = Apollo.BaseMutationOptions<JoinMutation, JoinMutationVariables>;
 export const JoinGameDocument = gql`
-    mutation JoinGame($gameName: String!, $playerName: String!) {
-  joinGame(gameName: $gameName, playerName: $playerName) {
+    mutation JoinGame($gameName: String!, $playerName: String!, $gameText: String!) {
+  joinGame(gameName: $gameName, playerName: $playerName, gameText: $gameText) {
+    gameText
     name
     players {
       name
@@ -358,6 +325,7 @@ export type JoinGameMutationFn = Apollo.MutationFunction<JoinGameMutation, JoinG
  *   variables: {
  *      gameName: // value for 'gameName'
  *      playerName: // value for 'playerName'
+ *      gameText: // value for 'gameText'
  *   },
  * });
  */
