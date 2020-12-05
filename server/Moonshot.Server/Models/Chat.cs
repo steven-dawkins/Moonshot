@@ -54,6 +54,7 @@ namespace Moonshot.Server.Models
 
         public Game AddGame(string name)
         {
+            // todo: throw exception if game exists
             return AddGame(name, "");
         }
 
@@ -70,7 +71,7 @@ namespace Moonshot.Server.Models
                 }
                 else
                 {
-                    if (!string.IsNullOrWhiteSpace(gameText))
+                    if (!string.IsNullOrWhiteSpace(gameText) && string.IsNullOrWhiteSpace(existingGame.GameText))
                     {
                         existingGame.GameText = gameText;
                     }

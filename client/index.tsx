@@ -6,11 +6,12 @@ import { split, HttpLink } from '@apollo/client';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { WebSocketLink } from '@apollo/client/link/ws';
 import { OnlineApp } from "./src/components/app";
-import { ChooseGame } from "./src/components/gameChooser";
+import { JoinGame } from "./src/components/JoinGame";
+import { ChooseGame } from "./src/components/GameChooser";
 import { useState } from "react";
 import { TypistPlayer } from "./src/TypistPlayer";
 import { getRandomText } from "./src/texts";
-import { WebGlScene } from "./src/components/scene";
+import { WebGlScene } from "./src/components/Scene";
 
 import 'antd/dist/antd.css';
 
@@ -18,27 +19,6 @@ const el = document.getElementById("body");
 
 const playerName = "Moonshot player " + Math.ceil(Math.random() * 100);
 
-var gameIndex = 0;
-
-function getPlayers()
-{
-    const text = getRandomText();
-    const player = new TypistPlayer({ name: playerName, index: 0 }, text);
-    const players = [player];
-
-    return { player: player, players: players, gameIndex: gameIndex++ };
-}
-
-function OfflineGame() {
-    const [props, setProps] = useState<{player: TypistPlayer, players: TypistPlayer[], gameIndex: number}>(getPlayers());
-    
-    return <div>
-        <WebGlScene key={props.gameIndex} {...props} onComplete={() => {
-        console.log("Restart");
-        setProps(getPlayers());
-    }} ></WebGlScene>
-    </div> 
-}
 
 function App() {
 
@@ -51,7 +31,7 @@ function App() {
             case "Offline":
                 return <OfflineGame></OfflineGame>;
             default:
-                return <OnlineApp gameName={gameName} playerName={playerName}></OnlineApp>
+                return <JoinGame gameName={gameName} playerName={playerName}></JoinGame>
         }
     }
     else {
