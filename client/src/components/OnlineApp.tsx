@@ -57,17 +57,15 @@ export function OnlineApp(props: { gameName: string; playerName: string; players
 
     const [keystrokeMutation, { loading: keystrokeLoading, error: keystrokeError }] = useAddGameKeystrokeMutation({});
 
-    if (props.player.typist.OnCharacter === null) {
-        props.player.typist.OnCharacter = (char: string) => {
-            keystrokeMutation({
-                variables: {
-                    keystroke: char,
-                    playerName: props.playerName,
-                    gameName: props.gameName,
-                }
-            });
-        };
-    }
+    props.player.typist.OnCharacter = (char: string) => {
+        keystrokeMutation({
+            variables: {
+                keystroke: char,
+                playerName: props.playerName,
+                gameName: props.gameName,
+            }
+        });
+    };
 
     if (keystrokeError) {
         return <div>Keystroke Error! {playersError}</div>;
