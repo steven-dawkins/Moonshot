@@ -23,7 +23,6 @@ export function OfflineGame(props: {playerName: string}) {
             key={sceneProps.gameIndex}
             {...sceneProps}
             onComplete={() => {
-                console.log("Restart");
                 setSceneProps(getOfflinePlayers(props.playerName));
             }}>
         </WebGlScene>

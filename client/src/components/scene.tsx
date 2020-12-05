@@ -12,14 +12,14 @@ function isAlphaNumeric(str: string) {
     code = str.charCodeAt(i);
     if (!(code > 47 && code < 58) && // numeric (0-9)
         !(code > 64 && code < 91) && // upper alpha (A-Z)
-        !(code > 96 && code < 123) &&
+        !(code > 96 && code < 123) && // lower alpha (a-z)
         !(str === " ") &&
         !(str === "/") &&
         !(str === ",") &&
         !(str === ".") &&
         !(str === "?") &&
         !(str === "!") &&
-        !(str === "'")) { // lower alpha (a-z)
+        !(str === "'")) {
       return false;
     }
   }
@@ -55,8 +55,6 @@ export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typis
       {
         this.state.typist.ProcessCharacter(evt.key, null);
         this.setState({ typist: this.state.typist });
-
-        // todo: publish to server
       }
 
       return true;

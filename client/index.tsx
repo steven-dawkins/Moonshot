@@ -5,15 +5,12 @@ import { ApolloClient, ApolloProvider, InMemoryCache } from "@apollo/client";
 import { split, HttpLink } from '@apollo/client';
 import { getMainDefinition } from '@apollo/client/utilities';
 import { WebSocketLink } from '@apollo/client/link/ws';
-import { OnlineApp } from "./src/components/app";
 import { JoinGame } from "./src/components/JoinGame";
 import { ChooseGame } from "./src/components/GameChooser";
 import { useState } from "react";
-import { TypistPlayer } from "./src/TypistPlayer";
-import { getRandomText } from "./src/texts";
-import { WebGlScene } from "./src/components/Scene";
 
 import 'antd/dist/antd.css';
+import { OfflineGame } from "./src/components/OfflineGame";
 
 const el = document.getElementById("body");
 
@@ -29,7 +26,7 @@ function App() {
         switch(gameName)
         {
             case "Offline":
-                return <OfflineGame></OfflineGame>;
+                return <OfflineGame playerName={playerName} ></OfflineGame>;
             default:
                 return <JoinGame gameName={gameName} playerName={playerName}></JoinGame>
         }
@@ -45,7 +42,7 @@ class ErrorBoundary extends React.Component<{}, { hasError: boolean }> {
       this.state = { hasError: false };
     }
   
-    static getDerivedStateFromError(error: {}) {
+    static getDerivedStateFromError() {
       // Update state so the next render will show the fallback UI.
       return { hasError: true };
     }
@@ -117,5 +114,5 @@ el);
 }
 else
 {   
-    render(<ErrorBoundary><OfflineGame /></ErrorBoundary>, el);
+    render(<ErrorBoundary><OfflineGame playerName={playerName}  /></ErrorBoundary>, el);
 }

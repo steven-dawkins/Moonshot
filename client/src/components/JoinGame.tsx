@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useJoinGameMutation } from "../generated/graphql";
 import { TypistPlayer } from "../TypistPlayer";
 import { getRandomText } from "../texts";
-import { OnlineApp } from "./app";
+import { OnlineApp } from "./OnlineApp";
 
 
 export function JoinGame(props: { gameName: string; playerName: string; }) {
