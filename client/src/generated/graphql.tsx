@@ -55,15 +55,15 @@ export type MoonshotMutation = {
 
 
 export type MoonshotMutationAddGameKeystrokeArgs = {
-  gameName?: Maybe<Scalars['String']>;
-  playerName?: Maybe<Scalars['String']>;
-  keystroke?: Maybe<Scalars['String']>;
+  gameName: Scalars['String'];
+  playerName: Scalars['String'];
+  keystroke: Scalars['String'];
 };
 
 
 export type MoonshotMutationAddKeystrokeArgs = {
-  playerName?: Maybe<Scalars['String']>;
-  keystroke?: Maybe<Scalars['String']>;
+  playerName: Scalars['String'];
+  keystroke: Scalars['String'];
 };
 
 
@@ -104,6 +104,21 @@ export type ChatSubscriptionsGameKeystrokeArgs = {
 export type ChatSubscriptionsPlayerJoinedGameArgs = {
   gameName: Scalars['String'];
 };
+
+export type AddGameKeystrokeMutationVariables = Exact<{
+  gameName: Scalars['String'];
+  playerName: Scalars['String'];
+  keystroke: Scalars['String'];
+}>;
+
+
+export type AddGameKeystrokeMutation = (
+  { __typename?: 'MoonshotMutation' }
+  & { addGameKeystroke?: Maybe<(
+    { __typename?: 'PlayerKeystroke' }
+    & Pick<PlayerKeystroke, 'keystroke' | 'playerName'>
+  )> }
+);
 
 export type CreateGameMutationVariables = Exact<{
   gameName: Scalars['String'];
@@ -220,6 +235,45 @@ export type GamePlayersSubscription = (
 );
 
 
+export const AddGameKeystrokeDocument = gql`
+    mutation addGameKeystroke($gameName: String!, $playerName: String!, $keystroke: String!) {
+  addGameKeystroke(
+    gameName: $gameName
+    playerName: $playerName
+    keystroke: $keystroke
+  ) {
+    keystroke
+    playerName
+  }
+}
+    `;
+export type AddGameKeystrokeMutationFn = Apollo.MutationFunction<AddGameKeystrokeMutation, AddGameKeystrokeMutationVariables>;
+
+/**
+ * __useAddGameKeystrokeMutation__
+ *
+ * To run a mutation, you first call `useAddGameKeystrokeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddGameKeystrokeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addGameKeystrokeMutation, { data, loading, error }] = useAddGameKeystrokeMutation({
+ *   variables: {
+ *      gameName: // value for 'gameName'
+ *      playerName: // value for 'playerName'
+ *      keystroke: // value for 'keystroke'
+ *   },
+ * });
+ */
+export function useAddGameKeystrokeMutation(baseOptions?: Apollo.MutationHookOptions<AddGameKeystrokeMutation, AddGameKeystrokeMutationVariables>) {
+        return Apollo.useMutation<AddGameKeystrokeMutation, AddGameKeystrokeMutationVariables>(AddGameKeystrokeDocument, baseOptions);
+      }
+export type AddGameKeystrokeMutationHookResult = ReturnType<typeof useAddGameKeystrokeMutation>;
+export type AddGameKeystrokeMutationResult = Apollo.MutationResult<AddGameKeystrokeMutation>;
+export type AddGameKeystrokeMutationOptions = Apollo.BaseMutationOptions<AddGameKeystrokeMutation, AddGameKeystrokeMutationVariables>;
 export const CreateGameDocument = gql`
     mutation CreateGame($gameName: String!, $playerName: String!, $gameText: String!) {
   createGame(name: $gameName, playerName: $playerName, gameText: $gameText) {

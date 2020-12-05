@@ -9,12 +9,18 @@ export class Typist
     private lastId: string | null | undefined;
     private startTime: number | null;
     private endtime: number | null;
+    private onCharacter: ((char: string) => void) | null;
 
     constructor(private text: string/*, private onComplete: (() => void) | null = null*/) {
         this.position = 0;
         this.lastId = null;
         this.startTime = null;
         this.endtime = null;
+        this.onCharacter = null;
+    }
+
+    public set OnCharacter(func: (char: string) => void) {
+        this.onCharacter = func;
     }
 
     public get Position() {
@@ -104,6 +110,10 @@ export class Typist
         if (this.position == this.text.length)
         {
             this.endtime = performance.now();
+        }
+
+        if (this.onCharacter !== null) {
+            this.onCharacter(char);
         }
 
         return this.position;

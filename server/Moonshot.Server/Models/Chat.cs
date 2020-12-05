@@ -61,7 +61,7 @@ namespace Moonshot.Server.Models
         {
             lock (this.games)
             {
-                if (!this.games.TryGetValue(name, out Game existingPlayer))
+                if (!this.games.TryGetValue(name, out Game existingGame))
                 {
                     Game game = new Game(name, gameText);
                     this.games.TryAdd(name, game);
@@ -70,8 +70,12 @@ namespace Moonshot.Server.Models
                 }
                 else
                 {
-                    existingPlayer.GameText = gameText;
-                    return existingPlayer;
+                    if (!string.IsNullOrWhiteSpace(gameText))
+                    {
+                        existingGame.GameText = gameText;
+                    }
+
+                    return existingGame;
                 }
             }
         }

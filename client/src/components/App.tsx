@@ -1,7 +1,9 @@
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { WebGlScene } from "./scene";
-import { useCreateGameMutation, useGameKeystrokesSubscription, useGamePlayersSubscription, useGetPlayersQuery, useJoinGameMutation, useKeystrokesSubscription, usePlayersSubscription, useGetGamesQuery } from "../generated/graphql";
+import { useCreateGameMutation, useGameKeystrokesSubscription, useGamePlayersSubscription,
+     useGetPlayersQuery, useJoinGameMutation, useKeystrokesSubscription, usePlayersSubscription, useGetGamesQuery,
+    useAddGameKeystrokeMutation } from "../generated/graphql";
 
 import { TypistPlayer } from "../TypistPlayer";
 import { getRandomText } from "../texts";
@@ -15,18 +17,18 @@ export function OnlineApp(props: { gameName: string, playerName: string }) {
 
     const { error: keystrokesError } = useGameKeystrokesSubscription({
         variables: {
-            gameName: "Game1"
+            gameName: props.gameName
         },
         onSubscriptionData: data => {
             console.log("keystroke");
             console.log(data);
-            const playerJoined = data.subscriptionData.data?.gameKeystroke;
+            const keystroke = data.subscriptionData.data?.gameKeystroke;
 
-            const p = players.filter(p => p.player.name === playerJoined?.playerName)[0];
+            const p = players.filter(p => p.player.name === keystroke?.playerName)[0];
 
-            if (playerJoined && playerJoined?.keystroke)
+            if (keystroke && keystroke?.keystroke && p !== player)
             {
-                p.typist.ProcessCharacter(playerJoined.keystroke, playerJoined.id);
+                p.typist.ProcessCharacter(keystroke.keystroke, keystroke.id);
             }
 
             // advertise update to players
@@ -47,6 +49,8 @@ export function OnlineApp(props: { gameName: string, playerName: string }) {
 
             const p = new TypistPlayer({ name: playerJoined?.name, index: playerJoined?.index }, text);
 
+            console.log("player joined: " + p.player.name);
+
             var existing = players.filter(t => t.player.index === p.player.index);
             
             if (!existing)
@@ -56,6 +60,10 @@ export function OnlineApp(props: { gameName: string, playerName: string }) {
                 setPlayers(players);
             }
         }
+    });
+
+    const [keystrokeMutation, { loading: keystrokeLoading, error: keystrokeError }] = useAddGameKeystrokeMutation({
+    
     });
 
 const [joinMutation, { data, loading: joinLoading, error: joinError }] = useJoinGameMutation({
@@ -84,6 +92,16 @@ const [joinMutation, { data, loading: joinLoading, error: joinError }] = useJoin
 
                     if (player.player.name === props.playerName) {
                         setPlayer(player);
+                        player.typist.OnCharacter = (char: string) => {
+                            keystrokeMutation({
+                                variables: {
+                                    keystroke: char,
+                                    playerName: props.playerName,
+                                    gameName: props.gameName,
+                                }
+                            });
+                        
+                        };
                     }
                 }
 
@@ -95,8 +113,16 @@ const [joinMutation, { data, loading: joinLoading, error: joinError }] = useJoin
 
     useEffect(() => {
         joinMutation();
-        //player?.typist.OnCharacter((char) => inputMutation(char));
     }, []);
+
+    // if (keystrokeLoading) {
+    //     return <div>Keystrokes Loading...</div>;
+    // }
+
+    if (keystrokeError) {
+        return <div>Keystroke Error! {playersError}</div>
+    }
+
     if (joinError) {
         return <div>Error! {joinError}</div>
     }

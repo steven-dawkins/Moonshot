@@ -61,8 +61,8 @@ namespace Moonshot.Server.MoonSchema
 
             Field<PlayerKeystrokeGraphType>("addKeystroke",
                 arguments: new QueryArguments(
-                    new QueryArgument<StringGraphType> { Name = nameof(PlayerKeystroke.PlayerName) },
-                    new QueryArgument<StringGraphType> { Name = nameof(PlayerKeystroke.Keystroke) }
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = nameof(PlayerKeystroke.PlayerName) },
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = nameof(PlayerKeystroke.Keystroke) }
                 ),
                 resolve: context =>
                 {
@@ -74,9 +74,9 @@ namespace Moonshot.Server.MoonSchema
 
             Field<PlayerKeystrokeGraphType>("addGameKeystroke",
                 arguments: new QueryArguments(
-                    new QueryArgument<StringGraphType> { Name = "gameName" },
-                    new QueryArgument<StringGraphType> { Name = nameof(PlayerKeystroke.PlayerName) },
-                    new QueryArgument<StringGraphType> { Name = nameof(PlayerKeystroke.Keystroke) }
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "gameName" },
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = nameof(PlayerKeystroke.PlayerName) },
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = nameof(PlayerKeystroke.Keystroke) }
                 ),
                 resolve: context =>
                 {

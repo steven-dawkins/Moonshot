@@ -8,6 +8,7 @@ namespace Moonshot.Server.Models
     public class Game
     {
         private ConcurrentDictionary<string, Player> players { get; }
+
         private readonly MessageObserver<Player> playerObserver;
         private readonly MessageObserver<PlayerKeystroke> playerKeystrokeObserver;
         private readonly ConcurrentQueue<PlayerKeystroke> playerKeystrokes;

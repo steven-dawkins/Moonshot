@@ -1,0 +1,6 @@
+mutation addGameKeystroke($gameName:String!, $playerName:String!, $keystroke:String!) {
+  addGameKeystroke(gameName:$gameName, playerName:$playerName, keystroke:$keystroke) {
+    keystroke
+    playerName
+  }
+}
