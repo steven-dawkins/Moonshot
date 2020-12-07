@@ -1,5 +1,8 @@
 FROM node:15.3.0-alpine3.10 as build-deps
 
+# workaround for https://github.com/parcel-bundler/parcel/issues/2031
+ENV PARCEL_WORKERS=1
+
 WORKDIR /app
 
 # Copy package.json and restore as distinct layers
@@ -23,8 +26,7 @@ RUN dotnet restore
 COPY ./server/Moonshot.Server/ ./
 RUN dotnet publish -c Release -o out --no-cache
 
-# COPY --from=build-deps ./dist/ ./out/client
-COPY ./client/dist/ ./out/client
+COPY --from=build-deps /app/dist/ ./out/client
 
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1

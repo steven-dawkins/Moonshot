@@ -12,6 +12,8 @@ import { useState } from "react";
 import 'antd/dist/antd.css';
 import { OfflineGame } from "./src/components/OfflineGame";
 
+console.log("Starting Moonshot 1.2");
+
 const el = document.getElementById("body");
 
 const playerName = "Moonshot player " + Math.ceil(Math.random() * 100);
@@ -70,12 +72,18 @@ if (true)
     //         cache: new InMemoryCache()
     //       });
 
+    const hostname = location.hostname;
+    const protocol = window.location.protocol === "https:"
+        ? "s"
+        : "";
+    
+
     const httpLink = new HttpLink({
-        uri: 'http://localhost:5000/graphql'
+        uri: `http${protocol}://${hostname}/graphql`
     });
 
     const wsLink = new WebSocketLink({
-        uri: `ws://localhost:5000/graphql`,
+        uri: `ws${protocol}://${hostname}/graphql`,
         options: {
             reconnect: true,
             connectionParams: {
@@ -109,8 +117,7 @@ if (true)
         <ErrorBoundary>
             <App></App>
         </ErrorBoundary>
-   </ApolloProvider>,
-el);
+   </ApolloProvider>, el);
 }
 else
 {   
