@@ -1,0 +1,15 @@
+
+
+**/obj/
+**/bin/
+
+# Exclude git history and configuration.
+.git/
+.gitignore
+
+**/node_modules/
+**/wwwroot/
+**/.vs/
+**/.cache/
+
+# client/dist

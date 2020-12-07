@@ -33,7 +33,16 @@ namespace Moonshot_Server
                             serverOptions.Listen(IPAddress.Loopback, port.Value);
                         }
                     });
-                    _ = webBuilder.UseStartup<Startup>();
+                    
+                    var startup = webBuilder.UseStartup<Startup>();
+
+                    if (Environment.GetEnvironmentVariable("PORT") != null)
+                    {
+                        string cloudPort = Environment.GetEnvironmentVariable("PORT");
+                        string cloudUrl = String.Concat("http://0.0.0.0:", cloudPort);
+
+                        startup.UseUrls(cloudUrl);
+                    }
                 });
     }
 }
