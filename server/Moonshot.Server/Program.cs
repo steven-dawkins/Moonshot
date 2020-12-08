@@ -18,7 +18,7 @@ namespace Moonshot_Server
             CreateHostBuilder(args).Build().Run();
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args, int? port = null) =>
+        public static IHostBuilder CreateHostBuilder(string[] args, int? port = null, string clientContentPath = null) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
@@ -33,6 +33,15 @@ namespace Moonshot_Server
                             serverOptions.Listen(IPAddress.Loopback, port.Value);
                         }
                     });
+
+
+#if DEBUG
+                    var contentPath = "../../client/dist";
+#else
+                    var contentPath = "./client/";
+#endif
+
+                    webBuilder.UseSetting("clientContentPath", clientContentPath ?? contentPath);
                     
                     var startup = webBuilder.UseStartup<Startup>();
 

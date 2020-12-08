@@ -9,7 +9,7 @@ namespace Moonshot.Tests
     {
         public ApiFixture(int port)
         {
-            this.host = Program.CreateHostBuilder(new string[] { }, port).Build();
+            this.host = Program.CreateHostBuilder(new string[] { }, port, "../../../../../client/dist").Build();
 
             this.ServerRunning = host.StartAsync();
 

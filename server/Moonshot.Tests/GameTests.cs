@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using GraphQL;
 using Moonshot.Server.Models;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -15,6 +16,7 @@ namespace Moonshot.Tests
                 {
                     games {
                         name
+                        gameText
                         players {
                             name
                             index
@@ -26,6 +28,43 @@ namespace Moonshot.Tests
                         }
                     }
                 }"
+        };
+
+        private Func<string, string, string, GraphQLRequest> createGameRequest = (gameName, gameText, playerName) => new GraphQLRequest
+        {
+            Query = @"mutation CreateGame($name: String!, $gameText: String!, $playerName: String!) {
+                    createGame(name: $name, gameText: $gameText, playerName: $playerName) {
+                        name
+                        gameText
+                    }
+                  }",
+            Variables = new
+            {
+                name = gameName,
+                gameText = gameText,
+                playerName = playerName
+            }
+        };
+
+
+
+        Func<string, string, string, GraphQLRequest> joinGameRequest = (gameName, playerName, gameText) => new GraphQLRequest
+        {
+            Query = @"mutation Join($gameName: String!, $playerName: String!, $gameText: String!) {
+                    joinGame(gameName: $gameName, playerName: $playerName, gameText: $gameText) {
+                        name
+                        players {
+                            name
+                            index
+                        }
+                    }
+                  }",
+            Variables = new
+            {
+                gameName = gameName,
+                playerName = playerName,
+                gameText = gameText
+            }
         };
 
         [Fact]
@@ -43,26 +82,14 @@ namespace Moonshot.Tests
         {
             using var fixture = new ApiFixture(5015);
 
-            var gameMutationRequest = new GraphQLRequest
-            {
-                Query = @"mutation CreateGame($name: String) {
-                    createGame(name: $name) {
-                        name
-                    }
-                  }",
-                Variables = new
-                {
-                    name = "Game1"
-                }
-            };
-
-            var r = await fixture.SendMutation<GraphQlPlayerModelRoot>(gameMutationRequest);
-            await fixture.SendMutation<GraphQlPlayerModelRoot>(gameMutationRequest);
+            var r = await fixture.SendMutation<GraphQlPlayerModelRoot>(createGameRequest("Game1", "Lorem Ipsum", "Player1"));
+            await fixture.SendMutation<GraphQlPlayerModelRoot>(createGameRequest("Game1", "Lorem Ipsum", "Player1"));
 
             var graphQLResponse = await fixture.Execute<GraphQlGameModel>(gamesRequest);
 
             graphQLResponse.Games.Length.Should().Be(1);
             graphQLResponse.Games[0].Name.Should().Be("Game1");
+            graphQLResponse.Games[0].GameText.Should().Be("Lorem Ipsum");
         }
 
         [Fact]
@@ -70,26 +97,9 @@ namespace Moonshot.Tests
         {
             using var fixture = new ApiFixture(5014);
 
-            var joinGameRequest = new GraphQLRequest
-            {
-                Query = @"mutation Join($gameName: String!, $playerName: String!) {
-                    joinGame(gameName: $gameName, playerName: $playerName) {
-                        name
-                        players {
-                            name
-                            index
-                        }
-                    }
-                  }",
-                Variables = new
-                {
-                    gameName = "Game1",
-                    playerName = "Steve"
-                }
-            };
-
-            await fixture.SendMutation<GraphQlPlayerModelRoot>(joinGameRequest);
-            await fixture.SendMutation<GraphQlPlayerModelRoot>(joinGameRequest);
+            // todo: gameText shouldn't be required
+            await fixture.SendMutation<GraphQlPlayerModelRoot>(joinGameRequest("Game1", "Steve", "Lorem Ipsum"));
+            await fixture.SendMutation<GraphQlPlayerModelRoot>(joinGameRequest("Game1", "Steve", "Lorem Ipsum"));
 
             var graphQLResponse = await fixture.Execute<GraphQlGameModel>(gamesRequest);
 
@@ -98,6 +108,23 @@ namespace Moonshot.Tests
             graphQLResponse.Games[0].Players.Count().Should().Be(1);
             graphQLResponse.Games[0].Players.Single().Name.Should().Be("Steve");
         }
+
+        //[Fact]
+        //public async Task PlayerCantJoinStartedGame()
+        //{
+        //    using var fixture = new ApiFixture(5014);
+
+        //    await fixture.SendMutation<GraphQlPlayerModelRoot>(createGameRequest("Game1", "Lorem Ipsum"));
+        //    // todo: start game
+        //    await fixture.SendMutation<GraphQlPlayerModelRoot>(joinGameRequest("Game1", "Steve"));
+
+        //    var graphQLResponse = await fixture.Execute<GraphQlGameModel>(gamesRequest);
+
+        //    graphQLResponse.Games.Length.Should().Be(1);
+        //    graphQLResponse.Games[0].Name.Should().Be("Game1");
+        //    graphQLResponse.Games[0].Players.Count().Should().Be(1);
+        //    graphQLResponse.Games[0].Players.Single().Name.Should().Be("Steve");
+        //}
 
         [Fact]
         public async Task PlayerKeystroke()
@@ -144,6 +171,8 @@ namespace Moonshot.Tests
         public class GraphQlGameModel2
         {
             public string Name { get; set; }
+
+            public string GameText { get; set; }
 
             public GraphQlPlayerModel[] Players { get; set; }
 

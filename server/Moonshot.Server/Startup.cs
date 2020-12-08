@@ -11,6 +11,7 @@ using Moonshot.Server.Models;
 using System.IO;
 using Microsoft.Extensions.FileProviders;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 
 namespace Moonshot.Server
 {
@@ -19,9 +20,12 @@ namespace Moonshot.Server
     {
         public IWebHostEnvironment CurrentEnvironment { get; }
 
-        public Startup(IWebHostEnvironment env)
+        private readonly IConfiguration configuration;
+
+        public Startup(IWebHostEnvironment env, IConfiguration configuration)
         {
             this.CurrentEnvironment = env;
+            this.configuration = configuration;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -72,12 +76,7 @@ namespace Moonshot.Server
                 });
             });
 
-#if DEBUG
-            var contentPath = "../../client/dist";
-#else
-            var contentPath = "./client/";
-#endif
-
+            var contentPath = this.configuration.GetValue<string>("clientContentPath");
 
             app.UseStaticFiles(new StaticFileOptions
             {

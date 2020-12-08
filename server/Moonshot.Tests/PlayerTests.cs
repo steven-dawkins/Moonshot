@@ -36,14 +36,16 @@ namespace Moonshot.Tests
 
             var playersMutationRequest = new GraphQLRequest
             {
-                Query = @"mutation Join($name: String) {
-                    join(name: $name) {
+                Query = @"mutation Join($name: String!, $gameText: String!, $playerName: String!) {
+                    join(name: $name, gameText: $gameText, playerName: $playerName) {
                         name
                     }
                   }",
                 Variables = new
                 {
-                    name = "Steve"
+                    name = "Game1",
+                    playerName = "Steve",
+                    gameText = "Lorem Ipsum"
                 }
             };
 

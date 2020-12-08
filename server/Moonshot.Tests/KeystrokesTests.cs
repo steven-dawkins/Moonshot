@@ -37,7 +37,7 @@ namespace Moonshot.Tests
 
             var playersMutationRequest = new GraphQLRequest
             {
-                Query = @"mutation AddKeystroke($playerName: String, $keystroke: String) {
+                Query = @"mutation AddKeystroke($playerName: String!, $keystroke: String!) {
                     addKeystroke(playerName: $playerName, keystroke: $keystroke) {
                         playerName
                         keystroke
