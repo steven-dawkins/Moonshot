@@ -25,12 +25,13 @@ namespace Moonshot.Server.MoonSchema
                     return player;
                 });
 
-            // todo: remove
+            // todo: remove?
             Field<NonNullGraphType<GameGraphType>>("createGame",
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "name" },
                     new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "gameText" },
-                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "playerName" }
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "playerName" },
+                    new QueryArgument<BooleanGraphType> { Name = "started" }
                 ),
                 resolve: context =>
                 {
@@ -39,6 +40,21 @@ namespace Moonshot.Server.MoonSchema
                     var playerName = context.GetArgument<string>("playerName");
                     var game = chat.AddGame(name, gameText);
                     var player = game.AddPlayer(playerName);
+                    return game;
+                });
+
+            Field<NonNullGraphType<GameGraphType>>("startGame",
+                arguments: new QueryArguments(
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "name" }
+                ),
+                resolve: context =>
+                {
+                    var name = context.GetArgument<string>("name");
+
+                    var game = chat.AddGame(name);
+
+                    game.Start();
+
                     return game;
                 });
 

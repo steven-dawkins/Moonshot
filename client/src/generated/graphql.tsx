@@ -21,6 +21,7 @@ export type GameQuery = {
 
 export type GameQueryGamesArgs = {
   gameName?: Maybe<Scalars['String']>;
+  started?: Maybe<Scalars['Boolean']>;
 };
 
 export type PlayerKeystroke = {
@@ -42,6 +43,7 @@ export type Game = {
   keystrokes: Array<Maybe<PlayerKeystroke>>;
   name: Scalars['String'];
   players: Array<Player>;
+  started: Scalars['Boolean'];
 };
 
 export type MoonshotMutation = {
@@ -51,6 +53,7 @@ export type MoonshotMutation = {
   createGame: Game;
   join: Player;
   joinGame: Game;
+  startGame: Game;
 };
 
 
@@ -71,6 +74,7 @@ export type MoonshotMutationCreateGameArgs = {
   name: Scalars['String'];
   gameText: Scalars['String'];
   playerName: Scalars['String'];
+  started?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -85,6 +89,11 @@ export type MoonshotMutationJoinGameArgs = {
   gameName: Scalars['String'];
   gameText: Scalars['String'];
   playerName: Scalars['String'];
+};
+
+
+export type MoonshotMutationStartGameArgs = {
+  name: Scalars['String'];
 };
 
 export type ChatSubscriptions = {
@@ -141,6 +150,7 @@ export type CreateGameMutation = (
 
 export type GetGamesQueryVariables = Exact<{
   gameName?: Maybe<Scalars['String']>;
+  started?: Maybe<Scalars['Boolean']>;
 }>;
 
 
@@ -148,7 +158,7 @@ export type GetGamesQuery = (
   { __typename?: 'GameQuery' }
   & { games?: Maybe<Array<(
     { __typename?: 'Game' }
-    & Pick<Game, 'name'>
+    & Pick<Game, 'name' | 'started'>
     & { players: Array<(
       { __typename?: 'Player' }
       & Pick<Player, 'name' | 'index'>
@@ -314,9 +324,10 @@ export type CreateGameMutationHookResult = ReturnType<typeof useCreateGameMutati
 export type CreateGameMutationResult = Apollo.MutationResult<CreateGameMutation>;
 export type CreateGameMutationOptions = Apollo.BaseMutationOptions<CreateGameMutation, CreateGameMutationVariables>;
 export const GetGamesDocument = gql`
-    query GetGames($gameName: String) {
-  games(gameName: $gameName) {
+    query GetGames($gameName: String, $started: Boolean) {
+  games(gameName: $gameName, started: $started) {
     name
+    started
     players {
       name
       index
@@ -338,6 +349,7 @@ export const GetGamesDocument = gql`
  * const { data, loading, error } = useGetGamesQuery({
  *   variables: {
  *      gameName: // value for 'gameName'
+ *      started: // value for 'started'
  *   },
  * });
  */

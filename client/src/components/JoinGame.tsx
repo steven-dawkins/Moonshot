@@ -2,14 +2,13 @@ import * as React from "react";
 import { useEffect } from "react";
 import { useJoinGameMutation } from "../generated/graphql";
 import { TypistPlayer } from "../TypistPlayer";
-import { getRandomText } from "../texts";
 import { OnlineApp } from "./OnlineApp";
 
 
-export function JoinGame(props: { gameName: string; playerName: string; }) {
+export function JoinGame(props: { gameName: string; playerName: string; gameText: string }) {
     const [joinMutation, { data, loading: joinLoading, error: joinError }] = useJoinGameMutation({
         variables: {
-            gameText: getRandomText(),
+            gameText: props.gameText,
             playerName: props.playerName,
             gameName: props.gameName
         }

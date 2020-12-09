@@ -21,20 +21,20 @@ const playerName = "Moonshot player " + Math.ceil(Math.random() * 100);
 
 function App() {
 
-    const [gameName, setGameName] = useState<string | null>(null);
+    const [gameInfo, setGameName] = useState<{gameName: string, gameText: string} | null>(null);
 
-    if (gameName !== null)
+    if (gameInfo !== null)
     {
-        switch(gameName)
+        switch(gameInfo.gameName)
         {
             case "Offline":
                 return <OfflineGame playerName={playerName} ></OfflineGame>;
             default:
-                return <JoinGame gameName={gameName} playerName={playerName}></JoinGame>
+                return <JoinGame gameName={gameInfo.gameName} playerName={playerName} gameText={gameInfo.gameText}></JoinGame>
         }
     }
     else {
-        return <ChooseGame chooseGame={setGameName}></ChooseGame>
+        return <ChooseGame chooseGame={(gameName, gameText) => setGameName({gameName, gameText})}></ChooseGame>
     }
 }
 
@@ -77,13 +77,18 @@ if (true)
         ? "s"
         : "";
     
+    const port = hostname == "localhost"
+        ? 5000
+        : protocol == "s"
+        ? 443
+        : 80;
 
     const httpLink = new HttpLink({
-        uri: `http${protocol}://${hostname}/graphql`
+        uri: `http${protocol}://${hostname}:${port}/graphql`
     });
 
     const wsLink = new WebSocketLink({
-        uri: `ws${protocol}://${hostname}/graphql`,
+        uri: `ws${protocol}://${hostname}:${port}/graphql`,
         options: {
             reconnect: true,
             connectionParams: {

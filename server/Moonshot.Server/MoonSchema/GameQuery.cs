@@ -16,12 +16,19 @@ namespace Moonshot.Server.MoonSchema
 
             Field<ListGraphType<NonNullGraphType<GameGraphType>>>("games",
                 arguments: new QueryArguments(
-                    new QueryArgument<StringGraphType> { Name = "gameName" }
+                    new QueryArgument<StringGraphType> { Name = "gameName" },
+                    new QueryArgument<BooleanGraphType> { Name = "started" }
                 ),
                 resolve: context => {
                     var gameName = context.GetArgument<string>("gameName");
+                    var started = context.GetArgument<bool?>("started");
 
                     var games = chat.Games;
+
+                    if (started != null)
+                    {
+                        games = games.Where(g => g.Started == started);
+                    }
 
                     if (!string.IsNullOrWhiteSpace(gameName))
                     {

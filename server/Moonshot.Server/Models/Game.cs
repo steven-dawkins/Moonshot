@@ -17,6 +17,8 @@ namespace Moonshot.Server.Models
 
         public string GameText { get; set; }
 
+        public bool Started { get; set; }
+
         public IEnumerable<Player> Players => this.players.Values;
 
         public IEnumerable<PlayerKeystroke> Keystrokes => this.playerKeystrokes;
@@ -29,6 +31,7 @@ namespace Moonshot.Server.Models
         {
             this.Name = name ?? throw new ArgumentNullException(nameof(name));
             this.GameText = gameText ?? throw new ArgumentNullException(nameof(gameText));
+            this.Started = false;
             this.players = new ConcurrentDictionary<string, Player>();
             this.playerObserver = new MessageObserver<Player>();
             this.playerKeystrokes = new ConcurrentQueue<PlayerKeystroke>();
@@ -37,6 +40,11 @@ namespace Moonshot.Server.Models
 
         public Player AddPlayer(string name)
         {
+            if (this.Started)
+            {
+                return null;
+            }
+
             Player p;
 
             lock (this.players)
@@ -61,6 +69,11 @@ namespace Moonshot.Server.Models
             this.playerKeystrokes.Enqueue(playerKeystroke);
             this.playerKeystrokeObserver.Observe(playerKeystroke);
             return playerKeystroke;
+        }
+
+        public void Start()
+        {
+            this.Started = true;
         }
     }
 }

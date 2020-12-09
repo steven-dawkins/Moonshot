@@ -1,6 +1,7 @@
-query GetGames($gameName: String){
-  games(gameName: $gameName) {
+query GetGames($gameName: String, $started: Boolean){
+  games(gameName: $gameName, started: $started) {
     name
+    started
     players {
        name
       index
