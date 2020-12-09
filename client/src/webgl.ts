@@ -18,6 +18,8 @@ import flameShader from "../assets/shaders/flame.vert";
 import flameFragShader from "../assets/shaders/flame.frag";
 
 import { TypistPlayer } from "./TypistPlayer";
+import * as THREE from "three";
+import { makeTextSprite } from "./webgl/spriteText";
 
 const earthPosition = new Vector2(100, 100);
 const earthRadius = 100;
@@ -117,6 +119,7 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
 
     const earthMaterial = new MeshBasicMaterial({ map: loader.load("./" + earthImage), transparent: true });
     const earth = CreatePlane(earthMaterial, earthRadius * 2, earthRadius * 2, earthPosition.x, earthPosition.y, 40);
+    earth.translateZ(0);
     scene.add(earth);
 
     const starUniforms:{ [uniform: string]: IUniform }[] = [];
@@ -190,7 +193,11 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
 
     
 
-    const rockets = new Array<{mesh: Object3D, flameUniforms: { [uniform: string]: IUniform }, flameMesh: Object3D}>();
+    const rockets = new Array<{
+        mesh: Object3D,
+        flameUniforms: { [uniform: string]: IUniform },
+        flameMesh: Object3D,
+        labelSprite: THREE.Sprite }>();
 
     var i = 0.0;
 
@@ -236,7 +243,15 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
                 flameMaterial.uniforms.uDiffuseSampler.value = fi;
                 const flameI = CreatePlane(flameMaterial, 50, 50, rocketPosition.x, rocketPosition.y, 49);
                 scene.add(flameI);
-                rockets[i] = { mesh: rocketMesh, flameUniforms: flameUniforms, flameMesh: flameI };
+
+                const sprite = makeTextSprite(playerI.player.name, undefined);
+                scene.add(sprite);
+
+                rockets[i] = {
+                    mesh: rocketMesh,
+                    flameUniforms: flameUniforms,
+                    flameMesh: flameI,
+                    labelSprite: sprite };
             }
 
             var rocketI = rockets[i];
@@ -254,6 +269,10 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
 
             rocketI.flameUniforms.time.value = elapsedSeconds;
             rocketI.flameUniforms.magnitude.value = Math.min(playerI.typist.WordsPerMinute / 80, 1.0);
+
+            rocketI.labelSprite.position.setX(rocketPosition.x /*+ 125*/);
+            rocketI.labelSprite.position.setY(rocketPosition.y);
+            rocketI.labelSprite.position.setZ(150);
         });
 
         renderer.setViewport(0, 0, WIDTH, HEIGHT);

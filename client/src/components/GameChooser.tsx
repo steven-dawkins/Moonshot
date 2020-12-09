@@ -28,9 +28,7 @@ export function ChooseGame(props: { chooseGame: (gameName: string, gameText: str
     console.log(data?.games);
 
     return <div>
-        <button onClick={(evt) => { evt.preventDefault(); props.chooseGame("Offline", gameText); }}>Offline</button>
-        
-        <fieldset>
+        <Form>
             <legend>Create game</legend>
 
             <Form.Item
@@ -55,7 +53,10 @@ export function ChooseGame(props: { chooseGame: (gameName: string, gameText: str
             <Form.Item>
                 <Button disabled={name.length === 0} onClick={(evt) => { evt.preventDefault(); props.chooseGame(name, gameText); }}>Create</Button>
             </Form.Item>
-        </fieldset>
+
+            <Button onClick={(evt) => { evt.preventDefault(); props.chooseGame("Offline", gameText); }}>Play Offline</Button>
+        
+        </Form>
     
         <ul>
             {data?.games?.map(g =>
