@@ -9,7 +9,8 @@ import { JoinGame } from "./src/components/JoinGame";
 import { ChooseGame } from "./src/components/GameChooser";
 import { useState } from "react";
 
-import 'antd/dist/antd.css';
+import 'antd/dist/antd.dark.css';
+
 import { OfflineGame } from "./src/components/OfflineGame";
 
 console.log("Starting Moonshot 1.2");

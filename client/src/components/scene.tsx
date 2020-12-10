@@ -1,4 +1,4 @@
-import { Button, Card, Statistic } from 'antd';
+import { Button, Card, Col, Row, Statistic } from 'antd';
 import * as React from 'react';
 
 import { Typist } from '../typist';
@@ -75,8 +75,8 @@ export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typis
     }
   
     render() {
-      return <div className="row">
-          <div className="column-left">
+      return <Row align="middle">
+          <Col span={8}>
             <Card title="Moonshot" /*style={{ width: 300 }}*/>
                 <h1>Start typing...</h1>
                 <span style={{color: "red"}}>{this.state.typist.TypedText}</span>
@@ -89,8 +89,17 @@ export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typis
                     ? <Button onClick={this.onRestart}>Play again</Button>
                     : <Button onClick={this.onRestart}>Restart</Button> }
             </Card>
-          </div>
-          <div className="column-right render" ref={el => this.el = el} />
-        </div>;
+
+            
+            <Card title="Players">
+                <ul>
+                    {this.props.players.map(player => <li key={player.player.index}>{player.player.name} ({Math.round(player.typist.Position * 100 )/100})</li>)}
+                </ul>
+            </Card>
+          </Col>
+          <Col span={8}>
+            <div ref={el => this.el = el} />
+          </Col>
+        </Row>;
     }
   }

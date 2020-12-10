@@ -7,6 +7,7 @@ import {
     useAddGameKeystrokeMutation
 } from "../generated/graphql";
 import { TypistPlayer } from "../TypistPlayer";
+import { Card } from "antd";
 
 
 export function OnlineApp(props: { gameName: string; playerName: string; players: TypistPlayer[]; player: TypistPlayer; gameText: string; }) {
@@ -82,12 +83,6 @@ export function OnlineApp(props: { gameName: string; playerName: string; players
     console.log("Online app: " + players.length);
 
     return <div>
-        <h1>Moonshot - {props.gameName}</h1>
-
-        <ul>
-            {players.map(player => <li key={player.player.index}>{player.player.name} ({player.typist.Position})</li>)}
-        </ul>
-
         <WebGlScene player={props.player} players={players} onComplete={() => { }}></WebGlScene>
     </div>;
 }

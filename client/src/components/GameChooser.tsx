@@ -2,7 +2,7 @@ import * as React from "react";
 import { useState } from "react";
 import { useGetGamesQuery } from "../generated/graphql";
 import { getRandomText } from "../texts";
-import { Button, Form, Input } from 'antd';
+import { Button, Card, Col, Form, Input, Row } from 'antd';
 
 const { TextArea } = Input;
 
@@ -27,7 +27,9 @@ export function ChooseGame(props: { chooseGame: (gameName: string, gameText: str
 
     console.log(data?.games);
 
-    return <div>
+    return <Row justify="space-around" align="middle">
+    <Col span={16}>
+    <Card title="Moonshot" style={{ width: 500 }}>
         <Form>
             <legend>Create game</legend>
 
@@ -55,15 +57,17 @@ export function ChooseGame(props: { chooseGame: (gameName: string, gameText: str
             </Form.Item>
 
             <Button onClick={(evt) => { evt.preventDefault(); props.chooseGame("Offline", gameText); }}>Play Offline</Button>
-        
+
+            <ul>
+                {data?.games?.map(g =>
+                    <li key={g.name}>
+                        {g.name} - {g.players.length} players <Button onClick={() => props.chooseGame(g.name, "")}>Join</Button>
+                    </li>
+                )}
+            </ul>
         </Form>
-    
-        <ul>
-            {data?.games?.map(g =>
-                <li key={g.name}>
-                    {g.name} - {g.players.length} players <button onClick={() => props.chooseGame(g.name, "")}>Join</button>
-                </li>
-            )}
-        </ul>
-    </div>
+
+    </Card>
+    </Col>
+  </Row>
 }
