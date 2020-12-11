@@ -7,7 +7,6 @@ import {
     useAddGameKeystrokeMutation
 } from "../generated/graphql";
 import { TypistPlayer } from "../TypistPlayer";
-import { Card } from "antd";
 
 
 export function OnlineApp(props: { gameName: string; playerName: string; players: TypistPlayer[]; player: TypistPlayer; gameText: string; }) {

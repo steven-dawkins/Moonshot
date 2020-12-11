@@ -17,25 +17,22 @@ console.log("Starting Moonshot 1.2");
 
 const el = document.getElementById("body");
 
-const playerName = "Moonshot player " + Math.ceil(Math.random() * 100);
-
-
 function App() {
 
-    const [gameInfo, setGameName] = useState<{gameName: string, gameText: string} | null>(null);
+    const [gameInfo, setGameName] = useState<{gameName: string, gameText: string, playerName: string} | null>(null);
 
     if (gameInfo !== null)
     {
         switch(gameInfo.gameName)
         {
             case "Offline":
-                return <OfflineGame playerName={playerName} ></OfflineGame>;
+                return <OfflineGame playerName={gameInfo.playerName} ></OfflineGame>;
             default:
-                return <JoinGame gameName={gameInfo.gameName} playerName={playerName} gameText={gameInfo.gameText}></JoinGame>
+                return <JoinGame gameName={gameInfo.gameName} playerName={gameInfo.playerName} gameText={gameInfo.gameText}></JoinGame>
         }
     }
     else {
-        return <ChooseGame chooseGame={(gameName, gameText) => setGameName({gameName, gameText})}></ChooseGame>
+        return <ChooseGame chooseGame={(gameName, gameText, playerName) => setGameName({gameName, gameText, playerName})}></ChooseGame>
     }
 }
 
