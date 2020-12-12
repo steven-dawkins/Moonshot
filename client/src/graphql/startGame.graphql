@@ -1,0 +1,6 @@
+
+mutation startGame($gameName:String!) {
+  startGame(name:$gameName) {
+      name
+  }
+}

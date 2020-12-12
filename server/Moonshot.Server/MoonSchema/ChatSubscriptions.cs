@@ -19,6 +19,24 @@ namespace Moonshot.Server.MoonSchema
 
             AddField(new EventStreamFieldType
             {
+                Name = "gameStream",
+                Type = typeof(GameStreamGraphType),
+                Arguments = new QueryArguments(
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "gameName" }
+                    ),
+                Resolver = new FuncFieldResolver<GameStreamEvent>(context => context.Source as GameStreamEvent),
+                Subscriber = new EventStreamResolver<GameStreamEvent>(context =>
+                {
+                    var gameName = context.GetArgument<string>("gameName");
+                    var g = _chat.AddGame(gameName);
+
+                    return g.EventStream;
+                })
+            });
+
+
+            AddField(new EventStreamFieldType
+            {
                 Name = "playerJoined",
                 Type = typeof(PlayerGraphType),
                 Resolver = new FuncFieldResolver<Player>(ResolvePlayerJoinMessage),
@@ -32,19 +50,10 @@ namespace Moonshot.Server.MoonSchema
                 Arguments =new QueryArguments(
                     new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "gameName" }
                     ),
-                Resolver = new FuncFieldResolver<Player>(context =>
-                {
-                    return context.Source as Player;
-                }),
+                Resolver = new FuncFieldResolver<Player>(context => context.Source as Player),
                 Subscriber = new EventStreamResolver<Player>(context =>
                 {
                     var gameName = context.GetArgument<string>("gameName");
-                    //var messageContext = context.UserContext.As<MessageHandlingContext>();
-                    //var user = messageContext.Get<ClaimsPrincipal>("user");
-
-                    //string sub = "Anonymous";
-                    //if (user != null)
-                    //    sub = user.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
                     var g = _chat.AddGame(gameName);
 
                     return g.PlayersStream;
@@ -65,12 +74,6 @@ namespace Moonshot.Server.MoonSchema
                 Subscriber = new EventStreamResolver<PlayerKeystroke>(context =>
                 {
                     var gameName = context.GetArgument<string>("gameName");
-                    //var messageContext = context.UserContext.As<MessageHandlingContext>();
-                    //var user = messageContext.Get<ClaimsPrincipal>("user");
-
-                    //string sub = "Anonymous";
-                    //if (user != null)
-                    //    sub = user.Claims.FirstOrDefault(c => c.Type == "sub")?.Value;
                     var g = _chat.AddGame(gameName);
 
                     return g.PlayersKeystrokeStream;

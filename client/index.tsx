@@ -124,5 +124,5 @@ if (true)
 }
 else
 {   
-    render(<ErrorBoundary><OfflineGame playerName={playerName}  /></ErrorBoundary>, el);
+    render(<ErrorBoundary><OfflineGame playerName={"Offline Player"}  /></ErrorBoundary>, el);
 }

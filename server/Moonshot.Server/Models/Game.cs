@@ -11,6 +11,7 @@ namespace Moonshot.Server.Models
 
         private readonly MessageObserver<Player> playerObserver;
         private readonly MessageObserver<PlayerKeystroke> playerKeystrokeObserver;
+        private readonly MessageObserver<GameStreamEvent> gameStreamObserver;
         private readonly ConcurrentQueue<PlayerKeystroke> playerKeystrokes;
 
         public string Name { get; }
@@ -27,6 +28,8 @@ namespace Moonshot.Server.Models
 
         public IObservable<PlayerKeystroke> PlayersKeystrokeStream => this.playerKeystrokeObserver;
 
+        public IObservable<GameStreamEvent> EventStream => this.gameStreamObserver;
+
         public Game(string name, string gameText)
         {
             this.Name = name ?? throw new ArgumentNullException(nameof(name));
@@ -36,6 +39,7 @@ namespace Moonshot.Server.Models
             this.playerObserver = new MessageObserver<Player>();
             this.playerKeystrokes = new ConcurrentQueue<PlayerKeystroke>();
             this.playerKeystrokeObserver = new MessageObserver<PlayerKeystroke>();
+            this.gameStreamObserver = new MessageObserver<GameStreamEvent>();
         }
 
         public Player AddPlayer(string name)
@@ -60,6 +64,7 @@ namespace Moonshot.Server.Models
             }
 
             this.playerObserver.Observe(p);
+            this.gameStreamObserver.Observe(new GameStreamEvent(GameStreamEvent.EventType.PlayerJoined, p.Name, null, null, p.Index));
 
             return p;
         }
@@ -68,12 +73,23 @@ namespace Moonshot.Server.Models
         {
             this.playerKeystrokes.Enqueue(playerKeystroke);
             this.playerKeystrokeObserver.Observe(playerKeystroke);
+
+            this.gameStreamObserver.Observe(new GameStreamEvent(
+                GameStreamEvent.EventType.Keystroke,
+                playerKeystroke.PlayerName,
+                playerKeystroke.Keystroke,
+                playerKeystroke.Id,
+                null));
+
             return playerKeystroke;
         }
 
         public void Start()
         {
             this.Started = true;
+
+            var evt = new GameStreamEvent(GameStreamEvent.EventType.GameStarted, null, null, null, null);
+            this.gameStreamObserver.Observe(evt);
         }
     }
 }

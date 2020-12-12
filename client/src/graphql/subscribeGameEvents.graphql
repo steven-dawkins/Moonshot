@@ -1,0 +1,10 @@
+subscription GameStream($gameName: String!) {
+  gameStream(gameName: $gameName) {
+    keystroke
+    playerName
+    type
+    keystrokeId
+    playerIndex
+    
+  }
+}

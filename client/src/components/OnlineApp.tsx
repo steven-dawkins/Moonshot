@@ -4,58 +4,55 @@ import { WebGlScene } from "./Scene";
 import {
     useGameKeystrokesSubscription, useGamePlayersSubscription,
 
-    useAddGameKeystrokeMutation
+    useAddGameKeystrokeMutation,
+    useGameStreamSubscription,
+    EventType,
+    useStartGameMutation
 } from "../generated/graphql";
 import { TypistPlayer } from "../TypistPlayer";
+import { Button, Card } from "antd";
 
 
 export function OnlineApp(props: { gameName: string; playerName: string; players: TypistPlayer[]; player: TypistPlayer; gameText: string; }) {
 
     const [players, setPlayers] = useState(props.players);
 
-    const { error: keystrokesError } = useGameKeystrokesSubscription({
+    const { error: gameStreamError } = useGameStreamSubscription({
         variables: {
             gameName: props.gameName
         },
         onSubscriptionData: data => {
-            const keystroke = data.subscriptionData.data?.gameKeystroke;
 
-            const p = players.filter(p => p.player.name === keystroke?.playerName)[0];
+            const evt = data.subscriptionData.data?.gameStream;
 
-            // ignore own player keystrokes (they are processed directly)
-            if (keystroke && keystroke?.keystroke && p !== props.player) {
-                p.typist.ProcessCharacter(keystroke.keystroke, keystroke.id);
-            }
-
-            // advertise update to players
-            setPlayers(players);
-        }
-    });
-
-    const { error: playersError } = useGamePlayersSubscription({
-        variables: {
-            gameName: props.gameName
-        },
-        onSubscriptionData: data => {
-            const playerJoined = data.subscriptionData.data?.playerJoinedGame;
-
-            if (!playerJoined) {
+            if (!evt) {
                 return;
             }
 
-            const p = new TypistPlayer({ name: playerJoined?.name, index: playerJoined?.index }, props.gameText);
-
-            var existing = players.filter(t => t.player.index === p.player.index);
-
-            if (existing.length === 0) {
-                players.push(p);
-
-                setPlayers(players);
+            switch(evt.type)
+            {
+                case EventType.GameStarted:
+                    {
+                        alert("Game started");
+                    }
+                    break;
+                case EventType.Keystroke:
+                    RecievedKeystroke(players, evt, props, setPlayers);
+                    break;
+                case EventType.PlayerJoined:
+                    PlayerJoined(evt, props, players, setPlayers);
+                    break;
             }
         }
     });
 
-    const [keystrokeMutation, { loading: keystrokeLoading, error: keystrokeError }] = useAddGameKeystrokeMutation({});
+    const [keystrokeMutation, { error: keystrokeError }] = useAddGameKeystrokeMutation({});
+
+    const [startGameMutation, { error: startGameError }] = useStartGameMutation({
+        variables: {
+            gameName: props.gameName
+        }
+    });
 
     props.player.typist.OnCharacter = (char: string) => {
         keystrokeMutation({
@@ -68,20 +65,54 @@ export function OnlineApp(props: { gameName: string; playerName: string; players
     };
 
     if (keystrokeError) {
-        return <div>Keystroke Error! {playersError}</div>;
+        return <Card title="Error">Keystroke Error! {keystrokeError.message}</Card>;
     }
 
-    if (playersError) {
-        return <div>Players Error! {playersError}</div>;
+    if (gameStreamError) {
+        return <Card title="Error">Keystrokes Error! {gameStreamError.message}</Card>;
     }
 
-    if (keystrokesError) {
-        return <div>Keystrokes Error! {keystrokesError}</div>;
+    if (startGameError) {
+        return <Card title="Error">Keystrokes Error! {startGameError.message}</Card>;
     }
-
-    console.log("Online app: " + players.length);
 
     return <div>
+        <Button onClick={() => startGameMutation()}>Start Game</Button>
         <WebGlScene player={props.player} players={players} onComplete={() => { }}></WebGlScene>
     </div>;
 }
+
+function RecievedKeystroke(players: TypistPlayer[], evt: { __typename?: "GameStream" | undefined; } & Pick<import("d:/dev/personal/moonshot/client/src/generated/graphql").GameStream, "keystroke" | "playerName" | "type" | "keystrokeId" | "playerIndex">, props: { gameName: string; playerName: string; players: TypistPlayer[]; player: TypistPlayer; gameText: string; }, setPlayers: React.Dispatch<React.SetStateAction<TypistPlayer[]>>) {
+    {
+        const p = players.filter(p => p.player.name === evt.playerName)[0];
+
+        // ignore own player keystrokes (they are processed directly)
+        if (evt.keystroke && evt.keystrokeId && p !== props.player) {
+            p.typist.ProcessCharacter(evt.keystroke, evt.keystrokeId);
+        }
+
+        // advertise update to players
+        setPlayers(players);
+    }
+}
+
+function PlayerJoined(evt: { __typename?: "GameStream" | undefined; } & Pick<import("d:/dev/personal/moonshot/client/src/generated/graphql").GameStream, "keystroke" | "playerName" | "type" | "keystrokeId" | "playerIndex">, props: { gameName: string; playerName: string; players: TypistPlayer[]; player: TypistPlayer; gameText: string; }, players: TypistPlayer[], setPlayers: React.Dispatch<React.SetStateAction<TypistPlayer[]>>) {
+    if (!evt.playerName) {
+        throw new Error("Recieved playerjoined event without playerName");
+    }
+
+    if (!evt.playerIndex) {
+        throw new Error("Recieved playerjoined event without playerIndex");
+    }
+
+    const p = new TypistPlayer({ name: evt.playerName, index: evt.playerIndex }, props.gameText);
+
+    var existing = players.filter(t => t.player.index === p.player.index);
+
+    if (existing.length === 0) {
+        players.push(p);
+
+        setPlayers(players);
+    }
+}
+

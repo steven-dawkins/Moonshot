@@ -35,6 +35,17 @@ export function ChooseGame(props: { chooseGame: (gameName: string, gameText: str
     <Col span={16}>
     <Card title="Moonshot" style={{ width: "700" }}>
         <Form {...layout}>
+            <legend>Join existing game</legend>
+
+            <ul>
+                {data?.games?.map(g =>
+                    <li key={g.name}>
+                        {g.name} - {g.players.length} players <Button onClick={() => props.chooseGame(g.name, "", playerName)}>Join</Button>
+                    </li>
+                )}
+            </ul>
+            <Button onClick={(evt) => { evt.preventDefault(); props.chooseGame("Offline", gameText, playerName); }}>Play Offline</Button>
+
             <legend>Create game</legend>
 
             <Form.Item
@@ -67,16 +78,6 @@ export function ChooseGame(props: { chooseGame: (gameName: string, gameText: str
             <Form.Item>
                 <Button disabled={name.length === 0} onClick={(evt) => { evt.preventDefault(); props.chooseGame(name, gameText, playerName); }}>Create</Button>
             </Form.Item>
-
-            <Button onClick={(evt) => { evt.preventDefault(); props.chooseGame("Offline", gameText, playerName); }}>Play Offline</Button>
-
-            <ul>
-                {data?.games?.map(g =>
-                    <li key={g.name}>
-                        {g.name} - {g.players.length} players <Button onClick={() => props.chooseGame(g.name, "", playerName)}>Join</Button>
-                    </li>
-                )}
-            </ul>
         </Form>
 
     </Card>

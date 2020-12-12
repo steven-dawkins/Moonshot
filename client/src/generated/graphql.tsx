@@ -99,6 +99,7 @@ export type MoonshotMutationStartGameArgs = {
 export type ChatSubscriptions = {
   __typename?: 'ChatSubscriptions';
   gameKeystroke?: Maybe<PlayerKeystroke>;
+  gameStream?: Maybe<GameStream>;
   keystrokeAdded?: Maybe<PlayerKeystroke>;
   playerJoined?: Maybe<Player>;
   playerJoinedGame?: Maybe<Player>;
@@ -110,9 +111,29 @@ export type ChatSubscriptionsGameKeystrokeArgs = {
 };
 
 
+export type ChatSubscriptionsGameStreamArgs = {
+  gameName: Scalars['String'];
+};
+
+
 export type ChatSubscriptionsPlayerJoinedGameArgs = {
   gameName: Scalars['String'];
 };
+
+export type GameStream = {
+  __typename?: 'GameStream';
+  keystroke?: Maybe<Scalars['String']>;
+  keystrokeId?: Maybe<Scalars['String']>;
+  playerIndex?: Maybe<Scalars['Int']>;
+  playerName?: Maybe<Scalars['String']>;
+  type: EventType;
+};
+
+export enum EventType {
+  PlayerJoined = 'PLAYER_JOINED',
+  GameStarted = 'GAME_STARTED',
+  Keystroke = 'KEYSTROKE'
+}
 
 export type AddGameKeystrokeMutationVariables = Exact<{
   gameName: Scalars['String'];
@@ -205,6 +226,32 @@ export type GetPlayersQuery = (
     { __typename?: 'Player' }
     & Pick<Player, 'name' | 'index'>
   )>> }
+);
+
+export type StartGameMutationVariables = Exact<{
+  gameName: Scalars['String'];
+}>;
+
+
+export type StartGameMutation = (
+  { __typename?: 'MoonshotMutation' }
+  & { startGame: (
+    { __typename?: 'Game' }
+    & Pick<Game, 'name'>
+  ) }
+);
+
+export type GameStreamSubscriptionVariables = Exact<{
+  gameName: Scalars['String'];
+}>;
+
+
+export type GameStreamSubscription = (
+  { __typename?: 'ChatSubscriptions' }
+  & { gameStream?: Maybe<(
+    { __typename?: 'GameStream' }
+    & Pick<GameStream, 'keystroke' | 'playerName' | 'type' | 'keystrokeId' | 'playerIndex'>
+  )> }
 );
 
 export type GameKeystrokesSubscriptionVariables = Exact<{
@@ -463,6 +510,71 @@ export function useGetPlayersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions
 export type GetPlayersQueryHookResult = ReturnType<typeof useGetPlayersQuery>;
 export type GetPlayersLazyQueryHookResult = ReturnType<typeof useGetPlayersLazyQuery>;
 export type GetPlayersQueryResult = Apollo.QueryResult<GetPlayersQuery, GetPlayersQueryVariables>;
+export const StartGameDocument = gql`
+    mutation startGame($gameName: String!) {
+  startGame(name: $gameName) {
+    name
+  }
+}
+    `;
+export type StartGameMutationFn = Apollo.MutationFunction<StartGameMutation, StartGameMutationVariables>;
+
+/**
+ * __useStartGameMutation__
+ *
+ * To run a mutation, you first call `useStartGameMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useStartGameMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [startGameMutation, { data, loading, error }] = useStartGameMutation({
+ *   variables: {
+ *      gameName: // value for 'gameName'
+ *   },
+ * });
+ */
+export function useStartGameMutation(baseOptions?: Apollo.MutationHookOptions<StartGameMutation, StartGameMutationVariables>) {
+        return Apollo.useMutation<StartGameMutation, StartGameMutationVariables>(StartGameDocument, baseOptions);
+      }
+export type StartGameMutationHookResult = ReturnType<typeof useStartGameMutation>;
+export type StartGameMutationResult = Apollo.MutationResult<StartGameMutation>;
+export type StartGameMutationOptions = Apollo.BaseMutationOptions<StartGameMutation, StartGameMutationVariables>;
+export const GameStreamDocument = gql`
+    subscription GameStream($gameName: String!) {
+  gameStream(gameName: $gameName) {
+    keystroke
+    playerName
+    type
+    keystrokeId
+    playerIndex
+  }
+}
+    `;
+
+/**
+ * __useGameStreamSubscription__
+ *
+ * To run a query within a React component, call `useGameStreamSubscription` and pass it any options that fit your needs.
+ * When your component renders, `useGameStreamSubscription` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGameStreamSubscription({
+ *   variables: {
+ *      gameName: // value for 'gameName'
+ *   },
+ * });
+ */
+export function useGameStreamSubscription(baseOptions: Apollo.SubscriptionHookOptions<GameStreamSubscription, GameStreamSubscriptionVariables>) {
+        return Apollo.useSubscription<GameStreamSubscription, GameStreamSubscriptionVariables>(GameStreamDocument, baseOptions);
+      }
+export type GameStreamSubscriptionHookResult = ReturnType<typeof useGameStreamSubscription>;
+export type GameStreamSubscriptionResult = Apollo.SubscriptionResult<GameStreamSubscription>;
 export const GameKeystrokesDocument = gql`
     subscription GameKeystrokes($gameName: String!) {
   gameKeystroke(gameName: $gameName) {

@@ -12,6 +12,7 @@ using System.IO;
 using Microsoft.Extensions.FileProviders;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using GraphQL.Types;
 
 namespace Moonshot.Server
 {
@@ -41,6 +42,7 @@ namespace Moonshot.Server
                                         .AllowAnyHeader()))
                 .AddSingleton<IChat, Chat>()
                 .AddSingleton<ChatSchema>()
+                .AddTransient<EnumerationGraphType<GameStreamEvent.EventType>>()
                 .AddGraphQL((options, provider) =>
                 {
                     options.EnableMetrics = CurrentEnvironment.IsDevelopment();
@@ -49,11 +51,12 @@ namespace Moonshot.Server
                 })
                 // Add required services for de/serialization
                 .AddSystemTextJson(deserializerSettings => { }, serializerSettings => { }) // For .NET Core 3+
-                                                                                          
+
                 .AddErrorInfoProvider(opt => opt.ExposeExceptionStackTrace = CurrentEnvironment.IsDevelopment())
                 .AddWebSockets() // Add required services for web socket support
                 .AddDataLoader() // Add required services for DataLoader support
-                .AddGraphTypes(typeof(ChatSchema)); // Add all IGraphType implementors in assembly which ChatSchema exists 
+                .AddGraphTypes(typeof(ChatSchema)) // Add all IGraphType implementors in assembly which ChatSchema exists 
+                ;
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
