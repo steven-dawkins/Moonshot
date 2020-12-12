@@ -7,13 +7,14 @@ import {
     useAddGameKeystrokeMutation,
     useGameStreamSubscription,
     EventType,
-    useStartGameMutation
+    useStartGameMutation,
+    GameStream
 } from "../generated/graphql";
-import { TypistPlayer } from "../TypistPlayer";
+import { TypistPlayer } from "../models/TypistPlayer";
 import { Button, Card } from "antd";
 
 
-export function OnlineApp(props: { gameName: string; playerName: string; players: TypistPlayer[]; player: TypistPlayer; gameText: string; }) {
+export function OnlineApp(props: { gameName: string; players: TypistPlayer[]; player: TypistPlayer; gameText: string; }) {
 
     const [players, setPlayers] = useState(props.players);
 
@@ -58,7 +59,7 @@ export function OnlineApp(props: { gameName: string; playerName: string; players
         keystrokeMutation({
             variables: {
                 keystroke: char,
-                playerName: props.playerName,
+                playerName: props.player.playerName,
                 gameName: props.gameName,
             }
         });
@@ -82,9 +83,9 @@ export function OnlineApp(props: { gameName: string; playerName: string; players
     </div>;
 }
 
-function RecievedKeystroke(players: TypistPlayer[], evt: { __typename?: "GameStream" | undefined; } & Pick<import("d:/dev/personal/moonshot/client/src/generated/graphql").GameStream, "keystroke" | "playerName" | "type" | "keystrokeId" | "playerIndex">, props: { gameName: string; playerName: string; players: TypistPlayer[]; player: TypistPlayer; gameText: string; }, setPlayers: React.Dispatch<React.SetStateAction<TypistPlayer[]>>) {
+function RecievedKeystroke(players: TypistPlayer[], evt: { __typename?: "GameStream" | undefined; } & Pick<import("d:/dev/personal/moonshot/client/src/generated/graphql").GameStream, "keystroke" | "playerName" | "type" | "keystrokeId" | "playerIndex">, props: { gameName: string; players: TypistPlayer[]; player: TypistPlayer; gameText: string; }, setPlayers: React.Dispatch<React.SetStateAction<TypistPlayer[]>>) {
     {
-        const p = players.filter(p => p.player.name === evt.playerName)[0];
+        const p = players.filter(p => p.playerName === evt.playerName)[0];
 
         // ignore own player keystrokes (they are processed directly)
         if (evt.keystroke && evt.keystrokeId && p !== props.player) {
@@ -96,7 +97,12 @@ function RecievedKeystroke(players: TypistPlayer[], evt: { __typename?: "GameStr
     }
 }
 
-function PlayerJoined(evt: { __typename?: "GameStream" | undefined; } & Pick<import("d:/dev/personal/moonshot/client/src/generated/graphql").GameStream, "keystroke" | "playerName" | "type" | "keystrokeId" | "playerIndex">, props: { gameName: string; playerName: string; players: TypistPlayer[]; player: TypistPlayer; gameText: string; }, players: TypistPlayer[], setPlayers: React.Dispatch<React.SetStateAction<TypistPlayer[]>>) {
+function PlayerJoined(
+    evt: { __typename?: "GameStream" | undefined; } & Pick<GameStream, "keystroke" | "playerName" | "type" | "keystrokeId" | "playerIndex">,
+    props: { gameName: string; players: TypistPlayer[]; player: TypistPlayer; gameText: string; },
+    players: TypistPlayer[],
+    setPlayers: React.Dispatch<React.SetStateAction<TypistPlayer[]>>) {
+
     if (!evt.playerName) {
         throw new Error("Recieved playerjoined event without playerName");
     }
@@ -105,9 +111,9 @@ function PlayerJoined(evt: { __typename?: "GameStream" | undefined; } & Pick<imp
         throw new Error("Recieved playerjoined event without playerIndex");
     }
 
-    const p = new TypistPlayer({ name: evt.playerName, index: evt.playerIndex }, props.gameText);
+    const p = new TypistPlayer(evt.playerName, evt.playerIndex, props.gameText);
 
-    var existing = players.filter(t => t.player.index === p.player.index);
+    var existing = players.filter(t => t.playerIndex === p.playerIndex);
 
     if (existing.length === 0) {
         players.push(p);

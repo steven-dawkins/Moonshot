@@ -1,8 +1,8 @@
 import { Button, Card, Col, Row, Statistic } from 'antd';
 import * as React from 'react';
 
-import { Typist } from '../typist';
-import { TypistPlayer } from '../TypistPlayer';
+import { Typist } from '../models/Typist';
+import { TypistPlayer } from '../models/TypistPlayer';
 import { InitWebgl } from '../webgl';
 
 function isAlphaNumeric(str: string) {
@@ -83,7 +83,7 @@ export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typis
                 |
                 <span>{this.state.typist.UnTypedText}</span>
 
-                <Statistic title="Average words per minute" value={Math.round(this.state.typist.WordsPerMinute)} />
+                <Statistic title="Average words per minute" value={Math.round(this.state.typist.WordsPerMinute * 10)/10} />
 
                 {this.state.typist.Finished
                     ? <Button onClick={this.onRestart}>Play again</Button>
@@ -93,7 +93,7 @@ export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typis
             
             <Card title="Players">
                 <ul>
-                    {this.props.players.map(player => <li key={player.player.index}>{player.player.name} ({Math.round(player.typist.Position * 100 )/100})</li>)}
+                    {this.props.players.map(player => <li key={player.playerIndex}>{player.playerName} ({Math.round(player.typist.Position * 100 )/100})</li>)}
                 </ul>
             </Card>
           </Col>

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useEffect } from "react";
 import { useJoinGameMutation } from "../generated/graphql";
-import { TypistPlayer } from "../TypistPlayer";
+import { TypistPlayer } from "../models/TypistPlayer";
 import { OnlineApp } from "./OnlineApp";
 
 
@@ -28,10 +28,10 @@ export function JoinGame(props: { gameName: string; playerName: string; gameText
 
     const players = data.joinGame.players.map(p => {
 
-        return new TypistPlayer({ name: p.name, index: p.index }, data.joinGame.gameText);
+        return new TypistPlayer(p.name, p.index, data.joinGame.gameText);
     });
 
-    const player = players.filter(p => p.player.name === props.playerName)[0];
+    const player = players.filter(p => p.playerName === props.playerName)[0];
 
-    return <OnlineApp gameName={props.gameName} playerName={props.playerName} players={players} player={player} gameText={data.joinGame.gameText}></OnlineApp>;
+    return <OnlineApp gameName={props.gameName} players={players} player={player} gameText={data.joinGame.gameText}></OnlineApp>;
 }

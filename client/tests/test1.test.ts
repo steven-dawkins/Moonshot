@@ -1,5 +1,6 @@
 import { expect } from "chai";
-import { Typist } from "../src/typist";
+import { Typist } from "../src/models/Typist";
+
 
 describe('Typist', function() {
     it('process character stream', function() {

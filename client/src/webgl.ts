@@ -17,7 +17,7 @@ import flameImage from "../assets/sprites/flame.png";
 import flameShader from "../assets/shaders/flame.vert";
 import flameFragShader from "../assets/shaders/flame.frag";
 
-import { TypistPlayer } from "./TypistPlayer";
+import { TypistPlayer } from "./models/TypistPlayer";
 import * as THREE from "three";
 import { makeTextSprite } from "./webgl/spriteText";
 
@@ -216,7 +216,7 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
 
         players.map(playerI => {
 
-            const i = playerI.player.index;
+            const i = playerI.playerIndex;
 
             const rocketPosition = calculateRocketPosition(i, players.length, playerI.typist.Position);
             const rocketAngle = calculateRocketAngle(i, players.length, playerI.typist.Position);
@@ -244,7 +244,7 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
                 const flameI = CreatePlane(flameMaterial, 50, 50, rocketPosition.x, rocketPosition.y, 49);
                 scene.add(flameI);
 
-                const sprite = makeTextSprite(playerI.player.name, undefined);
+                const sprite = makeTextSprite(playerI.playerName, undefined);
                 scene.add(sprite);
 
                 rockets[i] = {

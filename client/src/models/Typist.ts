@@ -1,5 +1,4 @@
-
-
+// required for tests
 //import { performance } from "perf_hooks";
 
 export class Typist
