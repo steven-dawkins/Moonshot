@@ -15,7 +15,7 @@ export function ChooseGame(props: { chooseGame: (gameName: string, gameText: str
     });
 
     const [playerName, setPlayerName] = useState("Moonshot player " + Math.ceil(Math.random() * 100));
-    const [name, setName] = useState("Game 1");
+    const [name, setName] = useState(`Game - ${Math.ceil(Math.random() * 100)}`);
     const [gameText, setGameText] = useState(getRandomText());
 
     if (loading) {

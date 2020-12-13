@@ -1,8 +1,8 @@
-import { Button, Card, Col, Row, Statistic } from 'antd';
+import { Button, Card, Col, List, Progress, Row, Statistic, Typography } from 'antd';
 import * as React from 'react';
+import { Game, GameState } from '../models/Game';
 
 import { Typist } from '../models/Typist';
-import { TypistPlayer } from '../models/TypistPlayer';
 import { InitWebgl } from '../webgl';
 
 function isAlphaNumeric(str: string) {
@@ -28,9 +28,9 @@ function isAlphaNumeric(str: string) {
 
 interface IWebGlSceneProps
 {
-    player: TypistPlayer;
-    players: TypistPlayer[];
+    game: Game;
     onComplete: () => void;
+    startGame: () => void;
 }
 
 export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typist}> {
@@ -40,7 +40,7 @@ export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typis
     {
       super(props);
       
-      this.state = { typist: props.player.typist };
+      this.state = { typist: props.game.player.typist };
 
       this.onKeyDown = this.onKeyDown.bind(this);
       this.onRestart = this.onRestart.bind(this);
@@ -65,7 +65,7 @@ export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typis
       {
         window.addEventListener("keydown", this.onKeyDown);
 
-        InitWebgl(this.el, this.props.players);
+        InitWebgl(this.el, this.props.game.players);
       }
     }
   
@@ -73,28 +73,46 @@ export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typis
       // this.engine.destroy();
       window.removeEventListener("keydown", this.onKeyDown);
     }
-  
+
     render() {
+
+
+    const gameStatus = this.props.game.state === GameState.Lobby
+        ? <div><Button onClick={() => this.props.startGame()}>Start Game</Button></div>
+        : <h1>Start typing...</h1>;
+        
       return <Row align="middle">
           <Col span={8}>
-            <Card title="Moonshot" /*style={{ width: 300 }}*/>
-                <h1>Start typing...</h1>
+            <Card title={`Moonshot-${this.props.game.state}`} /*style={{ width: 300 }}*/>
                 <span style={{color: "red"}}>{this.state.typist.TypedText}</span>
                 |
                 <span>{this.state.typist.UnTypedText}</span>
 
                 <Statistic title="Average words per minute" value={Math.round(this.state.typist.WordsPerMinute * 10)/10} />
 
+                {gameStatus}
+
                 {this.state.typist.Finished
                     ? <Button onClick={this.onRestart}>Play again</Button>
                     : <Button onClick={this.onRestart}>Restart</Button> }
             </Card>
-
             
             <Card title="Players">
                 <ul>
-                    {this.props.players.map(player => <li key={player.playerIndex}>{player.playerName} ({Math.round(player.typist.Position * 100 )/100})</li>)}
+                    {this.props.game.players.map(player => <li key={player.playerIndex}>{player.playerName} ({Math.round(player.typist.Position * 100 )/100})</li>)}
                 </ul>
+
+                <List
+                    dataSource = {this.props.game.players}
+                    renderItem={player => (
+                        <List.Item>
+                            {player.playerName}
+                            <Progress percent={player.typist.Position * 100} size="small" status="active" />
+                        </List.Item>
+                      )}
+                >
+                    
+                </List>
             </Card>
           </Col>
           <Col span={8}>

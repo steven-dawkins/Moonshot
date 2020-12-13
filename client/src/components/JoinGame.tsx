@@ -1,6 +1,7 @@
 import * as React from "react";
 import { useEffect } from "react";
 import { useJoinGameMutation } from "../generated/graphql";
+import { Game } from "../models/Game";
 import { TypistPlayer } from "../models/TypistPlayer";
 import { OnlineApp } from "./OnlineApp";
 
@@ -33,5 +34,7 @@ export function JoinGame(props: { gameName: string; playerName: string; gameText
 
     const player = players.filter(p => p.playerName === props.playerName)[0];
 
-    return <OnlineApp gameName={props.gameName} players={players} player={player} gameText={data.joinGame.gameText}></OnlineApp>;
+    const game = new Game(data.joinGame.name, players, player, data.joinGame.gameText);
+
+    return <OnlineApp game={game}></OnlineApp>;
 }

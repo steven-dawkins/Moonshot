@@ -9,14 +9,14 @@ describe('Game', function() {
 
     it('initial game state is lobby', function() {
 
-        let game = new Game([], defaultPlayer, defaultText);
+        let game = new Game("Game1", [], defaultPlayer, defaultText);
   
-        expect(game.State).equal(GameState.Lobby);
+        expect(game.state).equal(GameState.Lobby);
       }); 
 
     it('process add player', function() {
 
-      let game = new Game([], defaultPlayer, defaultText);
+      let game = new Game("Game1", [], defaultPlayer, defaultText);
 
       game.addPlayer(new TypistPlayer("Player1", 0, ""));
 
@@ -26,11 +26,11 @@ describe('Game', function() {
 
     it('process start game', function() {
 
-        let game = new Game([], defaultPlayer, defaultText);
+        let game = new Game("Game1", [], defaultPlayer, defaultText);
   
         game.startGame();
   
-        expect(game.State).equal(GameState.Started);
+        expect(game.state).equal(GameState.Started);
       }); 
 
     // it('reject add player after start game', function() {

@@ -12,15 +12,16 @@ import {
 } from "../generated/graphql";
 import { TypistPlayer } from "../models/TypistPlayer";
 import { Button, Card } from "antd";
+import { Game } from "../models/Game";
 
 
-export function OnlineApp(props: { gameName: string; players: TypistPlayer[]; player: TypistPlayer; gameText: string; }) {
+export function OnlineApp(props: { game: Game }) {
 
-    const [players, setPlayers] = useState(props.players);
+    const [game, setPlayers] = useState(props.game);
 
     const { error: gameStreamError } = useGameStreamSubscription({
         variables: {
-            gameName: props.gameName
+            gameName: props.game.gameName
         },
         onSubscriptionData: data => {
 
@@ -33,17 +34,18 @@ export function OnlineApp(props: { gameName: string; players: TypistPlayer[]; pl
             switch(evt.type)
             {
                 case EventType.GameStarted:
-                    {
-                        alert("Game started");
-                    }
+                    game.startGame();
                     break;
                 case EventType.Keystroke:
-                    RecievedKeystroke(players, evt, props, setPlayers);
+                    RecievedKeystroke(game, evt);
                     break;
                 case EventType.PlayerJoined:
-                    PlayerJoined(evt, props, players, setPlayers);
+                    PlayerJoined(evt, game);
                     break;
             }
+
+            // advertise update to players
+            setPlayers(game);
         }
     });
 
@@ -51,16 +53,16 @@ export function OnlineApp(props: { gameName: string; players: TypistPlayer[]; pl
 
     const [startGameMutation, { error: startGameError }] = useStartGameMutation({
         variables: {
-            gameName: props.gameName
+            gameName: props.game.gameName
         }
     });
 
-    props.player.typist.OnCharacter = (char: string) => {
+    props.game.player.typist.OnCharacter = (char: string) => {
         keystrokeMutation({
             variables: {
                 keystroke: char,
-                playerName: props.player.playerName,
-                gameName: props.gameName,
+                playerName: props.game.player.playerName,
+                gameName: props.game.gameName,
             }
         });
     };
@@ -78,30 +80,23 @@ export function OnlineApp(props: { gameName: string; players: TypistPlayer[]; pl
     }
 
     return <div>
-        <Button onClick={() => startGameMutation()}>Start Game</Button>
-        <WebGlScene player={props.player} players={players} onComplete={() => { }}></WebGlScene>
+        <WebGlScene game={game} onComplete={() => { }} startGame={startGameMutation}></WebGlScene>
     </div>;
 }
 
-function RecievedKeystroke(players: TypistPlayer[], evt: { __typename?: "GameStream" | undefined; } & Pick<import("d:/dev/personal/moonshot/client/src/generated/graphql").GameStream, "keystroke" | "playerName" | "type" | "keystrokeId" | "playerIndex">, props: { gameName: string; players: TypistPlayer[]; player: TypistPlayer; gameText: string; }, setPlayers: React.Dispatch<React.SetStateAction<TypistPlayer[]>>) {
+function RecievedKeystroke(
+    game: Game,
+    evt: { __typename?: "GameStream" | undefined; } & Pick<GameStream, "keystroke" | "playerName" | "type" | "keystrokeId" | "playerIndex">) {
     {
-        const p = players.filter(p => p.playerName === evt.playerName)[0];
-
-        // ignore own player keystrokes (they are processed directly)
-        if (evt.keystroke && evt.keystrokeId && p !== props.player) {
-            p.typist.ProcessCharacter(evt.keystroke, evt.keystrokeId);
+        if (evt.keystroke && evt.keystrokeId && evt.playerName) {
+            game.addKeystroke(evt.playerName, evt.keystroke, evt.keystrokeId)
         }
-
-        // advertise update to players
-        setPlayers(players);
     }
 }
 
 function PlayerJoined(
     evt: { __typename?: "GameStream" | undefined; } & Pick<GameStream, "keystroke" | "playerName" | "type" | "keystrokeId" | "playerIndex">,
-    props: { gameName: string; players: TypistPlayer[]; player: TypistPlayer; gameText: string; },
-    players: TypistPlayer[],
-    setPlayers: React.Dispatch<React.SetStateAction<TypistPlayer[]>>) {
+    game: Game) {
 
     if (!evt.playerName) {
         throw new Error("Recieved playerjoined event without playerName");
@@ -111,14 +106,8 @@ function PlayerJoined(
         throw new Error("Recieved playerjoined event without playerIndex");
     }
 
-    const p = new TypistPlayer(evt.playerName, evt.playerIndex, props.gameText);
+    const p = new TypistPlayer(evt.playerName, evt.playerIndex, game.gameText);
 
-    var existing = players.filter(t => t.playerIndex === p.playerIndex);
-
-    if (existing.length === 0) {
-        players.push(p);
-
-        setPlayers(players);
-    }
+    game.addPlayer(p);
 }
 
