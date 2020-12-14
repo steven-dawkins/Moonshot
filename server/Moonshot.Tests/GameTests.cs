@@ -13,7 +13,7 @@ namespace Moonshot.Tests
         private GraphQLRequest gamesRequest(bool? started = null) => new GraphQLRequest
         {
             Query = @"
-                query getGames($started: Boolean!) {
+                query getGames($started: Boolean) {
                     games(started: $started) {
                         name
                         gameText
@@ -184,6 +184,9 @@ namespace Moonshot.Tests
         {
             using var fixture = new ApiFixture(5017);
 
+            var playerName = "Player 1";
+            var gameName = "Game1";
+
             var playerKeystrokeRequest = new GraphQLRequest
             {
                 Query = @"mutation Keystroke($gameName: String!, $playerName: String!, $keystroke: String!) {
@@ -195,11 +198,15 @@ namespace Moonshot.Tests
                   }",
                 Variables = new
                 {
-                    gameName = "Game1",
-                    playerName = "Steve",
+                    gameName = gameName,
+                    playerName = playerName,
                     keystroke = "A"
                 }
             };
+
+            await fixture.SendMutation<GraphQlPlayerModelRoot>(joinGameRequest(gameName, playerName, "Lorem Ipsum"));
+
+            await fixture.SendMutation<GraphQlGameModel>(startGameRequest(gameName));
 
             await fixture.SendMutation<GraphQlPlayerModelRoot>(playerKeystrokeRequest);
             await fixture.SendMutation<GraphQlPlayerModelRoot>(playerKeystrokeRequest);
@@ -207,13 +214,12 @@ namespace Moonshot.Tests
             var graphQLResponse = await fixture.Execute<GraphQlGameModel>(gamesRequest());
 
             graphQLResponse.Games.Length.Should().Be(1);
-            graphQLResponse.Games[0].Name.Should().Be("Game1");
+            graphQLResponse.Games[0].Name.Should().Be(gameName);
             graphQLResponse.Games[0].Players.Count().Should().Be(1);
-            graphQLResponse.Games[0].Players.Single().Name.Should().Be("Steve");
+            graphQLResponse.Games[0].Players.Single().Name.Should().Be(playerName);
             graphQLResponse.Games[0].Keystrokes.ElementAt(0).Keystroke.Should().Be("A");
-            graphQLResponse.Games[0].Keystrokes.ElementAt(1).PlayerName.Should().Be("Steve");
+            graphQLResponse.Games[0].Keystrokes.ElementAt(1).PlayerName.Should().Be(playerName);
             graphQLResponse.Games[0].Keystrokes.ElementAt(1).Keystroke.Should().Be("A");
-            graphQLResponse.Games[0].Keystrokes.ElementAt(1).PlayerName.Should().Be("Steve");
         }
 
         public class GraphQlGameModel

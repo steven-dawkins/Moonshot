@@ -101,8 +101,6 @@ namespace Moonshot.Server.MoonSchema
 
                     var playerName = context.GetArgument<string>(nameof(PlayerKeystroke.PlayerName));
 
-                    game.AddPlayer(playerName);
-
                     var keystroke = context.GetArgument<string>(nameof(PlayerKeystroke.Keystroke));
                     var message = game.AddKeystroke(new PlayerKeystroke(playerName, keystroke));
                     return message;

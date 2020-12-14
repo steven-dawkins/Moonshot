@@ -1,4 +1,5 @@
-﻿using Moonshot_Server.Services;
+﻿using Moonshot.Server.Models.Exceptions;
+using Moonshot_Server.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -46,7 +47,7 @@ namespace Moonshot.Server.Models
         {
             if (this.Started)
             {
-                return null;
+                throw new AddPlayerException("Cannot join started game");
             }
 
             Player p;
@@ -71,17 +72,24 @@ namespace Moonshot.Server.Models
 
         public PlayerKeystroke AddKeystroke(PlayerKeystroke playerKeystroke)
         {
-            this.playerKeystrokes.Enqueue(playerKeystroke);
-            this.playerKeystrokeObserver.Observe(playerKeystroke);
+            if (this.Started)
+            {
+                this.playerKeystrokes.Enqueue(playerKeystroke);
+                this.playerKeystrokeObserver.Observe(playerKeystroke);
 
-            this.gameStreamObserver.Observe(new GameStreamEvent(
-                GameStreamEvent.EventType.Keystroke,
-                playerKeystroke.PlayerName,
-                playerKeystroke.Keystroke,
-                playerKeystroke.Id,
-                null));
+                this.gameStreamObserver.Observe(new GameStreamEvent(
+                    GameStreamEvent.EventType.Keystroke,
+                    playerKeystroke.PlayerName,
+                    playerKeystroke.Keystroke,
+                    playerKeystroke.Id,
+                    null));
 
-            return playerKeystroke;
+                return playerKeystroke;
+            }
+            else
+            {
+                throw new KeystrokeBeforeGameStartedException();
+            }
         }
 
         public void Start()
