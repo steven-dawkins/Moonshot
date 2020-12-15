@@ -1,4 +1,5 @@
-import { Button, Card, Col, List, Progress, Row, Statistic, Typography } from 'antd';
+import { Button, Card, Col, List, Progress, Row, Statistic } from 'antd';
+import { TrophyOutlined } from '@ant-design/icons';
 import * as React from 'react';
 import { Game, GameState } from '../models/Game';
 
@@ -53,8 +54,10 @@ export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typis
     onKeyDown(evt: KeyboardEvent) {
       if (evt.key.length <= 1 && isAlphaNumeric(evt.key))
       {
-        this.state.typist.ProcessCharacter(evt.key, null);
-        this.setState({ typist: this.state.typist });
+          if (this.props.game.state === GameState.Started) {
+            this.state.typist.ProcessCharacter(evt.key, null);
+            this.setState({ typist: this.state.typist });
+          }
       }
 
       return true;
@@ -76,6 +79,23 @@ export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typis
 
     render() {
 
+    // sort players by score
+    const players = this.props.game.players.sort((a, b) => {
+        if (a.typist.Finished && !b.typist.Finished) {
+            return -1;
+        }
+        else if (!a.typist.Finished && b.typist.Finished) {
+            return 1;
+        }
+        else if (a.typist.Finished && b.typist.Finished) {
+            return a.typist.ElapsedTime < b.typist.ElapsedTime ? 1 :-1;
+        }
+        else {
+            return a.typist.Position < b.typist.Position ? 1 : -1;
+        }
+    })
+
+    const winner = players.filter(p => p.typist.Finished)[0];
 
     const gameStatus = this.props.game.state === GameState.Lobby
         ? <div><Button onClick={() => this.props.startGame()}>Start Game</Button></div>
@@ -98,21 +118,16 @@ export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typis
             </Card>
             
             <Card title="Players">
-                <ul>
-                    {this.props.game.players.map(player => <li key={player.playerIndex}>{player.playerName} ({Math.round(player.typist.Position * 100 )/100})</li>)}
-                </ul>
 
                 <List
-                    dataSource = {this.props.game.players}
+                    dataSource = {players}
                     renderItem={player => (
                         <List.Item>
-                            {player.playerName}
+                            {player === winner ? <TrophyOutlined /> : <div /> }
+                            {player.playerName} - {Math.round(player.typist.ElapsedTime/100)/10}s
                             <Progress percent={player.typist.Position * 100} size="small" status="active" />
                         </List.Item>
-                      )}
-                >
-                    
-                </List>
+                      )} />
             </Card>
           </Col>
           <Col span={8}>

@@ -62,7 +62,7 @@ export class Typist
         return this.position === this.text.length;
     }
 
-    public get WordsPerMinute() {
+    public get ElapsedTime() {
         if (this.startTime === null) {
             return 0;
         }
@@ -72,6 +72,16 @@ export class Typist
             : performance.now();
 
         const elapsed = endTime - this.startTime;
+
+        return elapsed;
+    }
+
+    public get WordsPerMinute() {
+        if (this.startTime === null) {
+            return 0;
+        }
+
+        const elapsed = this.ElapsedTime;
 
         return this.Words / (elapsed / (1000 * 60));
     }

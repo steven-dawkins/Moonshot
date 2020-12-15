@@ -11,8 +11,8 @@ import {
     GameStream
 } from "../generated/graphql";
 import { TypistPlayer } from "../models/TypistPlayer";
-import { Button, Card } from "antd";
-import { Game } from "../models/Game";
+import { Card } from "antd";
+import { Game, GameState } from "../models/Game";
 
 
 export function OnlineApp(props: { game: Game }) {
@@ -57,6 +57,7 @@ export function OnlineApp(props: { game: Game }) {
         }
     });
 
+    
     props.game.player.typist.OnCharacter = (char: string) => {
         keystrokeMutation({
             variables: {
@@ -72,11 +73,11 @@ export function OnlineApp(props: { game: Game }) {
     }
 
     if (gameStreamError) {
-        return <Card title="Error">Keystrokes Error! {gameStreamError.message}</Card>;
+        return <Card title="Error">Gamestream Error! {gameStreamError.message}</Card>;
     }
 
     if (startGameError) {
-        return <Card title="Error">Keystrokes Error! {startGameError.message}</Card>;
+        return <Card title="Error">Startgame Error! {startGameError.message}</Card>;
     }
 
     return <div>

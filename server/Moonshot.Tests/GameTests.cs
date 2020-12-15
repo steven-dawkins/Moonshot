@@ -218,7 +218,8 @@ namespace Moonshot.Tests
             graphQLResponse.Games[0].Players.Count().Should().Be(1);
             graphQLResponse.Games[0].Players.Single().Name.Should().Be(playerName);
             graphQLResponse.Games[0].Keystrokes.ElementAt(0).Keystroke.Should().Be("A");
-            graphQLResponse.Games[0].Keystrokes.ElementAt(1).PlayerName.Should().Be(playerName);
+            graphQLResponse.Games[0].Keystrokes.ElementAt(1).PlayerName.Should().Be(playerName
+                );
             graphQLResponse.Games[0].Keystrokes.ElementAt(1).Keystroke.Should().Be("A");
         }
 

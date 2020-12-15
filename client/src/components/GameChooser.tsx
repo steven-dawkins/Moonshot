@@ -35,7 +35,7 @@ export function ChooseGame(props: { chooseGame: (gameName: string, gameText: str
     <Col span={16}>
     <Card title="Moonshot" style={{ width: "700" }}>
         <Form {...layout}>
-            <legend>Join existing game</legend>
+            <legend>Existing games</legend>
 
             <ul>
                 {data?.games?.map(g =>
@@ -44,6 +44,7 @@ export function ChooseGame(props: { chooseGame: (gameName: string, gameText: str
                     </li>
                 )}
             </ul>
+            
             <Button onClick={(evt) => { evt.preventDefault(); props.chooseGame("Offline", gameText, playerName); }}>Play Offline</Button>
 
             <legend>Create game</legend>
