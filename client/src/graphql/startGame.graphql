@@ -1,6 +1,6 @@
 
-mutation startGame($gameName:String!) {
-  startGame(name:$gameName) {
+mutation startGame($gameName:String!, $gameState: GameState!) {
+  startGame(name:$gameName, state: $gameState) {
       name
   }
 }

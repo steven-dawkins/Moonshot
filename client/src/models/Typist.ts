@@ -86,6 +86,12 @@ export class Typist
         return this.Words / (elapsed / (1000 * 60));
     }
 
+    public Start() {
+        if (this.startTime === null) {
+            this.startTime = performance.now();
+        }
+    }
+
     public ProcessCharacter(char: string, id: string | null | undefined = null) {
         // compensation for https://github.com/apollographql/apollo-client/issues/6037
         if (id !== null && this.lastId === id)

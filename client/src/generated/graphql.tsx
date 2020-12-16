@@ -94,7 +94,14 @@ export type MoonshotMutationJoinGameArgs = {
 
 export type MoonshotMutationStartGameArgs = {
   name: Scalars['String'];
+  state: GameState;
 };
+
+export enum GameState {
+  Lobby = 'LOBBY',
+  Countdown = 'COUNTDOWN',
+  Started = 'STARTED'
+}
 
 export type ChatSubscriptions = {
   __typename?: 'ChatSubscriptions';
@@ -122,6 +129,7 @@ export type ChatSubscriptionsPlayerJoinedGameArgs = {
 
 export type GameStream = {
   __typename?: 'GameStream';
+  gameState?: Maybe<GameState>;
   keystroke?: Maybe<Scalars['String']>;
   keystrokeId?: Maybe<Scalars['String']>;
   playerIndex?: Maybe<Scalars['Int']>;
@@ -131,7 +139,7 @@ export type GameStream = {
 
 export enum EventType {
   PlayerJoined = 'PLAYER_JOINED',
-  GameStarted = 'GAME_STARTED',
+  GameStateChanged = 'GAME_STATE_CHANGED',
   Keystroke = 'KEYSTROKE'
 }
 
@@ -230,6 +238,7 @@ export type GetPlayersQuery = (
 
 export type StartGameMutationVariables = Exact<{
   gameName: Scalars['String'];
+  gameState: GameState;
 }>;
 
 
@@ -250,7 +259,7 @@ export type GameStreamSubscription = (
   { __typename?: 'ChatSubscriptions' }
   & { gameStream?: Maybe<(
     { __typename?: 'GameStream' }
-    & Pick<GameStream, 'keystroke' | 'playerName' | 'type' | 'keystrokeId' | 'playerIndex'>
+    & Pick<GameStream, 'keystroke' | 'playerName' | 'type' | 'keystrokeId' | 'playerIndex' | 'gameState'>
   )> }
 );
 
@@ -511,8 +520,8 @@ export type GetPlayersQueryHookResult = ReturnType<typeof useGetPlayersQuery>;
 export type GetPlayersLazyQueryHookResult = ReturnType<typeof useGetPlayersLazyQuery>;
 export type GetPlayersQueryResult = Apollo.QueryResult<GetPlayersQuery, GetPlayersQueryVariables>;
 export const StartGameDocument = gql`
-    mutation startGame($gameName: String!) {
-  startGame(name: $gameName) {
+    mutation startGame($gameName: String!, $gameState: GameState!) {
+  startGame(name: $gameName, state: $gameState) {
     name
   }
 }
@@ -533,6 +542,7 @@ export type StartGameMutationFn = Apollo.MutationFunction<StartGameMutation, Sta
  * const [startGameMutation, { data, loading, error }] = useStartGameMutation({
  *   variables: {
  *      gameName: // value for 'gameName'
+ *      gameState: // value for 'gameState'
  *   },
  * });
  */
@@ -550,6 +560,7 @@ export const GameStreamDocument = gql`
     type
     keystrokeId
     playerIndex
+    gameState
   }
 }
     `;

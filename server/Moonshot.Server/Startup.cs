@@ -43,6 +43,7 @@ namespace Moonshot.Server
                 .AddSingleton<IChat, Chat>()
                 .AddSingleton<ChatSchema>()
                 .AddTransient<EnumerationGraphType<GameStreamEvent.EventType>>()
+                .AddTransient<EnumerationGraphType<Game.GameState>>()
                 .AddGraphQL((options, provider) =>
                 {
                     options.EnableMetrics = CurrentEnvironment.IsDevelopment();

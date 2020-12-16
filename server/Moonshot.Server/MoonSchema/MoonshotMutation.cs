@@ -45,15 +45,17 @@ namespace Moonshot.Server.MoonSchema
 
             Field<NonNullGraphType<GameGraphType>>("startGame",
                 arguments: new QueryArguments(
-                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "name" }
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "name" },
+                    new QueryArgument<NonNullGraphType<EnumerationGraphType<Game.GameState>>> { Name = "state" }
                 ),
                 resolve: context =>
                 {
                     var name = context.GetArgument<string>("name");
+                    var gameState = context.GetArgument<Game.GameState>("state");
 
                     var game = chat.AddGame(name);
 
-                    game.Start();
+                    game.SetGameState(gameState);
 
                     return game;
                 });

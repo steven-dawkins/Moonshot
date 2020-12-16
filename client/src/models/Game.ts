@@ -1,13 +1,13 @@
 import { TypistPlayer } from "./TypistPlayer";
 
-export enum GameState { Lobby, Started }
+export enum LocalGameState { Lobby, Countdown, Started }
 
 export class Game {
 
-    private _state: GameState;
+    private _state: LocalGameState;
 
     constructor(public gameName: string, public players: TypistPlayer[], public player: TypistPlayer, public gameText: string) {
-        this._state = GameState.Lobby;
+        this._state = LocalGameState.Lobby;
     }
 
     public get state() { return this._state; }
@@ -20,8 +20,12 @@ export class Game {
         }
     }
 
+    public startCountdown() {
+        this._state = LocalGameState.Countdown;
+    }
+
     public startGame() {
-        this._state = GameState.Started;
+        this._state = LocalGameState.Started;
     }
 
     public addKeystroke(playerName: string, keystroke: string, keystrokeId: string) {

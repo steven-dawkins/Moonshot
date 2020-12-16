@@ -1,7 +1,7 @@
 import { Button, Card, Col, List, Progress, Row, Statistic } from 'antd';
 import { TrophyOutlined } from '@ant-design/icons';
 import * as React from 'react';
-import { Game, GameState } from '../models/Game';
+import { Game, LocalGameState } from '../models/Game';
 
 import { Typist } from '../models/Typist';
 import { InitWebgl } from '../webgl';
@@ -54,7 +54,7 @@ export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typis
     onKeyDown(evt: KeyboardEvent) {
       if (evt.key.length <= 1 && isAlphaNumeric(evt.key))
       {
-          if (this.props.game.state === GameState.Started) {
+          if (this.props.game.state === LocalGameState.Started) {
             this.state.typist.ProcessCharacter(evt.key, null);
             this.setState({ typist: this.state.typist });
           }
@@ -97,8 +97,10 @@ export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typis
 
     const winner = players.filter(p => p.typist.Finished)[0];
 
-    const gameStatus = this.props.game.state === GameState.Lobby
+    const gameStatus = this.props.game.state === LocalGameState.Lobby
         ? <div><Button onClick={() => this.props.startGame()}>Start Game</Button></div>
+        : this.props.game.state === LocalGameState.Countdown
+        ? <h1>5 second countdown in progress...</h1>
         : <h1>Start typing...</h1>;
         
       return <Row align="middle">
@@ -123,8 +125,8 @@ export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typis
                     dataSource = {players}
                     renderItem={player => (
                         <List.Item>
-                            {player === winner ? <TrophyOutlined /> : <div /> }
-                            {player.playerName} - {Math.round(player.typist.ElapsedTime/100)/10}s
+                            {player.playerName} {player === winner ? <TrophyOutlined /> : "" } - {Math.round(player.typist.ElapsedTime/100)/10}s 
+                            - {Math.round(player.typist.WordsPerMinute * 10)/10} WPM
                             <Progress percent={player.typist.Position * 100} size="small" status="active" />
                         </List.Item>
                       )} />

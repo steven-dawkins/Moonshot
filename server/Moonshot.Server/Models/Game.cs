@@ -8,6 +8,8 @@ namespace Moonshot.Server.Models
 {
     public class Game
     {
+        public enum GameState { Lobby, Countdown, Started };
+
         private ConcurrentDictionary<string, Player> players { get; }
 
         private readonly MessageObserver<Player> playerObserver;
@@ -19,7 +21,9 @@ namespace Moonshot.Server.Models
 
         public string GameText { get; set; }
 
-        public bool Started { get; set; }
+        public bool Started => this.State == GameState.Started;
+
+        public GameState State { get; set; }
 
         public IEnumerable<Player> Players => this.players.Values;
 
@@ -35,7 +39,7 @@ namespace Moonshot.Server.Models
         {
             this.Name = name ?? throw new ArgumentNullException(nameof(name));
             this.GameText = gameText ?? throw new ArgumentNullException(nameof(gameText));
-            this.Started = false;
+            this.State = GameState.Lobby;
             this.players = new ConcurrentDictionary<string, Player>();
             this.playerObserver = new MessageObserver<Player>();
             this.playerKeystrokes = new ConcurrentQueue<PlayerKeystroke>();
@@ -65,7 +69,13 @@ namespace Moonshot.Server.Models
             }
 
             this.playerObserver.Observe(p);
-            this.gameStreamObserver.Observe(new GameStreamEvent(GameStreamEvent.EventType.PlayerJoined, p.Name, null, null, p.Index));
+            this.gameStreamObserver.Observe(new GameStreamEvent(
+                                                    GameStreamEvent.EventType.PlayerJoined,
+                                                    p.Name,
+                                                    null,
+                                                    null,
+                                                    p.Index,
+                                                    null));
 
             return p;
         }
@@ -82,6 +92,7 @@ namespace Moonshot.Server.Models
                     playerKeystroke.PlayerName,
                     playerKeystroke.Keystroke,
                     playerKeystroke.Id,
+                    null,
                     null));
 
                 return playerKeystroke;
@@ -92,11 +103,18 @@ namespace Moonshot.Server.Models
             }
         }
 
-        public void Start()
+        public void SetGameState(GameState newGameState)
         {
-            this.Started = true;
+            this.State = newGameState;
 
-            var evt = new GameStreamEvent(GameStreamEvent.EventType.GameStarted, null, null, null, null);
+            var evt = new GameStreamEvent(
+                            GameStreamEvent.EventType.GameStateChanged,
+                            null,
+                            null,
+                            null,
+                            null,
+                            newGameState);
+
             this.gameStreamObserver.Observe(evt);
         }
     }

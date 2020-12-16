@@ -19,7 +19,7 @@ import flameFragShader from "../assets/shaders/flame.frag";
 
 import { TypistPlayer } from "./models/TypistPlayer";
 import * as THREE from "three";
-import { makeTextSprite } from "./webgl/spriteText";
+import { makeTextSprite } from "./webgl/SpriteText";
 
 const earthPosition = new Vector2(100, 100);
 const earthRadius = 100;

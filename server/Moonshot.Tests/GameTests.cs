@@ -53,8 +53,8 @@ namespace Moonshot.Tests
 
         private Func<string, GraphQLRequest> startGameRequest = (gameName) => new GraphQLRequest
         {
-            Query = @"mutation StartGame($name: String!) {
-                    startGame(name: $name) {
+            Query = @"mutation StartGame($name: String!, $state: GameState) {
+                    startGame(name: $name, state: $state) {
                         name
                         gameText
                     }

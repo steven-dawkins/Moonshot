@@ -630,6 +630,20 @@
                   }
                 },
                 "defaultValue": null
+              },
+              {
+                "name": "state",
+                "description": null,
+                "type": {
+                  "kind": "NON_NULL",
+                  "name": null,
+                  "ofType": {
+                    "kind": "ENUM",
+                    "name": "GameState",
+                    "ofType": null
+                  }
+                },
+                "defaultValue": null
               }
             ],
             "type": {
@@ -648,6 +662,35 @@
         "inputFields": null,
         "interfaces": [],
         "enumValues": null,
+        "possibleTypes": null
+      },
+      {
+        "kind": "ENUM",
+        "name": "GameState",
+        "description": null,
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "LOBBY",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "COUNTDOWN",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "STARTED",
+            "description": null,
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
         "possibleTypes": null
       },
       {
@@ -772,6 +815,18 @@
         "description": null,
         "fields": [
           {
+            "name": "gameState",
+            "description": null,
+            "args": [],
+            "type": {
+              "kind": "ENUM",
+              "name": "GameState",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "keystroke",
             "description": null,
             "args": [],
@@ -856,7 +911,7 @@
             "deprecationReason": null
           },
           {
-            "name": "GAME_STARTED",
+            "name": "GAME_STATE_CHANGED",
             "description": null,
             "isDeprecated": false,
             "deprecationReason": null

@@ -8,11 +8,12 @@ import {
     useGameStreamSubscription,
     EventType,
     useStartGameMutation,
-    GameStream
+    GameStream,
+    GameState
 } from "../generated/graphql";
 import { TypistPlayer } from "../models/TypistPlayer";
 import { Card } from "antd";
-import { Game, GameState } from "../models/Game";
+import { Game, LocalGameState } from "../models/Game";
 
 
 export function OnlineApp(props: { game: Game }) {
@@ -33,8 +34,23 @@ export function OnlineApp(props: { game: Game }) {
 
             switch(evt.type)
             {
-                case EventType.GameStarted:
-                    game.startGame();
+                case EventType.GameStateChanged:
+                    switch(evt.gameState)
+                    {
+                        case GameState.Countdown:
+                            if (props.game.state !== LocalGameState.Countdown)
+                            {
+                                game.startCountdown();
+                                
+                                setTimeout(() => {
+                                    startGameMutation({variables: { gameName: props.game.gameName, gameState: GameState.Started }})
+                                }, 5000);
+                            }
+                            break;
+                        case GameState.Started:
+                            game.startGame();
+                            break;
+                    }
                     break;
                 case EventType.Keystroke:
                     RecievedKeystroke(game, evt);
@@ -51,11 +67,7 @@ export function OnlineApp(props: { game: Game }) {
 
     const [keystrokeMutation, { error: keystrokeError }] = useAddGameKeystrokeMutation({});
 
-    const [startGameMutation, { error: startGameError }] = useStartGameMutation({
-        variables: {
-            gameName: props.game.gameName
-        }
-    });
+    const [startGameMutation, { error: startGameError }] = useStartGameMutation();
 
     
     props.game.player.typist.OnCharacter = (char: string) => {
@@ -81,7 +93,7 @@ export function OnlineApp(props: { game: Game }) {
     }
 
     return <div>
-        <WebGlScene game={game} onComplete={() => { }} startGame={startGameMutation}></WebGlScene>
+        <WebGlScene game={game} onComplete={() => { }} startGame={() => startGameMutation({variables: { gameName: props.game.gameName, gameState: GameState.Countdown }})}></WebGlScene>
     </div>;
 }
 
