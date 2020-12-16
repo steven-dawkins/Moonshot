@@ -53,7 +53,7 @@ namespace Moonshot.Tests
 
         private Func<string, GraphQLRequest> startGameRequest = (gameName) => new GraphQLRequest
         {
-            Query = @"mutation StartGame($name: String!, $state: GameState) {
+            Query = @"mutation StartGame($name: String!, $state: GameState!) {
                     startGame(name: $name, state: $state) {
                         name
                         gameText
@@ -61,7 +61,8 @@ namespace Moonshot.Tests
                   }",
             Variables = new
             {
-                name = gameName
+                name = gameName,
+                state = Game.GameState.Started
             }
         };
 
@@ -169,7 +170,13 @@ namespace Moonshot.Tests
 
             await fixture.SendMutation<GraphQlGameModel>(startGameRequest("Game1"));
 
-            await fixture.SendMutation<GraphQlPlayerModelRoot>(joinGameRequest("Game1", "Player2", "Lorem Ipsum"));
+            try
+            {
+                await fixture.SendMutation<GraphQlPlayerModelRoot>(joinGameRequest("Game1", "Player2", "Lorem Ipsum"));
+            }
+            catch
+            {
+            }
 
             var graphQLResponse = await fixture.Execute<GraphQlGameModel>(gamesRequest());
 
