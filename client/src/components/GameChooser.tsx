@@ -14,8 +14,17 @@ export function ChooseGame(props: { chooseGame: (gameName: string, gameText: str
         }
     });
 
-    const [playerName, setPlayerName] = useState("Moonshot player " + Math.ceil(Math.random() * 100));
-    const [name, setName] = useState(`Game - ${Math.ceil(Math.random() * 100)}`);
+    const existingPlayerName = localStorage.getItem("PlayerName") ?? "";
+
+    const [playerName, setPlayerNameState] = useState(existingPlayerName);
+
+    const setPlayerName = (name: string) =>
+    {
+        setPlayerNameState(name);
+        localStorage.setItem("PlayerName", name);
+    }
+
+    const [gameName, setName] = useState(`Game - ${Math.ceil(Math.random() * 100)}`);
     const [gameText, setGameText] = useState(getRandomText());
 
     if (loading) {
@@ -40,12 +49,16 @@ export function ChooseGame(props: { chooseGame: (gameName: string, gameText: str
             <ul>
                 {data?.games?.map(g =>
                     <li key={g.name}>
-                        {g.name} - {g.players.length} players <Button onClick={() => props.chooseGame(g.name, "", playerName)}>Join</Button>
+                        {g.name} - {g.players.length} players
+                        <Button disabled={playerName.length <= 0} onClick={() => props.chooseGame(g.name, "", playerName)}>Join</Button>
                     </li>
                 )}
             </ul>
             
-            <Button onClick={(evt) => { evt.preventDefault(); props.chooseGame("Offline", gameText, playerName); }}>Play Offline</Button>
+            <Button
+                onClick={(evt) => { evt.preventDefault(); props.chooseGame("Offline", gameText, playerName); }}>
+                    Play Offline
+            </Button>
 
             <legend>Create game</legend>
 
@@ -53,31 +66,35 @@ export function ChooseGame(props: { chooseGame: (gameName: string, gameText: str
                 label="Player name"
                 name="player-name"
                 rules={[{ required: true, message: 'Please input a player name!' }]}
+                initialValue={playerName}
             >
-                <Input id="playerName" type="text" defaultValue={playerName} onChange={e => setPlayerName(e.target.value)} />
+                <Input id="playerName" type="text" onChange={e => setPlayerName(e.target.value)} />
             </Form.Item>
 
             <Form.Item
                 label="Game name"
                 name="game-name"
                 rules={[{ required: true, message: 'Please input a game name!' }]}
+                initialValue={gameName}
             >
-                <Input id="gameName" type="text" defaultValue={name} onChange={e => setName(e.target.value)} />
+                <Input id="gameName" type="text" onChange={e => setName(e.target.value)} />
             </Form.Item>
             
             <Form.Item
                 label="Game text"
                 name="game-text"
                 rules={[{ required: true, message: 'Please input the game text!' }]}
+                initialValue={gameText}
             >
                 
                 <TextArea id="gametext"
                     rows={4}
-                    defaultValue={gameText}
                     onChange={e => setGameText(e.target.value)} />
             </Form.Item>
             <Form.Item>
-                <Button disabled={name.length === 0} onClick={(evt) => { evt.preventDefault(); props.chooseGame(name, gameText, playerName); }}>Create</Button>
+                <Button
+                    disabled={gameName.length === 0 || playerName.length === 0 }
+                    onClick={(evt) => { evt.preventDefault(); props.chooseGame(gameName, gameText, playerName); }}>Create</Button>
             </Form.Item>
         </Form>
 
