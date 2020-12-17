@@ -5,12 +5,16 @@ export enum LocalGameState { Lobby, Countdown, Started }
 export class Game {
 
     private _state: LocalGameState;
+    private _countdown: string;
 
     constructor(public gameName: string, public players: TypistPlayer[], public player: TypistPlayer, public gameText: string) {
         this._state = LocalGameState.Lobby;
+        this._countdown = "";
     }
 
     public get state() { return this._state; }
+
+    public get countdown() { return this._countdown; }
 
     public addPlayer(player: TypistPlayer) {
         var existing = this.players.filter(t => t.playerIndex === player.playerIndex);
@@ -20,8 +24,9 @@ export class Game {
         }
     }
 
-    public startCountdown() {
+    public startCountdown(countdown: string) {
         this._state = LocalGameState.Countdown;
+        this._countdown = countdown;
     }
 
     public startGame() {

@@ -100,12 +100,14 @@ export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typis
     const gameStatus = this.props.game.state === LocalGameState.Lobby
         ? <div><Button onClick={() => this.props.startGame()}>Start Game</Button></div>
         : this.props.game.state === LocalGameState.Countdown
-        ? <h1>5 second countdown in progress...</h1>
+        ? <h1>{this.props.game.countdown}...</h1>
+        : this.props.game.player.typist.Finished
+        ? <h1>Touchdown!!!</h1>
         : <h1>Start typing...</h1>;
         
       return <Row align="middle">
           <Col span={8}>
-            <Card title={`Moonshot-${this.props.game.state}`} /*style={{ width: 300 }}*/>
+            <Card title={`Moonshot`} >
                 <span style={{color: "red"}}>{this.state.typist.TypedText}</span>
                 |
                 <span>{this.state.typist.UnTypedText}</span>

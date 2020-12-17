@@ -6,5 +6,6 @@ subscription GameStream($gameName: String!) {
     keystrokeId
     playerIndex
     gameState
+    countdown
   }
 }

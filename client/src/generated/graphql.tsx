@@ -95,6 +95,7 @@ export type MoonshotMutationJoinGameArgs = {
 export type MoonshotMutationStartGameArgs = {
   name: Scalars['String'];
   state: GameState;
+  countdown?: Maybe<Scalars['String']>;
 };
 
 export enum GameState {
@@ -129,6 +130,7 @@ export type ChatSubscriptionsPlayerJoinedGameArgs = {
 
 export type GameStream = {
   __typename?: 'GameStream';
+  countdown: Scalars['String'];
   gameState?: Maybe<GameState>;
   keystroke?: Maybe<Scalars['String']>;
   keystrokeId?: Maybe<Scalars['String']>;
@@ -239,6 +241,7 @@ export type GetPlayersQuery = (
 export type StartGameMutationVariables = Exact<{
   gameName: Scalars['String'];
   gameState: GameState;
+  countdown?: Maybe<Scalars['String']>;
 }>;
 
 
@@ -259,7 +262,7 @@ export type GameStreamSubscription = (
   { __typename?: 'ChatSubscriptions' }
   & { gameStream?: Maybe<(
     { __typename?: 'GameStream' }
-    & Pick<GameStream, 'keystroke' | 'playerName' | 'type' | 'keystrokeId' | 'playerIndex' | 'gameState'>
+    & Pick<GameStream, 'keystroke' | 'playerName' | 'type' | 'keystrokeId' | 'playerIndex' | 'gameState' | 'countdown'>
   )> }
 );
 
@@ -520,8 +523,8 @@ export type GetPlayersQueryHookResult = ReturnType<typeof useGetPlayersQuery>;
 export type GetPlayersLazyQueryHookResult = ReturnType<typeof useGetPlayersLazyQuery>;
 export type GetPlayersQueryResult = Apollo.QueryResult<GetPlayersQuery, GetPlayersQueryVariables>;
 export const StartGameDocument = gql`
-    mutation startGame($gameName: String!, $gameState: GameState!) {
-  startGame(name: $gameName, state: $gameState) {
+    mutation startGame($gameName: String!, $gameState: GameState!, $countdown: String) {
+  startGame(name: $gameName, state: $gameState, countdown: $countdown) {
     name
   }
 }
@@ -543,6 +546,7 @@ export type StartGameMutationFn = Apollo.MutationFunction<StartGameMutation, Sta
  *   variables: {
  *      gameName: // value for 'gameName'
  *      gameState: // value for 'gameState'
+ *      countdown: // value for 'countdown'
  *   },
  * });
  */
@@ -561,6 +565,7 @@ export const GameStreamDocument = gql`
     keystrokeId
     playerIndex
     gameState
+    countdown
   }
 }
     `;

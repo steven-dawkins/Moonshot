@@ -13,6 +13,7 @@ namespace Moonshot.Server.MoonSchema.GraphQLTypes
             _ = Field(x => x.Keystroke, type: typeof(StringGraphType));
             _ = Field(x => x.KeystrokeId, type: typeof(StringGraphType));
             _ = Field(x => x.GameState, type: typeof(EnumerationGraphType<Game.GameState>));
+            _ = Field(x => x.Countdown);
         }
     }
 }

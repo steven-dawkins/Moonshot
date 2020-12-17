@@ -75,6 +75,7 @@ namespace Moonshot.Server.Models
                                                     null,
                                                     null,
                                                     p.Index,
+                                                    null,
                                                     null));
 
             return p;
@@ -93,6 +94,7 @@ namespace Moonshot.Server.Models
                     playerKeystroke.Keystroke,
                     playerKeystroke.Id,
                     null,
+                    null,
                     null));
 
                 return playerKeystroke;
@@ -103,7 +105,7 @@ namespace Moonshot.Server.Models
             }
         }
 
-        public void SetGameState(GameState newGameState)
+        public void SetGameState(GameState newGameState, string countdown)
         {
             this.State = newGameState;
 
@@ -113,7 +115,8 @@ namespace Moonshot.Server.Models
                             null,
                             null,
                             null,
-                            newGameState);
+                            newGameState,
+                            countdown);
 
             this.gameStreamObserver.Observe(evt);
         }

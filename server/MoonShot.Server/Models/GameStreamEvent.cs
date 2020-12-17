@@ -7,7 +7,14 @@ namespace Moonshot.Server.Models
     {
         public enum EventType { PlayerJoined, GameStateChanged, Keystroke, };
 
-        public GameStreamEvent(EventType type, string playerName, string keystroke, Guid? keystrokeId, int? playerIndex, GameState? gameState)
+        public GameStreamEvent(
+            EventType type, 
+            string playerName, 
+            string keystroke,
+            Guid? keystrokeId,
+            int? playerIndex,
+            GameState? gameState,
+            string countdown)
         {
             this.Type = type;
             this.PlayerName = playerName;
@@ -15,6 +22,7 @@ namespace Moonshot.Server.Models
             this.KeystrokeId = keystrokeId;
             this.PlayerIndex = playerIndex;
             this.GameState = gameState;
+            this.Countdown = countdown;
         }
 
         public EventType Type { get; }
@@ -28,5 +36,7 @@ namespace Moonshot.Server.Models
         public int? PlayerIndex { get; }
 
         public GameState? GameState { get; }
+
+        public string Countdown { get; }
     }
 }

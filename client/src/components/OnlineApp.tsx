@@ -19,6 +19,7 @@ import { Game, LocalGameState } from "../models/Game";
 export function OnlineApp(props: { game: Game }) {
 
     const [game, setPlayers] = useState(props.game);
+    const [countDown, setCountdown] = useState("");
 
     const { error: gameStreamError } = useGameStreamSubscription({
         variables: {
@@ -38,14 +39,7 @@ export function OnlineApp(props: { game: Game }) {
                     switch(evt.gameState)
                     {
                         case GameState.Countdown:
-                            if (props.game.state !== LocalGameState.Countdown)
-                            {
-                                game.startCountdown();
-                                
-                                setTimeout(() => {
-                                    startGameMutation({variables: { gameName: props.game.gameName, gameState: GameState.Started }})
-                                }, 5000);
-                            }
+                            game.startCountdown(evt.countdown);
                             break;
                         case GameState.Started:
                             game.startGame();
@@ -92,8 +86,31 @@ export function OnlineApp(props: { game: Game }) {
         return <Card title="Error">Startgame Error! {startGameError.message}</Card>;
     }
 
+    const startGame = (countdown: number) => {
+
+        if (countdown > 0)
+        {
+            startGameMutation({variables: {
+                gameName: props.game.gameName,
+                gameState: GameState.Countdown,
+                countdown: countdown.toString() }});
+
+            setTimeout(startGame, 1000, countdown - 1);
+        }
+        else
+        {
+            startGameMutation({variables: {
+                gameName: props.game.gameName,
+                gameState: GameState.Started,
+                countdown: "0" }})
+        }
+    };
+
     return <div>
-        <WebGlScene game={game} onComplete={() => { }} startGame={() => startGameMutation({variables: { gameName: props.game.gameName, gameState: GameState.Countdown }})}></WebGlScene>
+        <WebGlScene
+            game={game}
+            onComplete={() => { }}
+            startGame={() => startGame(5)}></WebGlScene>
     </div>;
 }
 
