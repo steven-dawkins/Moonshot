@@ -20,6 +20,7 @@ import flameFragShader from "../assets/shaders/flame.frag";
 import { TypistPlayer } from "./models/TypistPlayer";
 import * as THREE from "three";
 import { makeTextSprite } from "./webgl/SpriteText";
+import { RocketPaths } from "./services/rocketPaths";
 
 const earthPosition = new Vector2(100, 100);
 const earthRadius = 100;
@@ -31,43 +32,6 @@ const WIDTH = 700,
 HEIGHT = 600,
 NEAR = 0.1,
 FAR = 10000;
-
-export function calculateRocketPosition(position: number, numRockets: number, progress: number) {
-
-    const alpha = numRockets === 1
-        ? 0.75
-        : position / numRockets;
-
-    const startPositionX = Math.sin(alpha * Math.PI - Math.PI/4) * earthRadius + earthPosition.x;
-    const startPositionY = Math.cos(alpha * Math.PI - Math.PI/4) * earthRadius + earthPosition.y;
-
-    const endPositionX = moonPosition.x - moonRadius;
-    const endPositionY = moonPosition.y - moonRadius;
-    
-    const startPosition = new Vector2(startPositionX, startPositionY);
-    const endPosition = new Vector2(endPositionX, endPositionY);
-
-    const midpoint = startPosition.clone().add(startPosition.clone().sub(earthPosition).multiplyScalar(2.0));
-
-    return startPosition.multiplyScalar((1 - progress) * (1 - progress))
-            .add(midpoint.multiplyScalar(2.0 * (1 - progress) * progress))
-            .add(endPosition.multiplyScalar(progress * progress));
-}
-
-function calculateRocketVector(position: number, numRockets: number, progress: number) {
-    const previous = calculateRocketPosition(position, numRockets, progress - 0.01);
-    const current = calculateRocketPosition(position, numRockets, progress);
-
-    const diff = current.sub(previous);
-
-    return diff;
-}
-
-function calculateRocketAngle(position: number, numRockets: number, progress: number) {
-    const diff = calculateRocketVector(position, numRockets, progress);
-
-    return diff.angle();
-}
 
 export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
 
@@ -214,17 +178,17 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
         
         backgroundUniforms.u_time.value = elapsedSeconds;
 
+        const rocketPaths = new RocketPaths(moonPosition, moonRadius, earthRadius, earthPosition, players.length);
+
         players.map(playerI => {
 
             const i = playerI.playerIndex;
 
-            const rocketPosition = calculateRocketPosition(i, players.length, playerI.typist.Position);
-            const rocketAngle = calculateRocketAngle(i, players.length, playerI.typist.Position);
-            const vec = calculateRocketVector(i, players.length, playerI.typist.Position);
+            const { position, vector } = rocketPaths.calculateRocketVector(i, playerI.typist.Position);
 
             if (!rockets[i])
             {
-                const rocketMesh = CreatePlane(rocketMaterial, 50, 50, rocketPosition.x, rocketPosition.y, 50);
+                const rocketMesh = CreatePlane(rocketMaterial, 50, 50, position.x, position.y, 50);
                 scene.add(rocketMesh);
 
                 const flameUniforms = {
@@ -241,7 +205,7 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
                 });
             
                 flameMaterial.uniforms.uDiffuseSampler.value = fi;
-                const flameI = CreatePlane(flameMaterial, 50, 50, rocketPosition.x, rocketPosition.y, 49);
+                const flameI = CreatePlane(flameMaterial, 50, 50, position.x, position.y, 49);
                 scene.add(flameI);
 
                 const sprite = makeTextSprite(playerI.playerName, undefined);
@@ -256,22 +220,22 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
 
             var rocketI = rockets[i];
 
-            rocketI.mesh.position.setX(rocketPosition.x);
-            rocketI.mesh.position.setY(rocketPosition.y);
-            rocketI.mesh.setRotationFromAxisAngle(new Vector3(0, 0, 1), rocketAngle - Math.PI / 2);
+            rocketI.mesh.position.setX(position.x);
+            rocketI.mesh.position.setY(position.y);
+            rocketI.mesh.setRotationFromAxisAngle(new Vector3(0, 0, 1), vector.angle() - Math.PI / 2);
 
-            const flamePosition = rocketPosition.sub(vec.normalize().multiplyScalar(45));
+            const flamePosition = position.sub(vector.normalize().multiplyScalar(45));
 
             rocketI.flameMesh.position.setX(flamePosition.x);
             rocketI.flameMesh.position.setY(flamePosition.y);
             rocketI.flameMesh.position.setZ(10);
-            rocketI.flameMesh.setRotationFromAxisAngle(new Vector3(0, 0, 1), rocketAngle + Math.PI / 2);
+            rocketI.flameMesh.setRotationFromAxisAngle(new Vector3(0, 0, 1), vector.angle() + Math.PI / 2);
 
             rocketI.flameUniforms.time.value = elapsedSeconds;
             rocketI.flameUniforms.magnitude.value = Math.min(playerI.typist.WordsPerMinute / 80, 1.0);
 
-            rocketI.labelSprite.position.setX(rocketPosition.x /*+ 125*/);
-            rocketI.labelSprite.position.setY(rocketPosition.y);
+            rocketI.labelSprite.position.setX(position.x /*+ 125*/);
+            rocketI.labelSprite.position.setY(position.y);
             rocketI.labelSprite.position.setZ(150);
         });
 
