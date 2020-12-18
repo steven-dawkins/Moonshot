@@ -55,8 +55,6 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
 
     camera.position.z = 200;
 
-    renderer.setSize(WIDTH, HEIGHT);
-
     parent.appendChild(renderer.domElement);
 
     const backgroundUniforms = {
@@ -167,6 +165,16 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
 
     var startTime = Date.now();
 
+    var windowDimensions = {
+        width: parent.clientWidth,
+        height: parent.clientHeight
+    };
+
+    window.onresize = () => {
+        windowDimensions.width = parent.clientWidth;
+        windowDimensions.height = parent.clientHeight;
+    }
+
     function webglRender(): void {
         var elapsedMilliseconds = Date.now() - startTime;
         var elapsedSeconds = elapsedMilliseconds / 1000.;
@@ -239,7 +247,15 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
             rocketI.labelSprite.position.setZ(150);
         });
 
-        renderer.setViewport(0, 0, WIDTH, HEIGHT);
+        renderer.setSize(windowDimensions.width, windowDimensions.height);
+        renderer.setViewport(0, 0, windowDimensions.width, windowDimensions.height);
+        renderer.domElement.width = windowDimensions.width;
+        renderer.domElement.height = windowDimensions.height;
+
+        camera.right = windowDimensions.width;
+        camera.top = windowDimensions.height;
+
+
         renderer.render(scene, camera);
         window.requestAnimationFrame(webglRender);
     }

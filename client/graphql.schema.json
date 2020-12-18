@@ -244,26 +244,6 @@
             "deprecationReason": null
           },
           {
-            "name": "keystrokes",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "LIST",
-                "name": null,
-                "ofType": {
-                  "kind": "OBJECT",
-                  "name": "PlayerKeystroke",
-                  "ofType": null
-                }
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "name",
             "description": null,
             "args": [],
@@ -709,33 +689,6 @@
         "description": null,
         "fields": [
           {
-            "name": "gameKeystroke",
-            "description": null,
-            "args": [
-              {
-                "name": "gameName",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
-            "type": {
-              "kind": "OBJECT",
-              "name": "PlayerKeystroke",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "gameStream",
             "description": null,
             "args": [
@@ -778,33 +731,6 @@
             "name": "playerJoined",
             "description": null,
             "args": [],
-            "type": {
-              "kind": "OBJECT",
-              "name": "Player",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
-            "name": "playerJoinedGame",
-            "description": null,
-            "args": [
-              {
-                "name": "gameName",
-                "description": null,
-                "type": {
-                  "kind": "NON_NULL",
-                  "name": null,
-                  "ofType": {
-                    "kind": "SCALAR",
-                    "name": "String",
-                    "ofType": null
-                  }
-                },
-                "defaultValue": null
-              }
-            ],
             "type": {
               "kind": "OBJECT",
               "name": "Player",

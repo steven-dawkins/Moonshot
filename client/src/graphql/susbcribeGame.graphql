@@ -1,6 +1,0 @@
-subscription GamePlayers($gameName: String!) {
-  playerJoinedGame(gameName: $gameName) {
-    name
-    index
-  }
-}

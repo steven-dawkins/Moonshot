@@ -45,43 +45,6 @@ namespace Moonshot.Server.MoonSchema
 
             AddField(new EventStreamFieldType
             {
-                Name = "playerJoinedGame",
-                Type = typeof(PlayerGraphType),
-                Arguments =new QueryArguments(
-                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "gameName" }
-                    ),
-                Resolver = new FuncFieldResolver<Player>(context => context.Source as Player),
-                Subscriber = new EventStreamResolver<Player>(context =>
-                {
-                    var gameName = context.GetArgument<string>("gameName");
-                    var g = _chat.AddGame(gameName);
-
-                    return g.PlayersStream;
-                })
-            });
-
-            AddField(new EventStreamFieldType
-            {
-                Name = "gameKeystroke",
-                Type = typeof(PlayerKeystrokeGraphType),
-                Arguments = new QueryArguments(
-                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "gameName" }
-                    ),
-                Resolver = new FuncFieldResolver<PlayerKeystroke>(context =>
-                {
-                    return context.Source as PlayerKeystroke;
-                }),
-                Subscriber = new EventStreamResolver<PlayerKeystroke>(context =>
-                {
-                    var gameName = context.GetArgument<string>("gameName");
-                    var g = _chat.AddGame(gameName);
-
-                    return g.PlayersKeystrokeStream;
-                })
-            });
-
-            AddField(new EventStreamFieldType
-            {
                 Name = "keystrokeAdded",
                 Type = typeof(PlayerKeystrokeGraphType),
                 Resolver = new FuncFieldResolver<PlayerKeystroke>(ResolveKeystroke),

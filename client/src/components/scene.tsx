@@ -134,8 +134,7 @@ export class WebGlScene extends React.Component<IWebGlSceneProps, {typist: Typis
                       )} />
             </Card>
           </Col>
-          <Col span={8}>
-            <div ref={el => this.el = el} />
+          <Col span={16} style={{height: "100vh"}}  ref={el => this.el = el}>
           </Col>
         </Row>;
     }

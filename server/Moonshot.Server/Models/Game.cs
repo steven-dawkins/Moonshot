@@ -12,10 +12,7 @@ namespace Moonshot.Server.Models
 
         private ConcurrentDictionary<string, Player> players { get; }
 
-        private readonly MessageObserver<Player> playerObserver;
-        private readonly MessageObserver<PlayerKeystroke> playerKeystrokeObserver;
         private readonly MessageObserver<GameStreamEvent> gameStreamObserver;
-        private readonly ConcurrentQueue<PlayerKeystroke> playerKeystrokes;
 
         public string Name { get; }
 
@@ -27,12 +24,6 @@ namespace Moonshot.Server.Models
 
         public IEnumerable<Player> Players => this.players.Values;
 
-        public IEnumerable<PlayerKeystroke> Keystrokes => this.playerKeystrokes;
-
-        public IObservable<Player> PlayersStream => this.playerObserver;
-
-        public IObservable<PlayerKeystroke> PlayersKeystrokeStream => this.playerKeystrokeObserver;
-
         public IObservable<GameStreamEvent> EventStream => this.gameStreamObserver;
 
         public Game(string name, string gameText)
@@ -41,9 +32,6 @@ namespace Moonshot.Server.Models
             this.GameText = gameText ?? throw new ArgumentNullException(nameof(gameText));
             this.State = GameState.Lobby;
             this.players = new ConcurrentDictionary<string, Player>();
-            this.playerObserver = new MessageObserver<Player>();
-            this.playerKeystrokes = new ConcurrentQueue<PlayerKeystroke>();
-            this.playerKeystrokeObserver = new MessageObserver<PlayerKeystroke>();
             this.gameStreamObserver = new MessageObserver<GameStreamEvent>();
         }
 
@@ -68,7 +56,6 @@ namespace Moonshot.Server.Models
                 this.players[name] = p;
             }
 
-            this.playerObserver.Observe(p);
             this.gameStreamObserver.Observe(new GameStreamEvent(
                                                     GameStreamEvent.EventType.PlayerJoined,
                                                     p.Name,
@@ -85,9 +72,6 @@ namespace Moonshot.Server.Models
         {
             if (this.Started)
             {
-                this.playerKeystrokes.Enqueue(playerKeystroke);
-                this.playerKeystrokeObserver.Observe(playerKeystroke);
-
                 this.gameStreamObserver.Observe(new GameStreamEvent(
                     GameStreamEvent.EventType.Keystroke,
                     playerKeystroke.PlayerName,

@@ -1,7 +1,0 @@
-subscription GameKeystrokes($gameName: String!) {
-  gameKeystroke(gameName: $gameName) {
-    playerName
-    keystroke
-    id
-  }
-}
