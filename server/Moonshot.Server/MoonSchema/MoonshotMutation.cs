@@ -10,29 +10,12 @@ namespace Moonshot.Server.MoonSchema
     {
         public MoonshotMutation(IChat chat)
         {
-            Field<NonNullGraphType<PlayerGraphType>>("join",
-                arguments: new QueryArguments(
-                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "name" },
-                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "gameText" },
-                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "playerName" }
-                ),
-                resolve: context =>
-                {
-                    var name = context.GetArgument<string>("name");
-                    var gameText = context.GetArgument<string>("gameText");
-                    var playerName = context.GetArgument<string>("playerName");
-                    var game = chat.AddGame(name, gameText);
-                    var player = chat.AddPlayer(playerName);
-                    return player;
-                });
-
             // todo: remove?
             Field<NonNullGraphType<GameGraphType>>("createGame",
                 arguments: new QueryArguments(
                     new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "name" },
                     new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "gameText" },
-                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "playerName" },
-                    new QueryArgument<BooleanGraphType> { Name = "started" }
+                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "playerName" }
                 ),
                 resolve: context =>
                 {
@@ -78,19 +61,6 @@ namespace Moonshot.Server.MoonSchema
                     var player = game.AddPlayer(playerName);
 
                     return game;
-                });
-
-            Field<PlayerKeystrokeGraphType>("addKeystroke",
-                arguments: new QueryArguments(
-                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = nameof(PlayerKeystroke.PlayerName) },
-                    new QueryArgument<NonNullGraphType<StringGraphType>> { Name = nameof(PlayerKeystroke.Keystroke) }
-                ),
-                resolve: context =>
-                {
-                    var playerName = context.GetArgument<string>(nameof(PlayerKeystroke.PlayerName));
-                    var keystroke = context.GetArgument<string>(nameof(PlayerKeystroke.Keystroke));
-                    var message = chat.AddKeystroke(new PlayerKeystroke(playerName, keystroke.Single()));
-                    return message;
                 });
 
             Field<PlayerKeystrokeGraphType>("addGameKeystroke",

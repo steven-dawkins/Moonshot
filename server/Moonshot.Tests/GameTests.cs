@@ -107,6 +107,7 @@ namespace Moonshot.Tests
             graphQLResponse.Games[0].Name.Should().Be("Game1");
             graphQLResponse.Games[0].Started.Should().Be(false);
             graphQLResponse.Games[0].GameText.Should().Be("Lorem Ipsum");
+            graphQLResponse.Games[0].Players.Length.Should().Be(1);
         }
 
         [Fact]

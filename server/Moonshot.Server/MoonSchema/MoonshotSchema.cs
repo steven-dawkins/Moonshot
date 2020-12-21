@@ -4,11 +4,11 @@ using Moonshot.Server.Models;
 
 namespace Moonshot.Server.MoonSchema
 {
-    public class ChatSchema : Schema
+    public class MoonshotSchema : Schema
     {
-        public ChatSchema(IChat chat, IServiceProvider provider) : base(provider)
+        public MoonshotSchema(IChat chat, IServiceProvider provider) : base(provider)
         {
-            Query = new GameQuery(chat);
+            Query = new MoonshotQuery(chat);
             Mutation = new MoonshotMutation(chat);
             Subscription = new ChatSubscriptions(chat);
         }

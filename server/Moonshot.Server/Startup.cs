@@ -41,7 +41,7 @@ namespace Moonshot.Server
                                         .AllowAnyMethod()
                                         .AllowAnyHeader()))
                 .AddSingleton<IChat, Chat>()
-                .AddSingleton<ChatSchema>()
+                .AddSingleton<MoonshotSchema>()
                 .AddTransient<EnumerationGraphType<GameStreamEvent.EventType>>()
                 .AddTransient<EnumerationGraphType<Game.GameState>>()
                 .AddGraphQL((options, provider) =>
@@ -56,7 +56,7 @@ namespace Moonshot.Server
                 .AddErrorInfoProvider(opt => opt.ExposeExceptionStackTrace = CurrentEnvironment.IsDevelopment())
                 .AddWebSockets() // Add required services for web socket support
                 .AddDataLoader() // Add required services for DataLoader support
-                .AddGraphTypes(typeof(ChatSchema)) // Add all IGraphType implementors in assembly which ChatSchema exists 
+                .AddGraphTypes(typeof(MoonshotSchema)) // Add all IGraphType implementors in assembly which ChatSchema exists 
                 ;
         }
 
@@ -94,10 +94,10 @@ namespace Moonshot.Server
             app.UseWebSockets();
 
             // use websocket middleware for ChatSchema at path /graphql
-            app.UseGraphQLWebSockets<ChatSchema>("/graphql");
+            app.UseGraphQLWebSockets<MoonshotSchema>("/graphql");
 
             // use HTTP middleware for ChatSchema at path /graphql
-            app.UseGraphQL<ChatSchema>("/graphql");
+            app.UseGraphQL<MoonshotSchema>("/graphql");
 
             // use graphiQL middleware at default url /ui/graphiql
             app.UseGraphiQLServer();

@@ -6,13 +6,10 @@ using Moonshot.Server.MoonSchema.GraphQLTypes;
 
 namespace Moonshot.Server.MoonSchema
 {
-    public class GameQuery : ObjectGraphType
+    public class MoonshotQuery : ObjectGraphType
     {
-        public GameQuery(IChat chat)
+        public MoonshotQuery(IChat chat)
         {
-            Field<ListGraphType<NonNullGraphType<PlayerKeystrokeGraphType>>>("keystrokes", resolve: context => chat.AllMessages.Take(100));
-
-            Field<ListGraphType<NonNullGraphType<PlayerGraphType>>>("players", resolve: context => chat.Players.Take(100));
 
             Field<ListGraphType<NonNullGraphType<GameGraphType>>>("games",
                 arguments: new QueryArguments(

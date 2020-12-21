@@ -53,14 +53,15 @@ export function makeTextSprite(
         }
 
         context.font = "Bold " + fontsize + "px " + fontface;
-        var metrics = context.measureText( message );
-        var textWidth = metrics.width;
 
         context.fillStyle   = "rgba(" + backgroundColor.r + "," + backgroundColor.g + "," + backgroundColor.b + "," + backgroundColor.a + ")";
         context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + "," + borderColor.b + "," + borderColor.a + ")";
 
         context.lineWidth = borderThickness;
         
+        
+        //var metrics = context.measureText( message );
+        //var textWidth = metrics.width;
         //roundRect(context, borderThickness/2, borderThickness/2, (textWidth + borderThickness) * 1.1, fontsize * 1.4 + borderThickness, 8);
 
         context.fillStyle = "rgba("+textColor.r+", "+textColor.g+", "+textColor.b+", 1.0)";

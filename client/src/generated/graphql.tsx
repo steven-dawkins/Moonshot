@@ -11,30 +11,15 @@ export type Scalars = {
   Float: number;
 };
 
-export type GameQuery = {
-  __typename?: 'GameQuery';
+export type MoonshotQuery = {
+  __typename?: 'MoonshotQuery';
   games?: Maybe<Array<Game>>;
-  keystrokes?: Maybe<Array<PlayerKeystroke>>;
-  players?: Maybe<Array<Player>>;
 };
 
 
-export type GameQueryGamesArgs = {
+export type MoonshotQueryGamesArgs = {
   gameName?: Maybe<Scalars['String']>;
   started?: Maybe<Scalars['Boolean']>;
-};
-
-export type PlayerKeystroke = {
-  __typename?: 'PlayerKeystroke';
-  id?: Maybe<Scalars['String']>;
-  keystroke?: Maybe<Scalars['String']>;
-  playerName?: Maybe<Scalars['String']>;
-};
-
-export type Player = {
-  __typename?: 'Player';
-  index: Scalars['Int'];
-  name: Scalars['String'];
 };
 
 export type Game = {
@@ -45,12 +30,17 @@ export type Game = {
   started: Scalars['Boolean'];
 };
 
+export type Player = {
+  __typename?: 'Player';
+  index: Scalars['Int'];
+  keystrokes: Array<Maybe<Scalars['String']>>;
+  name: Scalars['String'];
+};
+
 export type MoonshotMutation = {
   __typename?: 'MoonshotMutation';
   addGameKeystroke?: Maybe<PlayerKeystroke>;
-  addKeystroke?: Maybe<PlayerKeystroke>;
   createGame: Game;
-  join: Player;
   joinGame: Game;
   startGame: Game;
 };
@@ -63,21 +53,7 @@ export type MoonshotMutationAddGameKeystrokeArgs = {
 };
 
 
-export type MoonshotMutationAddKeystrokeArgs = {
-  playerName: Scalars['String'];
-  keystroke: Scalars['String'];
-};
-
-
 export type MoonshotMutationCreateGameArgs = {
-  name: Scalars['String'];
-  gameText: Scalars['String'];
-  playerName: Scalars['String'];
-  started?: Maybe<Scalars['Boolean']>;
-};
-
-
-export type MoonshotMutationJoinArgs = {
   name: Scalars['String'];
   gameText: Scalars['String'];
   playerName: Scalars['String'];
@@ -103,11 +79,16 @@ export enum GameState {
   Started = 'STARTED'
 }
 
+export type PlayerKeystroke = {
+  __typename?: 'PlayerKeystroke';
+  id?: Maybe<Scalars['String']>;
+  keystroke?: Maybe<Scalars['String']>;
+  playerName?: Maybe<Scalars['String']>;
+};
+
 export type ChatSubscriptions = {
   __typename?: 'ChatSubscriptions';
   gameStream?: Maybe<GameStream>;
-  keystrokeAdded?: Maybe<PlayerKeystroke>;
-  playerJoined?: Maybe<Player>;
 };
 
 
@@ -117,7 +98,7 @@ export type ChatSubscriptionsGameStreamArgs = {
 
 export type GameStream = {
   __typename?: 'GameStream';
-  countdown: Scalars['String'];
+  countdown?: Maybe<Scalars['String']>;
   gameState?: Maybe<GameState>;
   keystroke?: Maybe<Scalars['String']>;
   keystrokeId?: Maybe<Scalars['String']>;
@@ -173,7 +154,7 @@ export type GetGamesQueryVariables = Exact<{
 
 
 export type GetGamesQuery = (
-  { __typename?: 'GameQuery' }
+  { __typename?: 'MoonshotQuery' }
   & { games?: Maybe<Array<(
     { __typename?: 'Game' }
     & Pick<Game, 'name' | 'started'>
@@ -203,28 +184,6 @@ export type JoinGameMutation = (
   ) }
 );
 
-export type PlayersSubscriptionVariables = Exact<{ [key: string]: never; }>;
-
-
-export type PlayersSubscription = (
-  { __typename?: 'ChatSubscriptions' }
-  & { playerJoined?: Maybe<(
-    { __typename?: 'Player' }
-    & Pick<Player, 'name' | 'index'>
-  )> }
-);
-
-export type GetPlayersQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetPlayersQuery = (
-  { __typename?: 'GameQuery' }
-  & { players?: Maybe<Array<(
-    { __typename?: 'Player' }
-    & Pick<Player, 'name' | 'index'>
-  )>> }
-);
-
 export type StartGameMutationVariables = Exact<{
   gameName: Scalars['String'];
   gameState: GameState;
@@ -250,17 +209,6 @@ export type GameStreamSubscription = (
   & { gameStream?: Maybe<(
     { __typename?: 'GameStream' }
     & Pick<GameStream, 'keystroke' | 'playerName' | 'type' | 'keystrokeId' | 'playerIndex' | 'gameState' | 'countdown'>
-  )> }
-);
-
-export type KeystrokesSubscriptionVariables = Exact<{ [key: string]: never; }>;
-
-
-export type KeystrokesSubscription = (
-  { __typename?: 'ChatSubscriptions' }
-  & { keystrokeAdded?: Maybe<(
-    { __typename?: 'PlayerKeystroke' }
-    & Pick<PlayerKeystroke, 'playerName' | 'keystroke' | 'id'>
   )> }
 );
 
@@ -421,68 +369,6 @@ export function useJoinGameMutation(baseOptions?: Apollo.MutationHookOptions<Joi
 export type JoinGameMutationHookResult = ReturnType<typeof useJoinGameMutation>;
 export type JoinGameMutationResult = Apollo.MutationResult<JoinGameMutation>;
 export type JoinGameMutationOptions = Apollo.BaseMutationOptions<JoinGameMutation, JoinGameMutationVariables>;
-export const PlayersDocument = gql`
-    subscription Players {
-  playerJoined {
-    name
-    index
-  }
-}
-    `;
-
-/**
- * __usePlayersSubscription__
- *
- * To run a query within a React component, call `usePlayersSubscription` and pass it any options that fit your needs.
- * When your component renders, `usePlayersSubscription` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = usePlayersSubscription({
- *   variables: {
- *   },
- * });
- */
-export function usePlayersSubscription(baseOptions?: Apollo.SubscriptionHookOptions<PlayersSubscription, PlayersSubscriptionVariables>) {
-        return Apollo.useSubscription<PlayersSubscription, PlayersSubscriptionVariables>(PlayersDocument, baseOptions);
-      }
-export type PlayersSubscriptionHookResult = ReturnType<typeof usePlayersSubscription>;
-export type PlayersSubscriptionResult = Apollo.SubscriptionResult<PlayersSubscription>;
-export const GetPlayersDocument = gql`
-    query GetPlayers {
-  players {
-    name
-    index
-  }
-}
-    `;
-
-/**
- * __useGetPlayersQuery__
- *
- * To run a query within a React component, call `useGetPlayersQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetPlayersQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetPlayersQuery({
- *   variables: {
- *   },
- * });
- */
-export function useGetPlayersQuery(baseOptions?: Apollo.QueryHookOptions<GetPlayersQuery, GetPlayersQueryVariables>) {
-        return Apollo.useQuery<GetPlayersQuery, GetPlayersQueryVariables>(GetPlayersDocument, baseOptions);
-      }
-export function useGetPlayersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetPlayersQuery, GetPlayersQueryVariables>) {
-          return Apollo.useLazyQuery<GetPlayersQuery, GetPlayersQueryVariables>(GetPlayersDocument, baseOptions);
-        }
-export type GetPlayersQueryHookResult = ReturnType<typeof useGetPlayersQuery>;
-export type GetPlayersLazyQueryHookResult = ReturnType<typeof useGetPlayersLazyQuery>;
-export type GetPlayersQueryResult = Apollo.QueryResult<GetPlayersQuery, GetPlayersQueryVariables>;
 export const StartGameDocument = gql`
     mutation startGame($gameName: String!, $gameState: GameState!, $countdown: String) {
   startGame(name: $gameName, state: $gameState, countdown: $countdown) {
@@ -552,33 +438,3 @@ export function useGameStreamSubscription(baseOptions: Apollo.SubscriptionHookOp
       }
 export type GameStreamSubscriptionHookResult = ReturnType<typeof useGameStreamSubscription>;
 export type GameStreamSubscriptionResult = Apollo.SubscriptionResult<GameStreamSubscription>;
-export const KeystrokesDocument = gql`
-    subscription Keystrokes {
-  keystrokeAdded {
-    playerName
-    keystroke
-    id
-  }
-}
-    `;
-
-/**
- * __useKeystrokesSubscription__
- *
- * To run a query within a React component, call `useKeystrokesSubscription` and pass it any options that fit your needs.
- * When your component renders, `useKeystrokesSubscription` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the subscription, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useKeystrokesSubscription({
- *   variables: {
- *   },
- * });
- */
-export function useKeystrokesSubscription(baseOptions?: Apollo.SubscriptionHookOptions<KeystrokesSubscription, KeystrokesSubscriptionVariables>) {
-        return Apollo.useSubscription<KeystrokesSubscription, KeystrokesSubscriptionVariables>(KeystrokesDocument, baseOptions);
-      }
-export type KeystrokesSubscriptionHookResult = ReturnType<typeof useKeystrokesSubscription>;
-export type KeystrokesSubscriptionResult = Apollo.SubscriptionResult<KeystrokesSubscription>;

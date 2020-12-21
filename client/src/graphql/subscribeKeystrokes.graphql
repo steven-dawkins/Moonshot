@@ -1,7 +1,0 @@
-subscription Keystrokes {
-  keystrokeAdded {
-    playerName
-    keystroke
-    id
-  }
-}
