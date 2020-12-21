@@ -2,8 +2,6 @@ import * as React from "react";
 import { useState } from "react";
 import { WebGlScene } from "./Scene";
 import {
-    useGameKeystrokesSubscription, useGamePlayersSubscription,
-
     useAddGameKeystrokeMutation,
     useGameStreamSubscription,
     EventType,
@@ -13,13 +11,12 @@ import {
 } from "../generated/graphql";
 import { TypistPlayer } from "../models/TypistPlayer";
 import { Card } from "antd";
-import { Game, LocalGameState } from "../models/Game";
+import { Game } from "../models/Game";
 
 
 export function OnlineApp(props: { game: Game }) {
 
     const [game, setPlayers] = useState(props.game);
-    const [countDown, setCountdown] = useState("");
 
     const { error: gameStreamError } = useGameStreamSubscription({
         variables: {
@@ -39,6 +36,9 @@ export function OnlineApp(props: { game: Game }) {
                     switch(evt.gameState)
                     {
                         case GameState.Countdown:
+                            if (!evt.countdown) {
+                                throw new Error("event countdown is undefined");
+                            }
                             game.startCountdown(evt.countdown);
                             break;
                         case GameState.Started:

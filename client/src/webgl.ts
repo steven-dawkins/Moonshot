@@ -151,9 +151,6 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
         windowDimensions.height = parent.clientHeight;
     }
 
-    const rocketPaths = new RocketPaths(moonPosition, moonRadius, earthRadius, earthPosition, players.length);
-
-
     const labelPosition = (sprite: THREE.Sprite, pos: Vector2) => {
         const labelOffset = 30;
         sprite.position.setX(pos.x + 90 + labelOffset);
@@ -171,6 +168,9 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
         }
         
         backgroundUniforms.u_time.value = elapsedSeconds;
+
+
+        const rocketPaths = new RocketPaths(moonPosition, moonRadius, earthRadius, earthPosition, players.length);
 
         players.map(playerI => {
 
