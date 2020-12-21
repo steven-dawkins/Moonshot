@@ -4,7 +4,7 @@ namespace Moonshot.Server.Models
 {
     public class PlayerKeystroke
     {
-        public PlayerKeystroke(string playerName, string message)
+        public PlayerKeystroke(string playerName, char message)
         {
             this.PlayerName = playerName;
             this.Keystroke = message;
@@ -13,7 +13,7 @@ namespace Moonshot.Server.Models
 
         public string PlayerName { get; }
 
-        public string Keystroke { get; }
+        public char Keystroke { get; }
 
         public Guid Id { get; }
     }

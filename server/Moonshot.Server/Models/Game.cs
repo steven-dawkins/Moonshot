@@ -35,6 +35,11 @@ namespace Moonshot.Server.Models
             this.gameStreamObserver = new MessageObserver<GameStreamEvent>();
         }
 
+        public Player GetPlayer(string name)
+        {
+            return this.players.GetValueOrDefault(name);
+        }
+
         public Player AddPlayer(string name)
         {
             if (this.Started)
@@ -59,7 +64,7 @@ namespace Moonshot.Server.Models
             this.gameStreamObserver.Observe(new GameStreamEvent(
                                                     GameStreamEvent.EventType.PlayerJoined,
                                                     p.Name,
-                                                    null,
+                                                    char.MinValue,
                                                     null,
                                                     p.Index,
                                                     null,
@@ -72,6 +77,15 @@ namespace Moonshot.Server.Models
         {
             if (this.Started)
             {
+                var player = this.GetPlayer(playerKeystroke.PlayerName);
+
+                if (player == null)
+                {
+                    throw new KeystrokeForMissingPlayerException(playerKeystroke.PlayerName);
+                }
+
+                player.AddKeystroke(playerKeystroke.Keystroke);
+
                 this.gameStreamObserver.Observe(new GameStreamEvent(
                     GameStreamEvent.EventType.Keystroke,
                     playerKeystroke.PlayerName,
@@ -96,7 +110,7 @@ namespace Moonshot.Server.Models
             var evt = new GameStreamEvent(
                             GameStreamEvent.EventType.GameStateChanged,
                             null,
-                            null,
+                            char.MinValue,
                             null,
                             null,
                             newGameState,

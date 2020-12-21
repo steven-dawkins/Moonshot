@@ -2,6 +2,7 @@
 using GraphQL;
 using Moonshot.Server.Models;
 using Moonshot.Server.MoonSchema.GraphQLTypes;
+using System.Linq;
 
 namespace Moonshot.Server.MoonSchema
 {
@@ -88,7 +89,7 @@ namespace Moonshot.Server.MoonSchema
                 {
                     var playerName = context.GetArgument<string>(nameof(PlayerKeystroke.PlayerName));
                     var keystroke = context.GetArgument<string>(nameof(PlayerKeystroke.Keystroke));
-                    var message = chat.AddKeystroke(new PlayerKeystroke(playerName, keystroke));
+                    var message = chat.AddKeystroke(new PlayerKeystroke(playerName, keystroke.Single()));
                     return message;
                 });
 
@@ -106,7 +107,7 @@ namespace Moonshot.Server.MoonSchema
                     var playerName = context.GetArgument<string>(nameof(PlayerKeystroke.PlayerName));
 
                     var keystroke = context.GetArgument<string>(nameof(PlayerKeystroke.Keystroke));
-                    var message = game.AddKeystroke(new PlayerKeystroke(playerName, keystroke));
+                    var message = game.AddKeystroke(new PlayerKeystroke(playerName, keystroke.Single()));
                     return message;
                 });
         }

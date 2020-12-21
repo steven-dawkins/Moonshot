@@ -10,7 +10,7 @@ namespace Moonshot.Server.Models
         public GameStreamEvent(
             EventType type, 
             string playerName, 
-            string keystroke,
+            char keystroke,
             Guid? keystrokeId,
             int? playerIndex,
             GameState? gameState,
@@ -29,7 +29,7 @@ namespace Moonshot.Server.Models
 
         public string PlayerName { get; }
 
-        public string Keystroke { get; }
+        public char Keystroke { get; }
 
         public Guid? KeystrokeId { get; }
 

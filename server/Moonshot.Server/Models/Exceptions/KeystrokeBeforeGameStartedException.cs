@@ -3,6 +3,7 @@ using System.Runtime.Serialization;
 
 namespace Moonshot.Server.Models.Exceptions
 {
+
     [Serializable]
     internal class KeystrokeBeforeGameStartedException : Exception
     {

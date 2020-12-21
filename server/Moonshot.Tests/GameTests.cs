@@ -21,11 +21,7 @@ namespace Moonshot.Tests
                         players {
                             name
                             index
-                        }
-                        keystrokes {
-                            id
-                            playerName
-                            keystroke
+                            keystrokes
                         }
                     }
                 }",
@@ -223,11 +219,10 @@ namespace Moonshot.Tests
             graphQLResponse.Games.Length.Should().Be(1);
             graphQLResponse.Games[0].Name.Should().Be(gameName);
             graphQLResponse.Games[0].Players.Count().Should().Be(1);
-            graphQLResponse.Games[0].Players.Single().Name.Should().Be(playerName);
-            graphQLResponse.Games[0].Keystrokes.ElementAt(0).Keystroke.Should().Be("A");
-            graphQLResponse.Games[0].Keystrokes.ElementAt(1).PlayerName.Should().Be(playerName
-                );
-            graphQLResponse.Games[0].Keystrokes.ElementAt(1).Keystroke.Should().Be("A");
+            var p = graphQLResponse.Games[0].Players.Single();
+            p.Name.Should().Be(playerName);
+            p.Keystrokes.ElementAt(0).Should().Be("A");
+            p.Keystrokes.ElementAt(1).Should().Be("A");
         }
 
         public class GraphQlGameModel
@@ -244,14 +239,13 @@ namespace Moonshot.Tests
             public string GameText { get; set; }
 
             public GraphQlPlayerModel[] Players { get; set; }
-
-            public GraphQlPlayerKeystroke[] Keystrokes { get; set; }
         }
 
         public class GraphQlPlayerModel
         {
             public string Name { get; set; }
             public int Index { get; set; }
+            public string[] Keystrokes { get; set; }
         }
 
         public class GraphQlPlayerKeystroke
