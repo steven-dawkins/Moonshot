@@ -35,7 +35,7 @@ export function makeTextSprite(
             borderThickness: 4,
             borderColor: { r:0, g:0, b:0, a:1.0 },
             backgroundColor: { r:255, g:255, b:255, a:1.0 },
-            textColor: { r: 200, g:0, b:0, a:1.0 }
+            textColor: { r: 248, g: 225, b: 108, a: 1.0 }
         }
 
         if ( parameters === undefined ) {

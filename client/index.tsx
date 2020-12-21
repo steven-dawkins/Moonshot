@@ -13,7 +13,7 @@ import 'antd/dist/antd.dark.css';
 
 import { OfflineGame } from "./src/components/OfflineGame";
 
-console.log("Starting Moonshot 1.3");
+console.log("Starting Moonshot 1.4");
 
 const el = document.getElementById("body");
 
