@@ -131,30 +131,6 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
     //     moon.position.x = moonPosition.x * parent.clientWidth / WIDTH;
     // };
 
-    // const fontLoader = new FontLoader();
-
-    // fontLoader.load( 'assets/helvetiker_regular.typeface.json', function ( font ) {
-
-    //   const geometry = new TextGeometry( 'Hello three.js!', {
-    //     font: font,
-    //     size: 60,
-    //     height: 5,
-    //     curveSegments: 12,
-    //     bevelEnabled: true,
-    //     bevelThickness: 10,
-    //     bevelSize: 8,
-    //     bevelOffset: 0,
-    //     bevelSegments: 5
-    //   } );
-
-    //   var textMesh = new Mesh( geometry, material2 );
-    //   textMesh.translateY(100);
-
-    //   scene.add(textMesh);
-    // } );
-
-    
-
     const rockets = new Array<{
         mesh: Object3D,
         flameUniforms: { [uniform: string]: IUniform },
@@ -175,6 +151,16 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
         windowDimensions.height = parent.clientHeight;
     }
 
+    const rocketPaths = new RocketPaths(moonPosition, moonRadius, earthRadius, earthPosition, players.length);
+
+
+    const labelPosition = (sprite: THREE.Sprite, pos: Vector2) => {
+        const labelOffset = 30;
+        sprite.position.setX(pos.x + 90 + labelOffset);
+        sprite.position.setY(pos.y - 35);
+        sprite.position.setZ(51);
+    }
+
     function webglRender(): void {
         var elapsedMilliseconds = Date.now() - startTime;
         var elapsedSeconds = elapsedMilliseconds / 1000.;
@@ -185,8 +171,6 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
         }
         
         backgroundUniforms.u_time.value = elapsedSeconds;
-
-        const rocketPaths = new RocketPaths(moonPosition, moonRadius, earthRadius, earthPosition, players.length);
 
         players.map(playerI => {
 
@@ -216,14 +200,14 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
                 const flameI = CreatePlane(flameMaterial, 50, 50, position.x, position.y, 49);
                 scene.add(flameI);
 
-                const sprite = makeTextSprite(playerI.playerName, undefined);
-                scene.add(sprite);
+                const labelSprite = makeTextSprite(playerI.playerName, undefined);
+                scene.add(labelSprite);
 
                 rockets[i] = {
                     mesh: rocketMesh,
                     flameUniforms: flameUniforms,
                     flameMesh: flameI,
-                    labelSprite: sprite };
+                    labelSprite: labelSprite };
             }
 
             var rocketI = rockets[i];
@@ -232,7 +216,7 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
             rocketI.mesh.position.setY(position.y);
             rocketI.mesh.setRotationFromAxisAngle(new Vector3(0, 0, 1), vector.angle() - Math.PI / 2);
 
-            const flamePosition = position.sub(vector.normalize().multiplyScalar(45));
+            const flamePosition = position.clone().sub(vector.normalize().multiplyScalar(45));
 
             rocketI.flameMesh.position.setX(flamePosition.x);
             rocketI.flameMesh.position.setY(flamePosition.y);
@@ -242,9 +226,7 @@ export function InitWebgl(parent: HTMLDivElement, players: TypistPlayer[]) {
             rocketI.flameUniforms.time.value = elapsedSeconds;
             rocketI.flameUniforms.magnitude.value = Math.min(playerI.typist.WordsPerMinute / 80, 1.0);
 
-            rocketI.labelSprite.position.setX(position.x /*+ 125*/);
-            rocketI.labelSprite.position.setY(position.y);
-            rocketI.labelSprite.position.setZ(150);
+            labelPosition(rocketI.labelSprite, position);
         });
 
         renderer.setSize(windowDimensions.width, windowDimensions.height);
