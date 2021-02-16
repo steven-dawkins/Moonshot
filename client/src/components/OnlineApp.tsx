@@ -119,7 +119,7 @@ function RecievedKeystroke(
     evt: { __typename?: "GameStream" | undefined; } & Pick<GameStream, "keystroke" | "playerName" | "type" | "keystrokeId" | "playerIndex">) {
     {
         if (evt.keystroke && evt.keystrokeId && evt.playerName) {
-            game.addKeystroke(evt.playerName, evt.keystroke, evt.keystrokeId)
+            game.addKeystroke(evt.playerName, evt.keystroke, evt.keystrokeId);
         }
     }
 }

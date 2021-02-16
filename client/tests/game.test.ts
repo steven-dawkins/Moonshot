@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { Game, GameState } from "../src/models/Game";
+import { Game, LocalGameState } from "../src/models/Game";
 import { TypistPlayer } from "../src/models/TypistPlayer";
 
 let defaultPlayer = new TypistPlayer("Default", 0, "");
@@ -11,7 +11,7 @@ describe('Game', function() {
 
         let game = new Game("Game1", [], defaultPlayer, defaultText);
   
-        expect(game.state).equal(GameState.Lobby);
+        expect(game.state).equal(LocalGameState.Lobby);
       }); 
 
     it('process add player', function() {
@@ -30,7 +30,7 @@ describe('Game', function() {
   
         game.startGame();
   
-        expect(game.state).equal(GameState.Started);
+        expect(game.state).equal(LocalGameState.Started);
       }); 
 
     // it('reject add player after start game', function() {
